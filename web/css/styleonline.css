@@ -1,0 +1,868 @@
+/* styleonline.css */
+
+/* --- Reseteo Básico y Fuentes Globales --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F8F9FA; /* Fondo principal */
+    color: #343A40; /* Texto principal */
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #3CB371; /* Verde secundario para títulos principales */
+}
+
+a {
+    text-decoration: none;
+    color: #B0C4DE; /* Celeste principal para enlaces */
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #778899; /* Celeste más oscuro/acento al pasar el ratón */
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* --- Estilos del Header --- */
+.main-header {
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    border-bottom: 1px solid #E9ECEF;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 50px; /* Ajusta según el tamaño de tu logo */
+    margin-right: 15px;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
+.logo-text h1 {
+    font-size: 1.8em;
+    margin: 0;
+    color: #3CB371; /* Verde */
+}
+
+.logo-text p {
+    font-size: 0.85em;
+    margin: 0;
+    color: #6C757D; /* Gris secundario */
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.cart-container a,
+.account-btn {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 0.9em;
+    border: 1px solid transparent;
+}
+
+.cart-container .cart-btn {
+    color: #343A40;
+    border: 1px solid #B0C4DE; /* Borde celeste */
+}
+
+.cart-container .cart-btn:hover {
+    background-color: #B0C4DE; /* Celeste principal */
+    color: #FFFFFF;
+}
+
+.cart-btn i {
+    margin-right: 8px;
+    font-size: 1.2em;
+}
+
+.cart-count {
+    background-color: #3CB371; /* Verde secundario */
+    color: white;
+    border-radius: 50%;
+    padding: 2px 7px;
+    font-size: 0.75em;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.btn-continue-shopping {
+    background-color: #3CB371; /* Verde */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-continue-shopping:hover {
+    background-color: #2E8B57; /* Verde más oscuro */
+    transform: translateY(-2px);
+}
+
+
+.account-dropdown {
+    position: relative;
+}
+
+.account-btn {
+    background-color: transparent;
+    border: 1px solid #B0C4DE;
+    color: #343A40;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.account-btn:hover {
+    background-color: #B0C4DE;
+    color: #FFFFFF;
+}
+
+.account-btn i {
+    margin-right: 8px;
+    font-size: 1.3em;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden; /* Para que los bordes redondeados apliquen a los items */
+    animation: fadeInDropdown 0.3s ease-out;
+}
+
+@keyframes fadeInDropdown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.account-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: #343A40;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9em;
+}
+
+.dropdown-content a i {
+    margin-right: 10px;
+    color: #3CB371; /* Iconos en verde */
+}
+
+.dropdown-content a:hover {
+    background-color: #F0F8FF; /* AliceBlue, un celeste muy claro */
+    color: #3CB371; /* Texto en verde al pasar el ratón */
+}
+
+/* --- Barra de Navegación Principal --- */
+.main-nav {
+    background-color: #3CB371; /* Verde secundario */
+    padding: 0 5%;
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* Centrar elementos de navegación */
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav li {
+    position: relative; /* Para la línea inferior activa */
+}
+
+.main-nav li a {
+    display: block;
+    color: white;
+    padding: 15px 20px;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    position: relative; /* Para el pseudo-elemento */
+    overflow: hidden; /* Para el efecto de línea */
+}
+
+.main-nav li a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%; /* Empieza fuera */
+    width: 100%;
+    height: 3px;
+    background-color: #B0C4DE; /* Celeste para la línea */
+    transition: left 0.4s ease-in-out;
+}
+
+.main-nav li a:hover::before,
+.main-nav li.active a::before {
+    left: 0; /* Se desliza al centro */
+}
+
+.main-nav li a:hover,
+.main-nav li.active a {
+    background-color: rgba(255, 255, 255, 0.1); /* Un ligero resaltado */
+    color: #F0F8FF; /* Un blanco más brillante */
+}
+
+.main-nav li a i {
+    margin-right: 8px;
+}
+
+/* --- Contenido Principal (Product Container & Grid) --- */
+.product-container {
+    flex-grow: 1; /* Para que el footer quede abajo */
+    width: 90%;
+    max-width: 1300px; /* Un poco más ancho para productos */
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.2em;
+    margin-bottom: 30px;
+    color: #343A40; /* Gris oscuro para el título de sección */
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.section-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: #B0C4DE; /* Celeste */
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 25px;
+}
+
+.product-card {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* Para el badge */
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.product-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: #3CB371; /* Verde */
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.product-image-container {
+    width: 100%;
+    padding-top: 75%; /* Aspect ratio 4:3. Ajusta si tus imágenes son diferentes */
+    position: relative;
+    overflow: hidden;
+    background-color: #f0f0f0; /* Placeholder color */
+}
+
+.product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* 'cover' si prefieres que llene, 'contain' para verla completa */
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.08);
+}
+
+.product-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Para que los botones queden abajo */
+}
+
+.product-title {
+    font-size: 1.25em;
+    color: #343A40;
+    margin-bottom: 8px;
+    min-height: 2.5em; /* Para alinear títulos de varias líneas */
+}
+
+.product-price {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #778899; /* Celeste oscuro/acento */
+    margin-bottom: 10px;
+}
+
+.product-description {
+    font-size: 0.9em;
+    color: #6C757D;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Empuja los botones hacia abajo */
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Muestra hasta 3 líneas */
+    -webkit-box-orient: vertical;
+}
+
+.product-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto; /* Asegura que los botones estén al final */
+}
+
+.btn-add-to-cart,
+.btn-buy-now {
+    flex: 1; /* Ocupan el mismo espacio */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-add-to-cart {
+    background-color: #B0C4DE; /* Celeste principal */
+    color: #343A40;
+    border: 1px solid #9FB3C8; /* Borde ligeramente más oscuro */
+}
+
+.btn-add-to-cart:hover {
+    background-color: #9FB3C8;
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+.btn-buy-now {
+    background-color: #3CB371; /* Verde secundario */
+    color: white;
+}
+
+.btn-buy-now:hover {
+    background-color: #2E8B57; /* Verde más oscuro */
+    transform: translateY(-2px);
+}
+
+.btn-add-to-cart i,
+.btn-buy-now i {
+    margin-right: 8px;
+}
+
+/* --- Paginación --- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    padding-bottom: 20px;
+}
+
+.page-link {
+    color: #3CB371; /* Verde */
+    padding: 10px 15px;
+    margin: 0 5px;
+    border: 1px solid #B0C4DE; /* Borde celeste */
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
+    font-weight: 500;
+}
+
+.page-link:hover {
+    background-color: #B0C4DE; /* Celeste */
+    color: white;
+    border-color: #9FB3C8;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.page-link.active {
+    background-color: #3CB371; /* Verde */
+    color: white;
+    border-color: #3CB371;
+    font-weight: bold;
+}
+
+/* --- Estilos del Footer --- */
+.main-footer {
+    background-color: #343A40; /* Gris oscuro para el footer */
+    color: #F8F9FA; /* Texto claro */
+    padding: 40px 5% 20px;
+    margin-top: auto; /* Empuja el footer hacia abajo */
+}
+
+.footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 220px; /* Para que no se encojan demasiado */
+}
+
+.footer-section h3 {
+    font-size: 1.3em;
+    color: #3CB371; /* Verde para títulos de sección en footer */
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.footer-section h3::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background-color: #B0C4DE; /* Celeste */
+    margin-top: 5px;
+}
+
+.footer-section p {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    line-height: 1.7;
+    color: #CED4DA; /* Gris claro para el texto del footer */
+}
+
+.footer-section p i {
+    margin-right: 10px;
+    color: #B0C4DE; /* Iconos en celeste */
+    width: 20px; /* Para alinear texto */
+    text-align: center;
+}
+
+.social-icons a {
+    color: #B0C4DE;
+    font-size: 1.5em;
+    margin-right: 15px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: #FFFFFF;
+    transform: scale(1.1);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #495057; /* Línea divisoria sutil */
+    font-size: 0.85em;
+    color: #ADB5BD; /* Gris más claro para el copyright */
+}
+
+/* --- Estilos de Carrito.jsp --- */
+.cart-container-section {
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.cart-content {
+    display: flex;
+    flex-wrap: wrap; /* Para responsive */
+    gap: 30px;
+}
+
+.cart-items {
+    flex: 2; /* Ocupa más espacio */
+    min-width: 300px; /* Evita que se comprima demasiado */
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th, .cart-table td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #E9ECEF; /* Línea sutil entre filas */
+}
+
+.cart-table th {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #3CB371; /* Verde */
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+.cart-table td {
+    font-size: 0.95em;
+    vertical-align: middle;
+}
+
+.cart-table td img {
+    max-width: 80px; /* Ajusta según necesidad */
+    border-radius: 5px;
+    border: 1px solid #E9ECEF;
+}
+
+.quantity-input {
+    width: 70px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #CED4DA;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quantity-input:focus {
+    border-color: #3CB371; /* Verde al enfocar */
+    box-shadow: 0 0 0 0.2rem rgba(50, 179, 113, 0.25);
+    outline: none;
+}
+
+.btn-remove-item {
+    color: #DC3545; /* Rojo para eliminar */
+    font-weight: 500;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.btn-remove-item:hover {
+    color: #A71D2A; /* Rojo más oscuro */
+    text-decoration: underline;
+}
+
+.cart-summary {
+    flex: 1;
+    min-width: 280px;
+}
+
+.summary-card {
+    background-color: #F8F9FA; /* Fondo ligeramente diferente */
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #E9ECEF;
+}
+
+.summary-header h3 {
+    font-size: 1.4em;
+    color: #343A40;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.summary-body .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+.summary-body .summary-row label {
+    color: #6C757D;
+    font-weight: 500;
+}
+
+.summary-body .summary-row input[type="text"] {
+    border: none;
+    background-color: transparent;
+    text-align: right;
+    font-weight: bold;
+    color: #343A40;
+    width: 120px; /* Ajusta según necesidad */
+    pointer-events: none; /* Para que no sea editable */
+}
+
+.summary-row.total label,
+.summary-row.total input[type="text"] {
+    font-size: 1.15em;
+    font-weight: bold;
+    color: #3CB371; /* Verde para el total */
+}
+
+.summary-footer button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+.summary-footer .btn-payment {
+    background-color: #3CB371; /* Verde */
+    color: white;
+}
+
+.summary-footer .btn-payment:hover {
+    background-color: #2E8B57; /* Verde más oscuro */
+    transform: translateY(-2px);
+}
+
+.summary-footer .btn-generate-order {
+    background-color: #B0C4DE; /* Celeste */
+    color: #343A40;
+    border: 1px solid #9FB3C8;
+}
+
+.summary-footer .btn-generate-order:hover {
+    background-color: #9FB3C8;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* --- Utilidades --- */
+.text-center {
+    text-align: center;
+}
+
+/* --- Estilos Responsivos --- */
+
+/* Tablets y dispositivos más pequeños */
+@media (max-width: 992px) {
+    .header-top {
+        padding: 15px 3%;
+    }
+    .main-nav {
+        padding: 0 3%;
+    }
+    .main-nav ul {
+        justify-content: space-around; /* Mejor distribución en pantallas pequeñas */
+    }
+    .main-nav li a {
+        padding: 12px 10px; /* Menos padding en nav */
+        font-size: 0.9em;
+    }
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .footer-section {
+        width: 80%;
+        max-width: 400px; /* Limitar ancho en modo columna */
+    }
+    .footer-section h3::after {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .cart-content {
+        flex-direction: column;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .logo-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    .logo {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+    .user-actions {
+        width: 100%;
+        justify-content: space-around;
+    }
+    .main-nav ul {
+        flex-direction: column; /* Navegación vertical en móviles */
+        width: 100%;
+    }
+    .main-nav li {
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .main-nav li:last-child {
+        border-bottom: none;
+    }
+    .main-nav li a::before { /* Ajuste para nav vertical */
+      left: 0;
+      bottom: -100%;
+      width: 3px;
+      height: 100%;
+      transition: bottom 0.4s ease-in-out;
+    }
+    .main-nav li a:hover::before,
+    .main-nav li.active a::before {
+        bottom: 0;
+    }
+    .product-grid {
+        grid-template-columns: 1fr; /* Una columna en móviles */
+        gap: 20px;
+    }
+    .product-title {
+        font-size: 1.15em;
+    }
+    .product-price {
+        font-size: 1.3em;
+    }
+    .product-actions {
+        flex-direction: column; /* Botones uno debajo del otro */
+    }
+    .section-title {
+        font-size: 1.8em;
+    }
+    .cart-table thead {
+        display: none; /* Ocultar encabezados de tabla en móvil */
+    }
+    .cart-table tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid #E9ECEF;
+        border-radius: 5px;
+        padding: 10px;
+    }
+    .cart-table td {
+        display: block;
+        text-align: right; /* Alinear a la derecha */
+        padding-left: 50%; /* Dejar espacio para la etiqueta "data-label" */
+        position: relative;
+        border-bottom: none; /* Quitar bordes internos */
+    }
+    .cart-table td::before {
+        content: attr(data-label); /* Usar data-label para mostrar encabezado */
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+        color: #3CB371;
+    }
+    .cart-table td img {
+        float: right; /* Imagen a la derecha */
+        margin-left: 10px;
+    }
+    .quantity-input {
+        width: 60px;
+        float: right;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text h1 {
+        font-size: 1.5em;
+    }
+    .logo-text p {
+        font-size: 0.8em;
+    }
+    .account-btn span { /* Ocultar texto "Mi Cuenta" en pantallas muy pequeñas */
+        display: none;
+    }
+    .account-btn i {
+        margin-right: 0;
+    }
+    .dropdown-content {
+        min-width: 180px;
+    }
+    .page-link {
+        padding: 8px 12px;
+        margin: 0 3px;
+        font-size: 0.9em;
+    }
+}
