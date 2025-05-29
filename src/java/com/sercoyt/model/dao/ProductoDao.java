@@ -164,4 +164,33 @@ public class ProductoDao {
             e.printStackTrace();
         }
     }
+ 
+    public void actualizarStock(Connection con, int idProducto, int cantidad) throws SQLException {
+        String sql = "UPDATE productos SET stock = stock + ? WHERE idProducto = ?";
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, cantidad);
+            ps.setInt(2, idProducto);
+            ps.executeUpdate();
+        }
+    }
+
+    public String obtenerNombreProducto(int idProducto) throws SQLException {
+    String sql = "SELECT nombre FROM productos WHERE idProducto = ?";
+    String nombre = null;
+    
+    try (Connection con = ConnectDB.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql)) {
+        
+        ps.setInt(1, idProducto);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                nombre = rs.getString("nombre");
+            }
+        }
+    }
+    return nombre != null ? nombre : "Producto desconocido";
+}
+
 }
