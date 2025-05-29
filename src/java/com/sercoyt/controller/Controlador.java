@@ -54,7 +54,7 @@ public class Controlador extends HttpServlet {
                                + "FROM productos p "
                                + "JOIN marcas m ON p.idMarca = m.idMarca "
                                + "JOIN categorias c ON p.idCategoria = c.idCategoria "
-                               + "WHERE c.nombre = ?";  // PreparedStatement seguro
+                               + "WHERE c.nombre = ?";
                     List<Producto> productos = pdao.listarConFiltro(sql, nombreCategoria);
                     request.setAttribute("productos", productos);
                     request.getRequestDispatcher("index.jsp").forward(request, response);
@@ -106,11 +106,10 @@ public class Controlador extends HttpServlet {
                 case "ActualizarCantidad":
                     int idpro = Integer.parseInt(request.getParameter("idp"));
                     int cant = Integer.parseInt(request.getParameter("Cantidad"));
-                    cant = Math.max(1, Math.min(cant, 100));  // Límite: 100 unidades
+                    cant = Math.max(1, Math.min(cant, 100));
 
                     for (Carrito item : listaCarrito) {
                         if (item.getIdProducto() == idpro) {
-                            // No superar el stock
                             cant = Math.min(cant, item.getStock());
                             item.setCantidad(cant);
                             item.setSubTotal(item.getPrecioCompra() * cant);
@@ -128,12 +127,12 @@ public class Controlador extends HttpServlet {
                     request.setAttribute("carrito", listaCarrito);
                     request.getRequestDispatcher("carrito.jsp").forward(request, response);
                     break;
+                    
                 case "Comprar":
                     int idProductoComprar = Integer.parseInt(request.getParameter("id"));
                     Producto productoComprar = pdao.listarId(idProductoComprar);
 
                     if (productoComprar != null && productoComprar.getStock() > 0) {
-                        // Verificar si ya está en el carrito
                         boolean encontrado = false;
                         for (Carrito item : listaCarrito) {
                             if (item.getIdProducto() == idProductoComprar) {

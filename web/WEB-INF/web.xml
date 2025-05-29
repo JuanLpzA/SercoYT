@@ -20,6 +20,10 @@
         <servlet-name>AuthFilter</servlet-name>
         <servlet-class>com.sercoyt.controller.AuthFilter</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>VentaControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.VentaControlador</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ServletContextProvider</servlet-name>
         <url-pattern>/ServletContextProvider</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>AuthFilter</servlet-name>
         <url-pattern>/AuthFilter</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VentaControlador</servlet-name>
+        <url-pattern>/VentaControlador</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
