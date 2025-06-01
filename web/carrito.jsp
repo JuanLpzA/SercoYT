@@ -85,11 +85,16 @@
                             <c:choose>
                                 <c:when test="${empty sessionScope.usuario}">
                                     <a href="UsuarioControlador?accion=login&redirect=carrito" class="btn btn-primary">Iniciar Sesión para Pagar</a>
-                                    <button type="button" class="btn btn-success" disabled>Generar Compra</button>
                                 </c:when>
                                 <c:otherwise>
-                                    <button id="btnRealizarPago" class="btn btn-primary">Realizar Pago</button>
-                                    <button id="btnGenerarCompra" class="btn btn-success" style="display:none;">Generar Compra</button>
+                                    <c:choose>
+                                        <c:when test="${not empty carrito and carrito.size() > 0}">
+                                            <button id="btnGenerarCompra" class="btn btn-success">Continuar con Envío</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <button class="btn btn-success" disabled>Continuar con Envío</button>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -97,10 +102,69 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Modal de Pago -->
-        <div id="paymentModal" class="modal-overlay">
+
+        <!-- Modal de Dirección (actualizado) -->
+        <div id="addressModal" class="modal-overlay" style="display:none;">
             <div class="modal-content">
+                <span class="close-modal" id="closeAddressModal">&times;</span>
+                <h3>Dirección de Envío - Lambayeque</h3>
+                <div class="address-form">
+                    <div class="form-group">
+                        <label for="nombreReceptor">Nombre del receptor*</label>
+                        <input type="text" id="nombreReceptor" class="form-control" required>
+                        <div class="error-message" id="nombreReceptorError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefonoContacto">Teléfono de contacto*</label>
+                        <input type="tel" id="telefonoContacto" class="form-control" pattern="[0-9]{9}" maxlength="9" required>
+                        <small class="text-muted">Ingrese un número de 9 dígitos (ej. 987654321)</small>
+                        <div class="error-message" id="telefonoError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="provincia">Provincia*</label>
+                        <select id="provincia" name="provincia" class="form-control" required>
+                            <option value="">Seleccione una provincia</option>
+                            <option value="Chiclayo">Chiclayo</option>
+                            <option value="Ferreñafe">Ferreñafe</option>
+                            <option value="Lambayeque">Lambayeque</option>
+                        </select>
+                        <div class="error-message" id="provinciaError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="autocomplete">Dirección exacta*</label>
+                        <input type="text" id="autocomplete" class="form-control" placeholder="Escribe tu dirección">
+                        <small class="text-muted">Comienza a escribir y selecciona una opción válida</small>
+                        <div class="error-message" id="direccionError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referencia">Referencia adicional (Opcional)</label>
+                        <textarea id="referencia" name="referencia" class="form-control" rows="3"></textarea>
+                        <small class="text-muted">Ejemplo: Frente al colegio tal o Timbre rojo</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codigoPostal">Código postal (Opcional)</label>
+                        <input type="text" id="codigoPostal" class="form-control" maxlength="5" pattern="[0-9]{5}">
+                        <small class="text-muted">Ejemplo: 14000 (Chiclayo), 14100 (Ferreñafe), 14001 (Lambayeque)</small>
+                        <div class="error-message" id="codigoPostalError"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelAddress">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="confirmAddress">Continuar con Pago</button>
+                    </div>
+                </div>
+            </div>
+        </div>                
+
+        <!-- Modal de Pago -->
+        <div id="paymentModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal" id="closePaymentModal">&times;</span>
                 <h3>Método de Pago</h3>
                 <div class="payment-methods">
                     <div class="payment-method" data-method="tarjeta">
@@ -157,81 +221,7 @@
             </div>
         </div>
         
-        <!-- Modal de Dirección -->
-        <div id="addressModal" class="modal-overlay">
-            <div class="modal-content">
-                <h3>Dirección de Envío</h3>
-                <form id="addressForm" class="address-form" action="VentaControlador" method="POST">
-                    <input type="hidden" name="accion" value="guardarDireccion">
-                    <input type="hidden" id="metodoPagoSelected" name="metodoPago" value="">
-                    
-                    <div class="form-group">
-                        <label for="direccion">Dirección Principal*</label>
-                        <input type="text" id="direccion" name="direccion" required 
-                               value="${sessionScope.usuario.direccion}">
-                        <div class="error-message" id="direccionError">Ingrese su dirección principal</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="direccion2">Dirección Secundaria (Opcional)</label>
-                        <input type="text" id="direccion2" name="direccion2">
-                    </div>
-                    
-                    <div style="display: flex; gap: 15px;">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="distrito">Distrito*</label>
-                            <select id="distrito" name="distrito" required>
-                                <option value="">Seleccione un distrito</option>
-                                <option value="Chiclayo">Chiclayo</option>
-                                <option value="Lambayeque">Lambayeque</option>
-                                <option value="Ferreñafe">Ferreñafe</option>
-                                <option value="Monsefú">Monsefú</option>
-                                <option value="Santa Rosa">Santa Rosa</option>
-                                <option value="Pimentel">Pimentel</option>
-                                <option value="Eten">Eten</option>
-                                <option value="José Leonardo Ortiz">José Leonardo Ortiz</option>
-                                <option value="La Victoria">La Victoria</option>
-                                <option value="Picsi">Picsi</option>
-                                <option value="Pomalca">Pomalca</option>
-                                <option value="Reque">Reque</option>
-                                <option value="San José">San José</option>
-                                <option value="Túcume">Túcume</option>
-                            </select>
-                            <div class="error-message" id="distritoError">Seleccione un distrito</div>
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label for="ciudad">Ciudad*</label>
-                            <select id="ciudad" name="ciudad" required>
-                                <option value="">Seleccione una ciudad</option>
-                                <option value="Chiclayo">Chiclayo</option>
-                                <option value="Lambayeque">Lambayeque</option>
-                                <option value="Ferreñafe">Ferreñafe</option>
-                            </select>
-                            <div class="error-message" id="ciudadError">Seleccione una ciudad</div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="referencia">Referencia*</label>
-                        <textarea id="referencia" name="referencia" rows="3" required></textarea>
-                        <small>Ejemplo: Casa verde portón azul, a dos cuadras del parque</small>
-                        <div class="error-message" id="referenciaError">Ingrese una referencia para la entrega</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="tiempoEntrega">Tiempo estimado de entrega:</label>
-                        <select id="tiempoEntrega" name="tiempoEntrega" class="form-control" disabled>
-                            <option>3-5 días hábiles</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelAddress">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Finalizar Compra</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        
         
         <!-- Footer -->
         <footer class="main-footer">

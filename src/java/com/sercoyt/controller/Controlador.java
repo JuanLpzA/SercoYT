@@ -54,7 +54,7 @@ public class Controlador extends HttpServlet {
                                + "FROM productos p "
                                + "JOIN marcas m ON p.idMarca = m.idMarca "
                                + "JOIN categorias c ON p.idCategoria = c.idCategoria "
-                               + "WHERE c.nombre = ?";
+                               + "WHERE c.nombre = ? AND p.stock > 0 AND p.estadoProducto = 'activo'";
                     List<Producto> productos = pdao.listarConFiltro(sql, nombreCategoria);
                     request.setAttribute("productos", productos);
                     request.getRequestDispatcher("index.jsp").forward(request, response);

@@ -141,7 +141,8 @@ public class VentaDao {
                     d.setCantidad(rs.getInt("cantidad"));
                     d.setPrecioUnitario(rs.getDouble("precioUnitario"));
                     d.setSubtotal(rs.getDouble("subtotal"));
-                    // Puedes setear el nombre del producto si lo necesitas
+                    d.setNombreProducto(rs.getString("nombreProducto"));
+          
                     detalles.add(d);
                 }
             }
