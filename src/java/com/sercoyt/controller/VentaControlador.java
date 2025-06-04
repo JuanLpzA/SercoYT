@@ -4,46 +4,42 @@ import com.itextpdf.text.DocumentException;
 import com.sercoyt.model.*;
 import com.sercoyt.model.dao.*;
 import com.sercoyt.util.PDFGenerator;
-import com.sercoyt.model.Carrito;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import javax.servlet.annotation.WebServlet;
+import org.json.JSONObject;
 
 @WebServlet(name = "VentaControlador", urlPatterns = {"/VentaControlador"})
 public class VentaControlador extends HttpServlet {
-    
+
     private final VentaDao ventaDao = new VentaDao();
     private final ClienteDao clienteDao = new ClienteDao();
     private final ProductoDao productoDao = new ProductoDao();
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String accion = request.getParameter("accion");
         accion = (accion == null) ? "" : accion;
-        
+
         HttpSession session = request.getSession();
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        
+
         if (usuario == null) {
             response.sendRedirect("UsuarioControlador?accion=login&redirect=carrito");
             return;
         }
-        
+
         try {
             switch (accion) {
-                case "generarCompra":
-                    generarCompra(request, response, usuario);
-                    break;
-                case "guardarDireccion":
-                    guardarDireccion(request, response, usuario);
+                case "generarCompraCompleta":
+                    generarCompraCompleta(request, response, usuario);
                     break;
                 case "listarCompras":
                     listarCompras(request, response, usuario);
@@ -58,42 +54,34 @@ public class VentaControlador extends HttpServlet {
                     response.sendRedirect("Controlador?accion=Carrito");
             }
         } catch (Exception e) {
-            request.setAttribute("error", "Error al procesar la solicitud: " + e.getMessage());
-            request.getRequestDispatcher("error.jsp").forward(request, response);
+            sendJsonError(response, "Error al procesar la solicitud: " + e.getMessage());
         }
     }
 
-    private void generarCompra(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
-            throws ServletException, IOException, SQLException {
-
-        System.out.println("=== INICIO generarCompra ===");
-        System.out.println("Método de pago recibido: " + request.getParameter("metodoPago"));
+    private void generarCompraCompleta(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
+            throws ServletException, IOException, SQLException, DocumentException {
 
         HttpSession session = request.getSession();
         List<Carrito> carrito = (List<Carrito>) session.getAttribute("carrito");
 
         if (carrito == null || carrito.isEmpty()) {
-            System.out.println("ERROR: Carrito vacío o null");
-            response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"error\": \"El carrito está vacío\"}");
+            sendJsonError(response, "El carrito está vacío");
             return;
         }
 
-        System.out.println("Carrito tiene " + carrito.size() + " items");
-
         try {
-            // Calcular totales
+            // 1. Parsear datos de dirección
+            JSONObject direccionJson = new JSONObject(request.getParameter("direccion"));
+
+            // 2. Calcular totales
             double subtotal = carrito.stream().mapToDouble(Carrito::getSubTotal).sum();
             double igv = redondearDecimales(subtotal * 0.18, 2);
             double total = redondearDecimales(subtotal + igv, 2);
 
-            System.out.println("Subtotal: " + subtotal + ", IGV: " + igv + ", Total: " + total);
-
-            // Crear cliente si no existe
+            // 3. Crear o obtener cliente
             int idCliente = obtenerOcrearCliente(usuario);
-            System.out.println("ID Cliente: " + idCliente);
 
-            // Crear venta
+            // 4. Crear venta
             Venta venta = new Venta();
             venta.setFecha(new Date());
             venta.setIdTipoVenta(2); // Virtual
@@ -105,9 +93,7 @@ public class VentaControlador extends HttpServlet {
             venta.setIgv(igv);
             venta.setTotal(total);
 
-            System.out.println("Venta creada, registrando en BD...");
-
-            // Crear detalles
+            // 5. Crear detalles
             List<DetalleVenta> detalles = new ArrayList<>();
             for (Carrito item : carrito) {
                 DetalleVenta detalle = new DetalleVenta();
@@ -118,91 +104,91 @@ public class VentaControlador extends HttpServlet {
                 detalles.add(detalle);
             }
 
-            System.out.println("Detalles creados: " + detalles.size() + " items");
-
-            // Registrar venta en la base de datos (sin dirección)
+            // 6. Registrar venta y detalles
             int idVenta = ventaDao.registrarVenta(venta, detalles);
-            System.out.println("Venta registrada con ID: " + idVenta);
 
-            // Guardar ID de venta en sesión para el paso de dirección
-            session.setAttribute("idVentaPendiente", idVenta);
+            // 7. Registrar dirección de entrega
+            DireccionEntrega direccion = new DireccionEntrega();
+            direccion.setIdVenta(idVenta);
+            direccion.setDireccion(construirDireccionCompleta(direccionJson));
+            ventaDao.registrarDireccionEntrega(direccion);
 
-            // Responder con JSON de éxito
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            String jsonResponse = "{\"success\": true, \"idVenta\": " + idVenta + "}";
-            System.out.println("Enviando respuesta JSON: " + jsonResponse);
-            response.getWriter().write(jsonResponse);
-            response.getWriter().flush();
+            // 8. Generar y guardar PDF
+            String pdfPath = generarYGuardarBoleta(idVenta);
 
-            System.out.println("=== FIN generarCompra EXITOSO ===");
+            // 9. Limpiar carrito
+            session.removeAttribute("carrito");
+            session.removeAttribute("contador");
+
+            // 10. Responder con éxito
+            sendJsonSuccess(response, idVenta);
 
         } catch (Exception e) {
-            System.out.println("ERROR en generarCompra: " + e.getMessage());
-            e.printStackTrace();
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            String errorResponse = "{\"success\": false, \"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
-            System.out.println("Enviando respuesta de error: " + errorResponse);
-            response.getWriter().write(errorResponse);
-            response.getWriter().flush();
+            sendJsonError(response, "Error al procesar la compra: " + e.getMessage());
         }
     }
 
-    private void guardarDireccion(HttpServletRequest request, HttpServletResponse response, Usuario usuario) 
-        throws ServletException, IOException, SQLException {
-    
-    HttpSession session = request.getSession();
-    Integer idVenta = (Integer) session.getAttribute("idVentaPendiente");
-    
-    if (idVenta == null) {
+    private String construirDireccionCompleta(JSONObject direccionJson) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Receptor: ").append(direccionJson.getString("nombreReceptor"));
+        sb.append(" | Tel: ").append(direccionJson.getString("telefono"));
+        sb.append(" | Provincia: ").append(direccionJson.getString("provincia"));
+        sb.append(" | Dirección: ").append(direccionJson.getString("direccion"));
+
+        if (direccionJson.has("referencia") && !direccionJson.getString("referencia").isEmpty()) {
+            sb.append(" | Ref: ").append(direccionJson.getString("referencia"));
+        }
+
+        if (direccionJson.has("codigoPostal") && !direccionJson.getString("codigoPostal").isEmpty()) {
+            sb.append(" | CP: ").append(direccionJson.getString("codigoPostal"));
+        }
+
+        return sb.toString();
+    }
+
+    private String generarYGuardarBoleta(int idVenta)
+            throws SQLException, IOException, DocumentException {
+
+        Venta venta = ventaDao.obtenerVentaPorId(idVenta);
+        List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
+
+        // Obtener la ruta absoluta al directorio /pdf dentro del contexto del proyecto web
+        String pdfDir = ServletContextProvider.getContextServlet().getRealPath("SercoYT/web/pdf");
+        File dir = new File(pdfDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // Crear nombre de archivo con timestamp
+        String nombreArchivo = "boleta_" + idVenta + "_"
+                + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".pdf";
+
+        String filePath = pdfDir + File.separator + nombreArchivo;
+
+        try (OutputStream fileOut = new FileOutputStream(filePath)) {
+            PDFGenerator.generarBoleta(venta, detalles, fileOut);
+        }
+
+        System.out.println("PDF generado correctamente en: " + filePath);
+        return filePath;
+    }
+
+    private void sendJsonSuccess(HttpServletResponse response, int idVenta) throws IOException {
         response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"No hay venta pendiente para registrar dirección\"}");
-        return;
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"success\": true, \"idVenta\": " + idVenta + "}");
     }
-    
-    // Construir dirección completa
-    String direccionPrincipal = request.getParameter("direccion");
-    String direccionSecundaria = request.getParameter("direccion2");
-    String distrito = request.getParameter("distrito");
-    String ciudad = request.getParameter("ciudad");
-    String referencia = request.getParameter("referencia");
-    
-    StringBuilder direccionCompleta = new StringBuilder();
-    direccionCompleta.append(direccionPrincipal);
-    if (direccionSecundaria != null && !direccionSecundaria.isEmpty()) {
-        direccionCompleta.append(", ").append(direccionSecundaria);
+
+    private void sendJsonError(HttpServletResponse response, String message) throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"success\": false, \"error\": \"" + message + "\"}");
     }
-    direccionCompleta.append(", ").append(distrito);
-    direccionCompleta.append(", ").append(ciudad);
-    direccionCompleta.append(". Referencia: ").append(referencia);
-    
-    // Crear dirección de entrega
-    DireccionEntrega direccion = new DireccionEntrega();
-    direccion.setIdVenta(idVenta);
-    direccion.setDireccion(direccionCompleta.toString());
-    
-    // Actualizar venta con dirección
-    ventaDao.registrarDireccionEntrega(direccion);
-    
-    // Limpiar carrito y venta pendiente
-    session.removeAttribute("carrito");
-    session.removeAttribute("contador");
-    session.removeAttribute("idVentaPendiente");
-    
-    // Guardar ID de venta para mostrar boleta
-    session.setAttribute("ultimaVenta", idVenta);
-    
-    // Responder con JSON incluyendo el ID de venta
-    response.setContentType("application/json");
-    response.getWriter().write("{\"success\": true, \"idVenta\": " + idVenta + "}");
-}
-    
+
     private int obtenerOcrearCliente(Usuario usuario) throws SQLException {
         // Verificar si el cliente ya existe
         Integer idCliente = clienteDao.obtenerIdClientePorDni(usuario.getDni());
-        
+
         if (idCliente == null) {
             // Crear nuevo cliente
             Cliente cliente = new Cliente();
@@ -210,62 +196,95 @@ public class VentaControlador extends HttpServlet {
             cliente.setApellido(usuario.getApellido());
             cliente.setDni(usuario.getDni());
             cliente.setTelefono(usuario.getTelefono());
-            
+
             idCliente = clienteDao.registrarCliente(cliente);
         }
-        
+
         return idCliente;
     }
-    
-    private void listarCompras(HttpServletRequest request, HttpServletResponse response, Usuario usuario) 
+
+    private void listarCompras(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
             throws ServletException, IOException, SQLException {
-        
-        List<Venta> ventas = ventaDao.listarVentasPorUsuario(usuario.getIdUsuario());
+
+        // Obtenemos el DNI del usuario logueado
+        String dniUsuario = usuario.getDni();
+
+        // Buscamos las ventas asociadas a este DNI (a través de la tabla clientes)
+        List<VentaExtra> ventas = ventaDao.listarVentasCompletasPorClienteDni(dniUsuario);
+
         request.setAttribute("ventas", ventas);
-        request.getRequestDispatcher("misCompras.jsp").forward(request, response);
+        request.getRequestDispatcher("misPedidos.jsp").forward(request, response);
     }
-    
-    private void verDetalleCompra(HttpServletRequest request, HttpServletResponse response) 
+
+    private void verDetalleCompra(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
-        
+
         int idVenta = Integer.parseInt(request.getParameter("id"));
-        
+
+        // Primero obtenemos la venta básica
         Venta venta = ventaDao.obtenerVentaPorId(idVenta);
+
+        if (venta == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Venta no encontrada");
+            return;
+        }
+
+        // Convertimos a VentaExtra con todos los datos relacionados
+        VentaExtra ventaExtra = new VentaExtra();
+        ventaExtra.setIdVenta(venta.getIdVenta());
+        ventaExtra.setFecha(venta.getFecha());
+        ventaExtra.setIdTipoVenta(venta.getIdTipoVenta());
+        ventaExtra.setIdCliente(venta.getIdCliente());
+        ventaExtra.setIdUsuario(venta.getIdUsuario());
+        ventaExtra.setIdEstado(venta.getIdEstado());
+        ventaExtra.setIdPago(venta.getIdPago());
+        ventaExtra.setSubtotal(venta.getSubtotal());
+        ventaExtra.setIgv(venta.getIgv());
+        ventaExtra.setTotal(venta.getTotal());
+
+        // Obtenemos los nombres relacionados
+        Map<String, String> nombresRelacionados = ventaDao.obtenerNombresRelacionados(idVenta);
+        ventaExtra.setTipoVentaNombre(nombresRelacionados.get("tipoVentaNombre"));
+        ventaExtra.setClienteNombre(nombresRelacionados.get("clienteNombre"));
+        ventaExtra.setClienteDni(nombresRelacionados.get("clienteDni"));
+        ventaExtra.setEstadoNombre(nombresRelacionados.get("estadoNombre"));
+        ventaExtra.setMetodoPagoNombre(nombresRelacionados.get("metodoPagoNombre"));
+
         List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
         DireccionEntrega direccion = ventaDao.obtenerDireccionEntrega(idVenta);
-        
-        request.setAttribute("venta", venta);
+
+        request.setAttribute("venta", ventaExtra);
         request.setAttribute("detalles", detalles);
         request.setAttribute("direccion", direccion);
         request.getRequestDispatcher("detalleCompra.jsp").forward(request, response);
     }
-    
-    private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response) 
+
+    private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, DocumentException {
-        
+
         int idVenta = Integer.parseInt(request.getParameter("id"));
-        
+
         Venta venta = ventaDao.obtenerVentaPorId(idVenta);
         List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
-        
+
         response.setContentType("application/pdf");
         response.setHeader("Content-disposition", "inline; filename=boleta_" + idVenta + ".pdf");
-        
+
         PDFGenerator.generarBoleta(venta, detalles, response.getOutputStream());
     }
-    
+
     private double redondearDecimales(double valor, int decimales) {
         BigDecimal bd = new BigDecimal(Double.toString(valor));
         bd = bd.setScale(decimales, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

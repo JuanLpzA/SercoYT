@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Función para eliminar producto (se mantiene igual)
-    $("tr #btnDelete").click(function() {
+    $("tr #btnDelete").click(function () {
         var idp = $(this).parent().find("#idp").val();
         swal({
             title: "¿Está seguro de eliminar?",
@@ -193,6 +193,6 @@ $(document).ready(function() {
         }
 
     });
-    
-    
+
+
 });

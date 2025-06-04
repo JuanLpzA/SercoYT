@@ -55,8 +55,8 @@ body {
     color: #444;
 }
 
-.form-group input, 
-.form-group textarea, 
+.form-group input,
+.form-group textarea,
 .form-group select {
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -65,8 +65,8 @@ body {
     transition: all 0.3s ease;
 }
 
-.form-group input:focus, 
-.form-group textarea:focus, 
+.form-group input:focus,
+.form-group textarea:focus,
 .form-group select:focus {
     border-color: #007bff;
     outline: none;
@@ -93,6 +93,7 @@ body {
 .btn-primary {
     background-color: #007bff;
     color: white;
+    text-align: center;
 }
 
 .btn-primary:hover {
@@ -218,7 +219,7 @@ body {
     margin-bottom: 20px;
 }
 
-.cart-table th, 
+.cart-table th,
 .cart-table td {
     padding: 15px 12px;
     text-align: left;
@@ -303,7 +304,7 @@ body {
     font-weight: 500;
 }
 
-.summary-row input, 
+.summary-row input,
 .summary-row span {
     font-size: 14px;
     color: #333;
@@ -324,7 +325,7 @@ body {
     color: #333;
 }
 
-.summary-row.total input, 
+.summary-row.total input,
 .summary-row.total span {
     font-size: 16px;
     font-weight: 600;
@@ -360,11 +361,11 @@ body {
     .cart-content {
         gap: 25px;
     }
-    
+
     .cart-items {
         flex: 1 1 100%;
     }
-    
+
     .cart-summary-container {
         flex: 1 1 100%;
         position: static;
@@ -375,26 +376,26 @@ body {
     .cart-table {
         font-size: 14px;
     }
-    
-    .cart-table th, 
+
+    .cart-table th,
     .cart-table td {
         padding: 12px 8px;
     }
-    
+
     .cart-item-image {
         width: 60px;
         height: 60px;
         margin-right: 10px;
     }
-    
+
     .payment-methods {
         flex-direction: column;
     }
-    
+
     .payment-method {
         flex: 1 1 100%;
     }
-    
+
     .modal-content {
         width: 95%;
         padding: 20px 15px;
@@ -406,17 +407,17 @@ body {
         font-size: 24px;
         margin-bottom: 20px;
     }
-    
+
     .cart-table th {
         display: none;
     }
-    
+
     .cart-table tr {
         display: block;
         margin-bottom: 15px;
         border-bottom: 2px solid #eee;
     }
-    
+
     .cart-table td {
         display: flex;
         justify-content: space-between;
@@ -424,27 +425,27 @@ body {
         padding: 10px 8px;
         border-bottom: none;
     }
-    
+
     .cart-table td::before {
         content: attr(data-label);
         font-weight: 600;
         color: #555;
         margin-right: 15px;
     }
-    
+
     .quantity-input {
         width: 60px;
     }
-    
+
     .btn {
         padding: 8px 15px;
         font-size: 14px;
     }
-    
+
     .form-actions {
         justify-content: center;
     }
-    
+
     .coupon-form {
         flex-direction: column;
     }

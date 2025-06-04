@@ -30,7 +30,7 @@
                         ${error}
                     </div>
                 </c:if>
-                
+
                 <!-- Mostrar éxito si existe -->
                 <c:if test="${not empty exito}">
                     <div class="alert alert-success">
@@ -42,7 +42,7 @@
                 <c:if test="${empty mostrarIngresoCorreo or mostrarIngresoCorreo}">
                     <form action="${pageContext.request.contextPath}/UsuarioControlador" method="POST" class="registro-form">
                         <input type="hidden" name="accion" value="enviarCodigo">
-                        
+
                         <div class="form-group">
                             <label for="correo">Correo Electrónico <span class="required">*</span></label>
                             <input type="email" id="correo" name="correo" required 
@@ -60,20 +60,20 @@
                         </div>
                     </form>
                 </c:if>
-                
+
                 <!-- Paso 2: Ingresar código -->
                 <c:if test="${mostrarIngresoCodigo}">
                     <form action="${pageContext.request.contextPath}/UsuarioControlador" method="POST" class="registro-form">
                         <input type="hidden" name="accion" value="cambiarContrasena">
                         <input type="hidden" name="correo" value="${correo}">
-                        
+
                         <div class="form-group">
                             <label for="codigo">Código de Verificación <span class="required">*</span></label>
                             <input type="text" id="codigo" name="codigo" required 
                                    placeholder="Ingrese el código enviado a su correo" class="form-control">
                             <i class="fas fa-key input-icon"></i>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="nuevaContrasena">Nueva Contraseña <span class="required">*</span></label>
                             <input type="password" id="nuevaContrasena" name="nuevaContrasena" required 
@@ -103,7 +103,7 @@
         <footer class="main-footer">
             <%@include file="resources/commons/footer.jsp" %>
         </footer>    
-        
+
         <!-- Scripts -->
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>    

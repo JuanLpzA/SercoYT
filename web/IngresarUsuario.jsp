@@ -66,7 +66,7 @@
         <footer class="main-footer">
             <%@include file="resources/commons/footer.jsp" %>
         </footer>    
-        
+
         <!-- Scripts -->
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>    

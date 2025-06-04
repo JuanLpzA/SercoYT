@@ -205,7 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si la sección es 'dashboard' o 'estadisticas', (re)inicializar/actualizar gráficos
         if ((sectionId === 'dashboard' || sectionId === 'estadisticas') && contentSections[0].classList.contains('active')) {
             loadDashboardData(); // Esto también inicializará los gráficos del dashboard
-            if (sectionId === 'estadisticas') initStatisticsCharts();
+            if (sectionId === 'estadisticas')
+                initStatisticsCharts();
             resizeCharts();
         }
     }
@@ -221,8 +222,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 showModal(newClientModal);
             });
         }
-        if (closeClientModalBtn) closeClientModalBtn.addEventListener('click', () => hideModal(newClientModal));
-        if (cancelClientBtn) cancelClientBtn.addEventListener('click', () => hideModal(newClientModal));
+        if (closeClientModalBtn)
+            closeClientModalBtn.addEventListener('click', () => hideModal(newClientModal));
+        if (cancelClientBtn)
+            cancelClientBtn.addEventListener('click', () => hideModal(newClientModal));
         if (newClientForm) {
             newClientForm.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -244,8 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addProductBtn) {
             addProductBtn.addEventListener('click', () => openProductModal());
         }
-        if (closeProductModalBtn) closeProductModalBtn.addEventListener('click', () => hideModal(productModal));
-        if (cancelProductBtn) cancelProductBtn.addEventListener('click', () => hideModal(productModal));
+        if (closeProductModalBtn)
+            closeProductModalBtn.addEventListener('click', () => hideModal(productModal));
+        if (cancelProductBtn)
+            cancelProductBtn.addEventListener('click', () => hideModal(productModal));
 
         if (productForm) {
             productForm.addEventListener('submit', (e) => {
@@ -273,8 +278,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cerrar modales al hacer clic fuera del contenido del modal
         window.addEventListener('click', (event) => {
-            if (event.target === newClientModal) hideModal(newClientModal);
-            if (event.target === productModal) hideModal(productModal);
+            if (event.target === newClientModal)
+                hideModal(newClientModal);
+            if (event.target === productModal)
+                hideModal(productModal);
         });
     }
 
@@ -302,10 +309,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateProductModalSelects() {
         // Simulación de carga de categorías y marcas
         const categories = [
-            { id: 1, nombre: 'Electrónicos' }, { id: 2, nombre: 'Ropa' }, { id: 3, nombre: 'Hogar' }
+            {id: 1, nombre: 'Electrónicos'}, {id: 2, nombre: 'Ropa'}, {id: 3, nombre: 'Hogar'}
         ];
         const brands = [
-            { id: 1, nombre: 'Sony' }, { id: 2, nombre: 'Samsung' }, { id: 3, nombre: 'Nike' }
+            {id: 1, nombre: 'Sony'}, {id: 2, nombre: 'Samsung'}, {id: 3, nombre: 'Nike'}
         ];
 
         productCategorySelect.innerHTML = '<option value="">Seleccionar categoría</option>';
@@ -331,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
             });
-             // Activar la primera pestaña por defecto si existe
+            // Activar la primera pestaña por defecto si existe
             if (tabBtns.length > 0) {
                 tabBtns[0].click();
             }
@@ -342,12 +349,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Chart.js Functions ---
     function createOrUpdateChart(canvasId, type, data, options) {
         const ctx = document.getElementById(canvasId)?.getContext('2d');
-        if (!ctx) return;
+        if (!ctx)
+            return;
 
         if (charts[canvasId]) {
             charts[canvasId].destroy();
         }
-        charts[canvasId] = new Chart(ctx, { type, data, options });
+        charts[canvasId] = new Chart(ctx, {type, data, options});
     }
 
     function resizeCharts() {
@@ -363,7 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Dashboard Data & Charts (Simulated) ---
     function loadDashboardData() {
-        if (!totalProductsEl) return; // Si no estamos en el dashboard, salir
+        if (!totalProductsEl)
+            return; // Si no estamos en el dashboard, salir
 
         // Simular carga de datos
         totalProductsEl.textContent = '1,258';
@@ -373,10 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Top Productos
         const topProds = [
-            { name: 'Laptop Gamer XYZ', sales: 150 },
-            { name: 'Mouse Ergonómico', sales: 120 },
-            { name: 'Teclado Mecánico RGB', sales: 95 },
-            { name: 'Monitor Curvo 27"', sales: 70 },
+            {name: 'Laptop Gamer XYZ', sales: 150},
+            {name: 'Mouse Ergonómico', sales: 120},
+            {name: 'Teclado Mecánico RGB', sales: 95},
+            {name: 'Monitor Curvo 27"', sales: 70},
         ];
         topProductsEl.innerHTML = topProds.map(p => `
             <div class="list-item animate__animated animate__fadeInUp">
@@ -393,28 +402,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const salesChartData = {
             labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago'],
             datasets: [{
-                label: 'Ventas 2024',
-                data: [650, 590, 800, 810, 560, 550, 720, 900],
-                borderColor: 'rgba(135, 206, 250, 1)', // Celeste principal
-                backgroundColor: 'rgba(135, 206, 250, 0.2)',
-                tension: 0.3,
-                fill: true,
-            }, {
-                label: 'Ventas 2023 (anterior)',
-                data: [280, 480, 400, 190, 860, 270, 900, 750],
-                borderColor: 'rgba(192, 192, 192, 1)', // Gris
-                backgroundColor: 'rgba(192, 192, 192, 0.2)',
-                tension: 0.3,
-                fill: true,
-            }]
+                    label: 'Ventas 2024',
+                    data: [650, 590, 800, 810, 560, 550, 720, 900],
+                    borderColor: 'rgba(135, 206, 250, 1)', // Celeste principal
+                    backgroundColor: 'rgba(135, 206, 250, 0.2)',
+                    tension: 0.3,
+                    fill: true,
+                }, {
+                    label: 'Ventas 2023 (anterior)',
+                    data: [280, 480, 400, 190, 860, 270, 900, 750],
+                    borderColor: 'rgba(192, 192, 192, 1)', // Gris
+                    backgroundColor: 'rgba(192, 192, 192, 0.2)',
+                    tension: 0.3,
+                    fill: true,
+                }]
         };
-        createOrUpdateChart('salesChart', 'line', salesChartData, { responsive: true, maintainAspectRatio: false });
+        createOrUpdateChart('salesChart', 'line', salesChartData, {responsive: true, maintainAspectRatio: false});
     }
 
 
-    // --- "Vender" Section Logic (Simulated) ---
+    // --- "Vender" 
     function initVenderSection() {
-        if (!clientDniInput) return; // Salir si no estamos en la sección
+        if (!clientDniInput)
+            return; // Salir si no estamos en la sección
 
         searchClientBtn.addEventListener('click', () => {
             const dni = clientDniInput.value.trim();
@@ -452,14 +462,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadProductsForSale(filter = '') {
-        if (!productsListVender) return;
+        if (!productsListVender)
+            return;
         // Simular carga de productos
         const allProducts = [
-            { id: 1, nombre: 'Laptop Pro', precio: 3500, stock: 10, imagen: 'img/laptop.jpg' },
-            { id: 2, nombre: 'Mouse Gamer', precio: 150, stock: 25, imagen: 'img/mouse.jpg' },
-            { id: 3, nombre: 'Teclado RGB', precio: 280, stock: 15, imagen: 'img/keyboard.jpg' },
-            { id: 4, nombre: 'Monitor 24"', precio: 750, stock: 8, imagen: 'img/monitor.jpg' },
-            { id: 5, nombre: 'Webcam HD', precio: 120, stock: 30, imagen: 'img/webcam.jpg' },
+            {id: 1, nombre: 'Laptop Pro', precio: 3500, stock: 10, imagen: 'img/laptop.jpg'},
+            {id: 2, nombre: 'Mouse Gamer', precio: 150, stock: 25, imagen: 'img/mouse.jpg'},
+            {id: 3, nombre: 'Teclado RGB', precio: 280, stock: 15, imagen: 'img/keyboard.jpg'},
+            {id: 4, nombre: 'Monitor 24"', precio: 750, stock: 8, imagen: 'img/monitor.jpg'},
+            {id: 5, nombre: 'Webcam HD', precio: 120, stock: 30, imagen: 'img/webcam.jpg'},
         ];
         const filteredProducts = allProducts.filter(p => p.nombre.toLowerCase().includes(filter.toLowerCase()));
 
@@ -495,14 +506,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function addProductToSale(product) {
         const existingItem = currentSaleItems.find(item => item.id === product.id);
         if (existingItem) {
-            if(existingItem.cantidad < product.stock) {
+            if (existingItem.cantidad < product.stock) {
                 existingItem.cantidad++;
             } else {
                 showSweetAlert('Stock Máximo', `No puede agregar más de ${product.stock} unidades.`, 'warning', 2000);
                 return;
             }
         } else {
-            currentSaleItems.push({ ...product, cantidad: 1, saleItemId: nextSaleItemId++ });
+            currentSaleItems.push({...product, cantidad: 1, saleItemId: nextSaleItemId++});
         }
         updateSaleSummary();
     }
@@ -529,7 +540,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function updateSaleSummary() {
-        if (!saleItemsList) return;
+        if (!saleItemsList)
+            return;
 
         saleItemsList.innerHTML = currentSaleItems.map(item => `
             <div class="sale-item animate__animated animate__fadeIn">
@@ -571,7 +583,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clientDniInput.value = '';
         clientInfoDiv.style.display = 'none';
         newClientBtnVender.style.display = 'none'; // Ocultar botón de nuevo cliente
-        if (productSearchInput) productSearchInput.value = '';
+        if (productSearchInput)
+            productSearchInput.value = '';
         loadProductsForSale(); // Recargar lista de productos original
         updateSaleSummary();
         console.log('Nueva venta iniciada.');
@@ -579,28 +592,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- "Productos" Section Logic (Simulated) ---
     function initProductosSection() {
-        if (!productsTableBody) return; // Salir si no estamos en la sección
+        if (!productsTableBody)
+            return; // Salir si no estamos en la sección
         loadProductsTable();
         populateProductFilters(); // Cargar filtros de categoría y marca
     }
 
     function populateProductFilters() {
         // Simulación
-        const categories = [ { id: "", nombre: "Todas las Categorías"}, { id: 1, nombre: 'Electrónicos' }, { id: 2, nombre: 'Ropa' }];
-        const brands = [ { id: "", nombre: "Todas las Marcas"}, { id: 1, nombre: 'Sony' }, { id: 2, nombre: 'Nike' }];
+        const categories = [{id: "", nombre: "Todas las Categorías"}, {id: 1, nombre: 'Electrónicos'}, {id: 2, nombre: 'Ropa'}];
+        const brands = [{id: "", nombre: "Todas las Marcas"}, {id: 1, nombre: 'Sony'}, {id: 2, nombre: 'Nike'}];
 
         categoryFilter.innerHTML = categories.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
         brandFilter.innerHTML = brands.map(b => `<option value="${b.id}">${b.nombre}</option>`).join('');
     }
 
     function loadProductsTable(filters = {}) {
-        if (!productsTableBody) return;
+        if (!productsTableBody)
+            return;
         // Simulación de carga de productos
         const sampleProducts = [
-            { id: 1, imagen: 'img/laptop.jpg', nombre: 'Laptop Pro X', categoria: 'Electrónicos', marca: 'TechBrand', precio: 4500.00, stock: 15, estado: 'Activo', descripcion: 'Laptop potente', idCategoria: 1, idMarca: 1 },
-            { id: 2, imagen: 'img/mouse.jpg', nombre: 'Mouse Gamer Z', categoria: 'Accesorios', marca: 'GameGear', precio: 120.50, stock: 50, estado: 'Activo', descripcion: 'Mouse preciso', idCategoria: 1, idMarca: 2 },
-            { id: 3, imagen: 'img/keyboard.jpg', nombre: 'Teclado Mecánico K', categoria: 'Accesorios', marca: 'TechBrand', precio: 350.00, stock: 0, estado: 'Inactivo', descripcion: 'Teclado duradero', idCategoria: 1, idMarca: 1 },
-            { id: 4, imagen: 'img/monitor.jpg', nombre: 'Monitor UltraWide', categoria: 'Monitores', marca: 'ViewMax', precio: 1200.00, stock: 5, estado: 'Activo', descripcion: 'Monitor inmersivo', idCategoria: 1, idMarca: 2 },
+            {id: 1, imagen: 'img/laptop.jpg', nombre: 'Laptop Pro X', categoria: 'Electrónicos', marca: 'TechBrand', precio: 4500.00, stock: 15, estado: 'Activo', descripcion: 'Laptop potente', idCategoria: 1, idMarca: 1},
+            {id: 2, imagen: 'img/mouse.jpg', nombre: 'Mouse Gamer Z', categoria: 'Accesorios', marca: 'GameGear', precio: 120.50, stock: 50, estado: 'Activo', descripcion: 'Mouse preciso', idCategoria: 1, idMarca: 2},
+            {id: 3, imagen: 'img/keyboard.jpg', nombre: 'Teclado Mecánico K', categoria: 'Accesorios', marca: 'TechBrand', precio: 350.00, stock: 0, estado: 'Inactivo', descripcion: 'Teclado duradero', idCategoria: 1, idMarca: 1},
+            {id: 4, imagen: 'img/monitor.jpg', nombre: 'Monitor UltraWide', categoria: 'Monitores', marca: 'ViewMax', precio: 1200.00, stock: 5, estado: 'Activo', descripcion: 'Monitor inmersivo', idCategoria: 1, idMarca: 2},
         ];
 
         productsTableBody.innerHTML = sampleProducts.map(p => `
@@ -638,29 +653,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     buttons: ["Cancelar", "Sí, eliminar"],
                     dangerMode: true,
                 })
-                .then((willDelete) => {
-                    if (willDelete) {
-                        // Lógica para eliminar (AJAX)
-                        console.log('Eliminar producto ID:', productId);
-                        showSweetAlert('Eliminado', 'El producto ha sido eliminado.', 'success');
-                        loadProductsTable(); // Recargar
-                    }
-                });
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                // Lógica para eliminar (AJAX)
+                                console.log('Eliminar producto ID:', productId);
+                                showSweetAlert('Eliminado', 'El producto ha sido eliminado.', 'success');
+                                loadProductsTable(); // Recargar
+                            }
+                        });
             });
         });
     }
 
 
-    // --- "Clientes" Section Logic (Simulated) ---
+    // --- "Clientes" 
     function initClientesSection() {
-        if (!clientsTableBody) return;
+        if (!clientsTableBody)
+            return;
         loadClientsTable();
     }
     function loadClientsTable() {
-        if (!clientsTableBody) return;
+        if (!clientsTableBody)
+            return;
         const sampleClients = [
-            { id: 1, nombre: 'Ana', apellido: 'García', dni: '87654321', telefono: '912345678' },
-            { id: 2, nombre: 'Carlos', apellido: 'Lopez', dni: '12345670', telefono: '909876543' },
+            {id: 1, nombre: 'Ana', apellido: 'García', dni: '87654321', telefono: '912345678'},
+            {id: 2, nombre: 'Carlos', apellido: 'Lopez', dni: '12345670', telefono: '909876543'},
         ];
         clientsTableBody.innerHTML = sampleClients.map(c => `
             <tr class="animate__animated animate__fadeIn">
@@ -675,7 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             </tr>
         `).join('');
-         // Add event listeners for edit/view (simulated)
+        // Add event listeners for edit/view (simulated)
         clientsTableBody.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 showSweetAlert('Función Editar', 'Próximamente disponible para clientes.', 'info', 1500);
@@ -687,16 +704,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Reportes (Simulated data)
     function initReportesSection() {
-        if (!presencialReportsBody) return;
+        if (!presencialReportsBody)
+            return;
         loadPresencialReports();
         loadVirtualReports();
         initReportTabs(); // Moverlo aquí para que se ejecute solo cuando la sección de reportes exista.
     }
     function loadPresencialReports() {
-        if (!presencialReportsBody) return;
+        if (!presencialReportsBody)
+            return;
         const data = [
-            { id: 'P001', fecha: '2024-05-20', cliente: 'Juan Pérez', vendedor: 'Admin User', total: 150.00, metodo: 'Efectivo' },
-            { id: 'P002', fecha: '2024-05-21', cliente: 'Ana Solis', vendedor: 'Admin User', total: 85.50, metodo: 'Tarjeta' },
+            {id: 'P001', fecha: '2024-05-20', cliente: 'Juan Pérez', vendedor: 'Admin User', total: 150.00, metodo: 'Efectivo'},
+            {id: 'P002', fecha: '2024-05-21', cliente: 'Ana Solis', vendedor: 'Admin User', total: 85.50, metodo: 'Tarjeta'},
         ];
         presencialReportsBody.innerHTML = data.map(r => `
             <tr><td>${r.id}</td><td>${r.fecha}</td><td>${r.cliente}</td><td>${r.vendedor}</td><td>S/. ${r.total.toFixed(2)}</td><td>${r.metodo}</td>
@@ -704,9 +723,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
     function loadVirtualReports() {
-         if (!virtualReportsBody) return;
+        if (!virtualReportsBody)
+            return;
         const data = [
-            { id: 'V001', fecha: '2024-05-19', cliente: 'Luis Castro', total: 250.00, estado: 'Entregado', direccion: 'Av. Siempreviva 123' },
+            {id: 'V001', fecha: '2024-05-19', cliente: 'Luis Castro', total: 250.00, estado: 'Entregado', direccion: 'Av. Siempreviva 123'},
         ];
         virtualReportsBody.innerHTML = data.map(r => `
             <tr><td>${r.id}</td><td>${r.fecha}</td><td>${r.cliente}</td><td>S/. ${r.total.toFixed(2)}</td><td>${r.estado}</td><td>${r.direccion}</td>
@@ -717,14 +737,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cuentas (Simulated data)
     function initCuentasSection() {
-        if (!accountsTableBody) return;
+        if (!accountsTableBody)
+            return;
         loadAccountsTable();
     }
     function loadAccountsTable() {
-        if (!accountsTableBody) return;
+        if (!accountsTableBody)
+            return;
         const data = [
-            { id: 1, nombre: 'Admin', apellido: 'User', dni: '00000001', correo: 'admin@sercoyt.com', tipo: 'administrador', estado: 'Activo' },
-            { id: 2, nombre: 'Vendedor', apellido: 'Uno', dni: '00000002', correo: 'vendedor1@sercoyt.com', tipo: 'vendedor', estado: 'Activo' },
+            {id: 1, nombre: 'Admin', apellido: 'User', dni: '00000001', correo: 'admin@sercoyt.com', tipo: 'administrador', estado: 'Activo'},
+            {id: 2, nombre: 'Vendedor', apellido: 'Uno', dni: '00000002', correo: 'vendedor1@sercoyt.com', tipo: 'vendedor', estado: 'Activo'},
         ];
         accountsTableBody.innerHTML = data.map(acc => `
             <tr><td>${acc.id}</td><td>${acc.nombre}</td><td>${acc.apellido}</td><td>${acc.dni}</td><td>${acc.correo}</td><td>${acc.tipo}</td>
@@ -736,7 +758,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Estadísticas (Simulated data & charts)
     function initEstadisticasSection() {
-         if (!document.getElementById('categoryChart')) return; // Salir si no estamos en la sección
+        if (!document.getElementById('categoryChart'))
+            return; // Salir si no estamos en la sección
         initStatisticsCharts();
         loadLowStockProducts();
     }
@@ -745,41 +768,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const categoryChartData = {
             labels: ['Electrónicos', 'Ropa', 'Hogar', 'Accesorios'],
             datasets: [{
-                label: 'Ventas',
-                data: [300, 150, 220, 180],
-                backgroundColor: ['#87CEFA', '#FFB6C1', '#90EE90', '#FFDAB9'],
-            }]
+                    label: 'Ventas',
+                    data: [300, 150, 220, 180],
+                    backgroundColor: ['#87CEFA', '#FFB6C1', '#90EE90', '#FFDAB9'],
+                }]
         };
-        createOrUpdateChart('categoryChart', 'doughnut', categoryChartData, { responsive: true, maintainAspectRatio: false });
+        createOrUpdateChart('categoryChart', 'doughnut', categoryChartData, {responsive: true, maintainAspectRatio: false});
 
         // Comparativa Mensual (ejemplo: Ingresos vs Gastos)
         const monthlyCompData = {
             labels: ['Ene', 'Feb', 'Mar', 'Abr'],
             datasets: [
-                { label: 'Ingresos', data: [5000, 6200, 5800, 7100], backgroundColor: 'rgba(52, 211, 153, 0.7)' },
-                { label: 'Gastos', data: [3000, 3500, 3200, 3800], backgroundColor: 'rgba(248, 113, 113, 0.7)' }
+                {label: 'Ingresos', data: [5000, 6200, 5800, 7100], backgroundColor: 'rgba(52, 211, 153, 0.7)'},
+                {label: 'Gastos', data: [3000, 3500, 3200, 3800], backgroundColor: 'rgba(248, 113, 113, 0.7)'}
             ]
         };
-        createOrUpdateChart('monthlyComparisonChart', 'bar', monthlyCompData, { responsive: true, maintainAspectRatio: false });
+        createOrUpdateChart('monthlyComparisonChart', 'bar', monthlyCompData, {responsive: true, maintainAspectRatio: false});
 
-         // Métodos de Pago
+        // Métodos de Pago
         const paymentMethodsData = {
             labels: ['Efectivo', 'Tarjeta', 'Yape/Plin'],
             datasets: [{
-                label: 'Uso',
-                data: [120, 80, 150],
-                backgroundColor: ['#87CEFA', '#FFDEAD', '#98FB98'],
-            }]
+                    label: 'Uso',
+                    data: [120, 80, 150],
+                    backgroundColor: ['#87CEFA', '#FFDEAD', '#98FB98'],
+                }]
         };
-        createOrUpdateChart('paymentMethodsChart', 'pie', paymentMethodsData, { responsive: true, maintainAspectRatio: false });
+        createOrUpdateChart('paymentMethodsChart', 'pie', paymentMethodsData, {responsive: true, maintainAspectRatio: false});
     }
 
     function loadLowStockProducts() {
-        if (!lowStockProductsEl) return;
+        if (!lowStockProductsEl)
+            return;
         const data = [
-            { nombre: 'Monitor UltraWide', stock: 5 },
-            { nombre: 'Silla Gamer Ergo', stock: 3 },
-            { nombre: 'Webcam Pro 4K', stock: 2 },
+            {nombre: 'Monitor UltraWide', stock: 5},
+            {nombre: 'Silla Gamer Ergo', stock: 3},
+            {nombre: 'Webcam Pro 4K', stock: 2},
         ];
         lowStockProductsEl.innerHTML = data.map(p => `
             <div class="list-item animate__animated animate__fadeInUp">
@@ -791,9 +815,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Notificaciones (Simulated)
     function initNotificacionesSection() {
-        if(!notificationsListEl) return;
+        if (!notificationsListEl)
+            return;
         loadNotifications();
-        if(markAllReadBtn) {
+        if (markAllReadBtn) {
             markAllReadBtn.addEventListener('click', () => {
                 notificationsListEl.querySelectorAll('.notification-item.unread').forEach(item => item.classList.remove('unread'));
                 updateNotificationCounts(0);
@@ -802,11 +827,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     function loadNotifications() {
-        if(!notificationsListEl) return;
+        if (!notificationsListEl)
+            return;
         const sampleNotifications = [
-            { id:1, text: 'Producto "Teclado K" tiene bajo stock (0 unidades).', timestamp: 'Hace 5 minutos', unread: true },
-            { id:2, text: 'Producto "Monitor UltraWide" tiene bajo stock (5 unidades).', timestamp: 'Hace 1 hora', unread: true },
-            { id:3, text: 'Nueva venta virtual #V001 registrada.', timestamp: 'Hace 3 horas', unread: false },
+            {id: 1, text: 'Producto "Teclado K" tiene bajo stock (0 unidades).', timestamp: 'Hace 5 minutos', unread: true},
+            {id: 2, text: 'Producto "Monitor UltraWide" tiene bajo stock (5 unidades).', timestamp: 'Hace 1 hora', unread: true},
+            {id: 3, text: 'Nueva venta virtual #V001 registrada.', timestamp: 'Hace 3 horas', unread: false},
         ];
         notificationsListEl.innerHTML = sampleNotifications.map(n => `
             <div class="notification-item ${n.unread ? 'unread' : ''} animate__animated animate__fadeInUp" data-id="${n.id}">
@@ -858,7 +884,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Cargar datos del dashboard si es la sección inicial (la función setActiveSection se encarga de esto, pero una llamada explícita puede ser útil)
         if (document.getElementById('dashboard-section')?.classList.contains('active')) {
-             loadDashboardData();
+            loadDashboardData();
         }
 
         console.log('Dashboard JS Inicializado.');

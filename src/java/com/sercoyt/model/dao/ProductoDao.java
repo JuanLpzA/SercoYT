@@ -18,17 +18,16 @@ public class ProductoDao {
 
     public Producto listarId(int id) {
         String sql = "SELECT p.*, m.nombre as nombreMarca, c.nombre as nombreCategoria "
-                   + "FROM productos p "
-                   + "JOIN marcas m ON p.idMarca = m.idMarca "
-                   + "JOIN categorias c ON p.idCategoria = c.idCategoria "
-                   + "WHERE p.idProducto = ?";
+                + "FROM productos p "
+                + "JOIN marcas m ON p.idMarca = m.idMarca "
+                + "JOIN categorias c ON p.idCategoria = c.idCategoria "
+                + "WHERE p.idProducto = ?";
         Producto p = new Producto();
 
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, id);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     p.setId(rs.getInt("idProducto"));
@@ -51,11 +50,10 @@ public class ProductoDao {
     public List<Producto> listarConFiltro(String sql, String parametroCategoria) {
         List<Producto> productos = new ArrayList<>();
 
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setString(1, parametroCategoria);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Producto p = new Producto();
@@ -80,11 +78,10 @@ public class ProductoDao {
     public List<Producto> listarPorCategoria(String sql, String categoria) {
         List<Producto> productos = new ArrayList<>();
 
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setString(1, categoria);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Producto p = new Producto();
@@ -109,14 +106,12 @@ public class ProductoDao {
     public List<Producto> listar() {
         List<Producto> productos = new ArrayList<>();
         String sql = "SELECT p.*, m.nombre as nombreMarca, c.nombre as nombreCategoria "
-                   + "FROM productos p "
-                   + "JOIN marcas m ON p.idMarca = m.idMarca "
-                   + "JOIN categorias c ON p.idCategoria = c.idCategoria";
+                + "FROM productos p "
+                + "JOIN marcas m ON p.idMarca = m.idMarca "
+                + "JOIN categorias c ON p.idCategoria = c.idCategoria";
 
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 Producto p = new Producto();
                 p.setId(rs.getInt("idProducto"));
@@ -139,18 +134,14 @@ public class ProductoDao {
     public void listarImg(int id, HttpServletResponse response) {
         String sql = "SELECT imagenUrl FROM productos WHERE idProducto = ?";
 
-        try (Connection con = ConnectDB.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             OutputStream outputStream = response.getOutputStream()) {
-            
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql); OutputStream outputStream = response.getOutputStream()) {
+
             ps.setInt(1, id);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    try (InputStream inputStream = rs.getBinaryStream("imagenUrl");
-                         BufferedInputStream bis = new BufferedInputStream(inputStream);
-                         BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
-                        
+                    try (InputStream inputStream = rs.getBinaryStream("imagenUrl"); BufferedInputStream bis = new BufferedInputStream(inputStream); BufferedOutputStream bos = new BufferedOutputStream(outputStream)) {
+
                         byte[] buffer = new byte[4096];
                         int bytesRead;
                         while ((bytesRead = bis.read(buffer)) != -1) {
@@ -164,7 +155,7 @@ public class ProductoDao {
             e.printStackTrace();
         }
     }
- 
+
     public void actualizarStock(Connection con, int idProducto, int cantidad) throws SQLException {
         String sql = "UPDATE productos SET stock = stock + ? WHERE idProducto = ?";
 
@@ -176,21 +167,20 @@ public class ProductoDao {
     }
 
     public String obtenerNombreProducto(int idProducto) throws SQLException {
-    String sql = "SELECT nombre FROM productos WHERE idProducto = ?";
-    String nombre = null;
-    
-    try (Connection con = ConnectDB.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql)) {
-        
-        ps.setInt(1, idProducto);
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                nombre = rs.getString("nombre");
+        String sql = "SELECT nombre FROM productos WHERE idProducto = ?";
+        String nombre = null;
+
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, idProducto);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    nombre = rs.getString("nombre");
+                }
             }
         }
+        return nombre != null ? nombre : "Producto desconocido";
     }
-    return nombre != null ? nombre : "Producto desconocido";
-}
 
 }

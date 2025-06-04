@@ -9,6 +9,7 @@ package com.sercoyt.model;
  * @author Arrunategui
  */
 public class Carrito {
+
     private int item;
     private int idProducto;
     private String nombres;
@@ -16,7 +17,7 @@ public class Carrito {
     private double precioCompra;
     private int cantidad;
     private double subTotal;
-    private int stock; 
+    private int stock;
 
     public Carrito() {
     }
@@ -96,5 +97,4 @@ public class Carrito {
         this.subTotal = subTotal;
     }
 
-    
 }

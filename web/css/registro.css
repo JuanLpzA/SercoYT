@@ -169,15 +169,15 @@
         flex-direction: column;
         gap: 0;
     }
-    
+
     .registro-card {
         margin: 0 15px;
     }
-    
+
     .registro-header {
         padding: 1.8rem;
     }
-    
+
     .registro-form {
         padding: 1.8rem;
     }

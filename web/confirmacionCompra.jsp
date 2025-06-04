@@ -1,4 +1,4 @@
-<!-- En el script JavaScript -->
+
 <script>
     $(document).ready(function() {
         // ... (código existente)

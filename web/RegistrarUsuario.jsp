@@ -62,7 +62,7 @@
                                value="${usuario.dni}">
                         <i class="fas fa-id-card input-icon"></i>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contrasena">Contraseña <span class="required">*</span></label>
@@ -126,12 +126,12 @@
         <footer class="main-footer">
             <%@include file="resources/commons/footer.jsp" %>
         </footer>    
-        
+
         <!-- Scripts -->
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>    
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-        
+
         <!-- Script de validación -->
         <script src="${pageContext.request.contextPath}/js/validacionRegistro.js"></script>
     </body>

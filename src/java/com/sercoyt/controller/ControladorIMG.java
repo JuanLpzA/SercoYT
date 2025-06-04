@@ -18,7 +18,9 @@ import java.sql.SQLException;
  * @author Arrunategui
  */
 public class ControladorIMG extends HttpServlet {
+
     ProductoDao pdao = new ProductoDao();
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -44,7 +46,6 @@ public class ControladorIMG extends HttpServlet {
             out.println("</html>");
         }
     }
-    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
@@ -58,7 +59,7 @@ public class ControladorIMG extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int id=Integer.parseInt(request.getParameter("id"));
+        int id = Integer.parseInt(request.getParameter("id"));
         pdao.listarImg(id, response);
     }
 

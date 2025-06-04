@@ -11,13 +11,14 @@ import java.io.InputStream;
  * @author Arrunategui
  */
 public class Producto {
+
     private int id;
     private String nombres;
     private String descripcion;
     private double precio;
     private int stock;
     private InputStream foto;
-    private String nombreMarca;  
+    private String nombreMarca;
     private String nombreCategoria;
 
     public Producto() {
@@ -97,7 +98,5 @@ public class Producto {
     public void setNombreMarca(String nombreMarca) {
         this.nombreMarca = nombreMarca;
     }
-    
-    
-    
+
 }

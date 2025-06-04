@@ -1,0 +1,671 @@
+/* Reset y variables CSS */
+:root {
+    --primary-green: #3CB371;
+    --secondary-green: #2E8B57;
+    --accent-green: #90EE90;
+    --dark-green: #228B22;
+    --light-green: #F0FFF0;
+    --gradient-primary: linear-gradient(135deg, #3CB371 0%, #2E8B57 100%);
+    --gradient-accent: linear-gradient(135deg, #90EE90 0%, #3CB371 100%);
+    --shadow-light: 0 5px 15px rgba(60, 179, 113, 0.1);
+    --shadow-medium: 0 10px 30px rgba(60, 179, 113, 0.15);
+    --shadow-heavy: 0 20px 40px rgba(60, 179, 113, 0.2);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-radius: 20px;
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Container principal */
+.asesoria-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+    min-height: calc(100vh - 200px);
+    overflow-x: hidden;
+}
+
+/* Hero Section */
+.hero-section {
+    background: var(--gradient-primary);
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-title {
+    color: white;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    letter-spacing: -1px;
+}
+
+.hero-subtitle {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* Títulos de sección renovados */
+.section-title {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 4rem;
+    font-size: 2.8rem;
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 1.5rem;
+    letter-spacing: -0.5px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: var(--accent-green);
+    border-radius: 1px;
+}
+
+/* Sección de Asesoría Online - Ahora primera */
+.asesoria-online {
+    background: #ffffff;
+    padding: 5rem 2rem;
+    position: relative;
+}
+
+.asesoria-online::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50%;
+    width: 200%;
+    height: 100px;
+    background: var(--light-green);
+    transform: rotate(-2deg);
+    transform-origin: center;
+}
+
+.section-description {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 4rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.asesoria-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 3rem;
+    margin-top: 4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.asesoria-card {
+    background: #ffffff;
+    border-radius: var(--border-radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.asesoria-card:nth-child(1) { animation-delay: 0.1s; }
+.asesoria-card:nth-child(2) { animation-delay: 0.2s; }
+.asesoria-card:nth-child(3) { animation-delay: 0.3s; }
+
+.asesoria-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(60, 179, 113, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.asesoria-card:hover::before {
+    left: 100%;
+}
+
+.asesoria-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: var(--shadow-heavy);
+    border-color: var(--primary-green);
+}
+
+.asesoria-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--gradient-primary);
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: white;
+    font-size: 2.5rem;
+    box-shadow: var(--shadow-medium);
+    transition: var(--transition);
+    animation: float 6s ease-in-out infinite;
+}
+
+.asesoria-card:hover .asesoria-icon {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: var(--shadow-heavy);
+}
+
+.asesoria-card h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.asesoria-card:hover h3 {
+    color: var(--primary-green);
+}
+
+.asesoria-card p {
+    color: #6c757d;
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+    font-size: 1.1rem;
+}
+
+.btn-asesoria {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 1.2rem 2.5rem;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    box-shadow: var(--shadow-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-asesoria::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-asesoria:hover::before {
+    left: 100%;
+}
+
+.btn-asesoria:hover {
+    background: var(--gradient-accent);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.btn-asesoria i {
+    font-size: 1.3rem;
+    animation: pulse 2s infinite;
+}
+
+/* Sección de Contacto Renovada */
+.contact-section {
+    background: var(--light-green);
+    padding: 5rem 2rem;
+    position: relative;
+    margin-top: 5rem;
+}
+
+.contact-section::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: #ffffff;
+    transform: skewY(-2deg);
+}
+
+.contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 4rem;
+    align-items: start;
+    position: relative;
+    z-index: 2;
+}
+
+.contact-info {
+    background: #ffffff;
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    border-left: 6px solid var(--primary-green);
+    height: fit-content;
+    animation: slideInLeft 1s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-info::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(60, 179, 113, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.contact-info h3 {
+    color: #2c3e50;
+    margin-bottom: 2.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+}
+
+.contact-info h3::before {
+    content: '📞';
+    font-size: 1.5em;
+    animation: pulse 3s infinite;
+}
+
+.contact-info p {
+    margin-bottom: 1.8rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    transition: var(--transition);
+    position: relative;
+}
+
+.contact-info p:hover {
+    background: var(--light-green);
+    color: var(--dark-green);
+    transform: translateX(10px);
+}
+
+.contact-info i {
+    margin-right: 1.5rem;
+    color: var(--primary-green);
+    width: 25px;
+    text-align: center;
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.contact-info p:hover i {
+    transform: scale(1.2);
+    color: var(--dark-green);
+}
+
+/* Mapa con efectos modernos */
+.map-container {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-heavy);
+    position: relative;
+    animation: slideInRight 1s ease-out;
+}
+
+.map-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--gradient-primary);
+    z-index: 2;
+}
+
+.map-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(60, 179, 113, 0.1), transparent);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.map-container:hover::after {
+    opacity: 1;
+}
+
+.map-container iframe {
+    border: none;
+    width: 100%;
+    height: 450px;
+    filter: grayscale(30%) contrast(1.1);
+    transition: var(--transition);
+}
+
+.map-container:hover iframe {
+    filter: grayscale(0%) contrast(1.2) brightness(1.1);
+}
+
+/* Enlaces sociales premium */
+.social-links {
+    margin-top: 3rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    padding: 1.2rem 2rem;
+    border-radius: 50px;
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+    min-width: 160px;
+    justify-content: center;
+}
+
+.social-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: left 0.4s ease;
+}
+
+.social-btn:hover::before {
+    left: 100%;
+}
+
+.social-btn i {
+    margin-right: 1rem;
+    color: white !important;
+    font-size: 1.3rem;
+    transition: var(--transition);
+}
+
+.social-btn:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: var(--shadow-heavy);
+}
+
+.social-btn:hover i {
+    transform: scale(1.2);
+}
+
+.fb { 
+    background: linear-gradient(135deg, #1877f2, #42a5f5);
+}
+.ig { 
+    background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+}
+.wa { 
+    background: linear-gradient(135deg, #25D366, #128C7E);
+}
+
+/* Responsive Design Mejorado */
+@media (max-width: 1200px) {
+    .asesoria-container {
+        max-width: 100%;
+        padding: 0;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .asesoria-options {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-title {
+        font-size: 2.2rem;
+    }
+    
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    
+    .contact-section {
+        padding: 3rem 1.5rem;
+    }
+    
+    .contact-info {
+        padding: 2.5rem;
+    }
+    
+    .map-container iframe {
+        height: 350px;
+    }
+    
+    .asesoria-options {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .asesoria-card {
+        padding: 2.5rem 2rem;
+    }
+    
+    .social-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .social-btn {
+        width: 250px;
+    }
+    
+    .asesoria-online {
+        padding: 3rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding: 3rem 1rem 1rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .contact-section {
+        padding: 2rem 1rem;
+        margin-top: 3rem;
+    }
+    
+    .contact-info {
+        padding: 2rem;
+    }
+    
+    .asesoria-online {
+        padding: 2rem 1rem;
+    }
+    
+    .asesoria-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .asesoria-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .map-container iframe {
+        height: 300px;
+    }
+    
+    .btn-asesoria {
+        padding: 1rem 2rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Performance optimizations */
+.asesoria-card, .contact-info, .map-container {
+    will-change: transform;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

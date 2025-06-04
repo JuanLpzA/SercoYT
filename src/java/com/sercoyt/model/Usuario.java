@@ -1,7 +1,7 @@
-
 package com.sercoyt.model;
 
 public class Usuario {
+
     private int idUsuario;
     private String nombre;
     private String apellido;
@@ -108,5 +108,5 @@ public class Usuario {
     public void setTipoUsuario(String tipoUsuario) {
         this.tipoUsuario = tipoUsuario;
     }
-   
+
 }
