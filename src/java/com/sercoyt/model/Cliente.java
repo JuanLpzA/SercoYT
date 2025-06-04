@@ -9,6 +9,7 @@ package com.sercoyt.model;
  * @author Arrunategui
  */
 public class Cliente {
+
     private int idCliente;
     private String nombre;
     private String apellido;
@@ -66,9 +67,4 @@ public class Cliente {
         this.telefono = telefono;
     }
 
-
-    
-    
-    
-    
 }

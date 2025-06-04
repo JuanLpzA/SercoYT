@@ -12,17 +12,17 @@
         <header class="main-header">
             <%@include file="resources/commons/header.jsp" %>
         </header>
-        
+
         <main class="registro-container">
             <div class="registro-card">
                 <div class="registro-header" style="background: #4CAF50;">
                     <h2><i class="fas fa-check-circle"></i> ¡Registro Exitoso!</h2>
                 </div>
-                
+
                 <div class="confirmacion-body">
                     <p>Tu cuenta ha sido registrada correctamente.</p>
                     <p>Ahora puedes iniciar sesión con tu DNI y contraseña.</p>
-                    
+
                     <div class="form-footer">
                         <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=login" class="btn-registro">
                             <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </main>
-        
+
         <footer class="main-footer">
             <%@include file="resources/commons/footer.jsp" %>
         </footer>

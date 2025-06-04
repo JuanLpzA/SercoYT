@@ -9,6 +9,7 @@ package com.sercoyt.model;
  * @author Arrunategui
  */
 public class DireccionEntrega {
+
     private int idEntrega;
     private int idVenta;
     private String direccion;
@@ -45,7 +46,5 @@ public class DireccionEntrega {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    
-    
-    
+
 }

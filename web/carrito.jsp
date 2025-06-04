@@ -84,7 +84,7 @@
                         <div class="summary-footer">
                             <c:choose>
                                 <c:when test="${empty sessionScope.usuario}">
-                                    <a href="UsuarioControlador?accion=login&redirect=carrito" class="btn btn-primary">Iniciar Sesión para Pagar</a>
+                                    <a href="UsuarioControlador?accion=login&redirect=carrito" class="btn btn-primary">Iniciar Sesión Para Pagar</a>
                                 </c:when>
                                 <c:otherwise>
                                     <c:choose>

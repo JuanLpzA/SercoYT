@@ -1,6 +1,5 @@
 package com.sercoyt.controller;
 
-
 import com.itextpdf.text.DocumentException;
 import com.sercoyt.model.*;
 import com.sercoyt.model.dao.*;
@@ -18,25 +17,25 @@ import org.json.JSONObject;
 
 @WebServlet(name = "VentaControlador", urlPatterns = {"/VentaControlador"})
 public class VentaControlador extends HttpServlet {
-    
+
     private final VentaDao ventaDao = new VentaDao();
     private final ClienteDao clienteDao = new ClienteDao();
     private final ProductoDao productoDao = new ProductoDao();
-    
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String accion = request.getParameter("accion");
         accion = (accion == null) ? "" : accion;
-        
+
         HttpSession session = request.getSession();
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        
+
         if (usuario == null) {
             response.sendRedirect("UsuarioControlador?accion=login&redirect=carrito");
             return;
         }
-        
+
         try {
             switch (accion) {
                 case "generarCompraCompleta":
@@ -61,27 +60,27 @@ public class VentaControlador extends HttpServlet {
 
     private void generarCompraCompleta(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
             throws ServletException, IOException, SQLException, DocumentException {
-        
+
         HttpSession session = request.getSession();
         List<Carrito> carrito = (List<Carrito>) session.getAttribute("carrito");
-        
+
         if (carrito == null || carrito.isEmpty()) {
             sendJsonError(response, "El carrito está vacío");
             return;
         }
-        
+
         try {
             // 1. Parsear datos de dirección
             JSONObject direccionJson = new JSONObject(request.getParameter("direccion"));
-            
+
             // 2. Calcular totales
             double subtotal = carrito.stream().mapToDouble(Carrito::getSubTotal).sum();
             double igv = redondearDecimales(subtotal * 0.18, 2);
             double total = redondearDecimales(subtotal + igv, 2);
-            
+
             // 3. Crear o obtener cliente
             int idCliente = obtenerOcrearCliente(usuario);
-            
+
             // 4. Crear venta
             Venta venta = new Venta();
             venta.setFecha(new Date());
@@ -93,7 +92,7 @@ public class VentaControlador extends HttpServlet {
             venta.setSubtotal(subtotal);
             venta.setIgv(igv);
             venta.setTotal(total);
-            
+
             // 5. Crear detalles
             List<DetalleVenta> detalles = new ArrayList<>();
             for (Carrito item : carrito) {
@@ -104,26 +103,26 @@ public class VentaControlador extends HttpServlet {
                 detalle.setSubtotal(item.getSubTotal());
                 detalles.add(detalle);
             }
-            
+
             // 6. Registrar venta y detalles
             int idVenta = ventaDao.registrarVenta(venta, detalles);
-            
+
             // 7. Registrar dirección de entrega
             DireccionEntrega direccion = new DireccionEntrega();
             direccion.setIdVenta(idVenta);
             direccion.setDireccion(construirDireccionCompleta(direccionJson));
             ventaDao.registrarDireccionEntrega(direccion);
-            
+
             // 8. Generar y guardar PDF
             String pdfPath = generarYGuardarBoleta(idVenta);
-            
+
             // 9. Limpiar carrito
             session.removeAttribute("carrito");
             session.removeAttribute("contador");
-            
+
             // 10. Responder con éxito
             sendJsonSuccess(response, idVenta);
-            
+
         } catch (Exception e) {
             sendJsonError(response, "Error al procesar la compra: " + e.getMessage());
         }
@@ -173,26 +172,23 @@ public class VentaControlador extends HttpServlet {
         System.out.println("PDF generado correctamente en: " + filePath);
         return filePath;
     }
-    
+
     private void sendJsonSuccess(HttpServletResponse response, int idVenta) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"success\": true, \"idVenta\": " + idVenta + "}");
     }
-    
+
     private void sendJsonError(HttpServletResponse response, String message) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"success\": false, \"error\": \"" + message + "\"}");
     }
-    
-    // Resto de los métodos existentes (listarCompras, verDetalleCompra, generarBoletaPDF, etc.)
-    // ... se mantienen igual que en tu versión original ...
-    
+
     private int obtenerOcrearCliente(Usuario usuario) throws SQLException {
         // Verificar si el cliente ya existe
         Integer idCliente = clienteDao.obtenerIdClientePorDni(usuario.getDni());
-        
+
         if (idCliente == null) {
             // Crear nuevo cliente
             Cliente cliente = new Cliente();
@@ -200,62 +196,95 @@ public class VentaControlador extends HttpServlet {
             cliente.setApellido(usuario.getApellido());
             cliente.setDni(usuario.getDni());
             cliente.setTelefono(usuario.getTelefono());
-            
+
             idCliente = clienteDao.registrarCliente(cliente);
         }
-        
+
         return idCliente;
     }
-    
-    private void listarCompras(HttpServletRequest request, HttpServletResponse response, Usuario usuario) 
+
+    private void listarCompras(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
             throws ServletException, IOException, SQLException {
-        
-        List<Venta> ventas = ventaDao.listarVentasPorUsuario(usuario.getIdUsuario());
+
+        // Obtenemos el DNI del usuario logueado
+        String dniUsuario = usuario.getDni();
+
+        // Buscamos las ventas asociadas a este DNI (a través de la tabla clientes)
+        List<VentaExtra> ventas = ventaDao.listarVentasCompletasPorClienteDni(dniUsuario);
+
         request.setAttribute("ventas", ventas);
-        request.getRequestDispatcher("misCompras.jsp").forward(request, response);
+        request.getRequestDispatcher("misPedidos.jsp").forward(request, response);
     }
-    
-    private void verDetalleCompra(HttpServletRequest request, HttpServletResponse response) 
+
+    private void verDetalleCompra(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
-        
+
         int idVenta = Integer.parseInt(request.getParameter("id"));
-        
+
+        // Primero obtenemos la venta básica
         Venta venta = ventaDao.obtenerVentaPorId(idVenta);
+
+        if (venta == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Venta no encontrada");
+            return;
+        }
+
+        // Convertimos a VentaExtra con todos los datos relacionados
+        VentaExtra ventaExtra = new VentaExtra();
+        ventaExtra.setIdVenta(venta.getIdVenta());
+        ventaExtra.setFecha(venta.getFecha());
+        ventaExtra.setIdTipoVenta(venta.getIdTipoVenta());
+        ventaExtra.setIdCliente(venta.getIdCliente());
+        ventaExtra.setIdUsuario(venta.getIdUsuario());
+        ventaExtra.setIdEstado(venta.getIdEstado());
+        ventaExtra.setIdPago(venta.getIdPago());
+        ventaExtra.setSubtotal(venta.getSubtotal());
+        ventaExtra.setIgv(venta.getIgv());
+        ventaExtra.setTotal(venta.getTotal());
+
+        // Obtenemos los nombres relacionados
+        Map<String, String> nombresRelacionados = ventaDao.obtenerNombresRelacionados(idVenta);
+        ventaExtra.setTipoVentaNombre(nombresRelacionados.get("tipoVentaNombre"));
+        ventaExtra.setClienteNombre(nombresRelacionados.get("clienteNombre"));
+        ventaExtra.setClienteDni(nombresRelacionados.get("clienteDni"));
+        ventaExtra.setEstadoNombre(nombresRelacionados.get("estadoNombre"));
+        ventaExtra.setMetodoPagoNombre(nombresRelacionados.get("metodoPagoNombre"));
+
         List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
         DireccionEntrega direccion = ventaDao.obtenerDireccionEntrega(idVenta);
-        
-        request.setAttribute("venta", venta);
+
+        request.setAttribute("venta", ventaExtra);
         request.setAttribute("detalles", detalles);
         request.setAttribute("direccion", direccion);
         request.getRequestDispatcher("detalleCompra.jsp").forward(request, response);
     }
-    
-    private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response) 
+
+    private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, DocumentException {
-        
+
         int idVenta = Integer.parseInt(request.getParameter("id"));
-        
+
         Venta venta = ventaDao.obtenerVentaPorId(idVenta);
         List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
-        
+
         response.setContentType("application/pdf");
         response.setHeader("Content-disposition", "inline; filename=boleta_" + idVenta + ".pdf");
-        
+
         PDFGenerator.generarBoleta(venta, detalles, response.getOutputStream());
     }
-    
+
     private double redondearDecimales(double valor, int decimales) {
         BigDecimal bd = new BigDecimal(Double.toString(valor));
         bd = bd.setScale(decimales, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

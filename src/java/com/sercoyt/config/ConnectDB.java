@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.DriverManager;
 
 public class ConnectDB {
+
     private static final Logger logger = Logger.getLogger(ConnectDB.class.getName());
     private static HikariDataSource dataSource;
 
@@ -21,7 +22,7 @@ public class ConnectDB {
         try {
             // Cargar explícitamente el driver de MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-            
+
             Properties properties = loadProperties();
             String url = properties.getProperty("database.url");
             String user = properties.getProperty("database.user");
@@ -34,14 +35,14 @@ public class ConnectDB {
             config.setPassword(password);
             config.setMaximumPoolSize(maxPool);
             config.setMinimumIdle(Math.min(5, maxPool));
-            
+
             // Configuración de tiempo de espera
             config.setConnectionTimeout(30000);
             config.setValidationTimeout(5000);
             config.setIdleTimeout(600000);
             config.setMaxLifetime(1800000);
             config.setLeakDetectionThreshold(60000);
-            
+
             // Configuración específica para MySQL
             config.addDataSourceProperty("cachePrepStmts", "true");
             config.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -50,15 +51,15 @@ public class ConnectDB {
             config.addDataSourceProperty("useSSL", "false");
             config.addDataSourceProperty("allowPublicKeyRetrieval", "true");
             config.addDataSourceProperty("autoReconnect", "true");
-            
+
             dataSource = new HikariDataSource(config);
             logger.log(Level.INFO, "Pool de conexiones inicializado correctamente");
-            
+
             // Test connection
             try (Connection conn = dataSource.getConnection()) {
                 logger.log(Level.INFO, "Conexión de prueba exitosa a la base de datos");
             }
-            
+
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error fatal al inicializar el pool de conexiones", e);
             throw new RuntimeException("No se pudo inicializar el pool de conexiones", e);

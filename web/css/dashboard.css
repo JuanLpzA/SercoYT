@@ -369,8 +369,14 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Tarjetas de Estadísticas (Dashboard) */
@@ -409,10 +415,18 @@ body {
     height: 60px;
 }
 
-.stats-primary { background-color: var(--primary-color); }
-.stats-success { background-color: #34d399; } /* Verde */
-.stats-warning { background-color: #f59e0b; } /* Ámbar */
-.stats-info   { background-color: #60a5fa; } /* Azul claro */
+.stats-primary {
+    background-color: var(--primary-color);
+}
+.stats-success {
+    background-color: #34d399;
+} /* Verde */
+.stats-warning {
+    background-color: #f59e0b;
+} /* Ámbar */
+.stats-info   {
+    background-color: #60a5fa;
+} /* Azul claro */
 
 .stats-content h3 {
     margin: 0 0 5px 0;
@@ -606,7 +620,7 @@ textarea.form-control {
     .sale-container {
         grid-template-columns: 1fr 1.5fr 1fr; /* Cliente | Productos | Resumen */
     }
-     .sale-form-card, .products-selection-card, .sale-summary-card {
+    .sale-form-card, .products-selection-card, .sale-summary-card {
         grid-column: span 1;
     }
 }
@@ -619,7 +633,9 @@ textarea.form-control {
     border-radius: var(--border-radius);
     border-left: 4px solid var(--primary-color);
 }
-.client-info p { margin: 5px 0; }
+.client-info p {
+    margin: 5px 0;
+}
 
 .products-grid {
     display: grid;
@@ -674,9 +690,16 @@ textarea.form-control {
     padding: 8px 0;
     font-size: 0.9em;
 }
-.sale-item span:first-child { flex-grow: 1; }
-.sale-item .item-qty { margin: 0 10px; }
-.sale-item .item-remove { color: #ef4444; cursor: pointer; }
+.sale-item span:first-child {
+    flex-grow: 1;
+}
+.sale-item .item-qty {
+    margin: 0 10px;
+}
+.sale-item .item-remove {
+    color: #ef4444;
+    cursor: pointer;
+}
 
 .sale-totals .total-row {
     display: flex;
@@ -750,8 +773,14 @@ textarea.form-control {
     font-size: 0.8em;
     font-weight: 500;
 }
-.status-active { background-color: #d1fae5; color: #065f46; } /* Verde */
-.status-inactive { background-color: #fee2e2; color: #991b1b; } /* Rojo */
+.status-active {
+    background-color: #d1fae5;
+    color: #065f46;
+} /* Verde */
+.status-inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+} /* Rojo */
 
 .action-buttons button {
     background: none;
@@ -763,9 +792,15 @@ textarea.form-control {
     color: #a0aec0;
     transition: color var(--transition-speed) ease;
 }
-.action-buttons button.edit-btn:hover { color: var(--primary-color); }
-.action-buttons button.delete-btn:hover { color: #ef4444; }
-.action-buttons button.view-btn:hover { color: #3b82f6; }
+.action-buttons button.edit-btn:hover {
+    color: var(--primary-color);
+}
+.action-buttons button.delete-btn:hover {
+    color: #ef4444;
+}
+.action-buttons button.view-btn:hover {
+    color: #3b82f6;
+}
 
 
 /* Tabs (Reportes) */
@@ -789,8 +824,13 @@ textarea.form-control {
     color: var(--primary-color-dark);
     border-bottom-color: var(--primary-color-dark);
 }
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.3s; }
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
 
 
 /* Listas (Productos Bajo Stock, Top Productos, Notificaciones) */
@@ -806,9 +846,16 @@ textarea.form-control {
     border-bottom: 1px solid #e9ecef;
     font-size: 0.9em;
 }
-.list-item:last-child { border-bottom: none; }
-.list-item .item-name { font-weight: 500; }
-.list-item .item-value { color: var(--primary-color-dark); font-weight: 600; }
+.list-item:last-child {
+    border-bottom: none;
+}
+.list-item .item-name {
+    font-weight: 500;
+}
+.list-item .item-value {
+    color: var(--primary-color-dark);
+    font-weight: 600;
+}
 
 .notification-item {
     background-color: #f8f9fa;
@@ -821,18 +868,23 @@ textarea.form-control {
 .notification-item.unread {
     background-color: var(--secondary-color);
 }
-.notification-item p { margin: 5px 0; }
-.notification-item .timestamp { font-size: 0.8em; color: #718096; }
+.notification-item p {
+    margin: 5px 0;
+}
+.notification-item .timestamp {
+    font-size: 0.8em;
+    color: #718096;
+}
 
 @keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Modales */
@@ -870,12 +922,22 @@ textarea.form-control {
 }
 
 @keyframes fadeInModalBg {
-  from { opacity: 0; }
-  to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 @keyframes slideInModal {
-  from { opacity: 0; transform: translateY(-30px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modal-header {
@@ -952,7 +1014,7 @@ textarea.form-control {
     .sidebar.collapsed .menu-link {
         justify-content: flex-start;
     }
-     .sidebar.collapsed .logo {
+    .sidebar.collapsed .logo {
         margin-right: 10px;
     }
     .sidebar.collapsed .menu-link i {
@@ -1017,7 +1079,7 @@ textarea.form-control {
     .top-header {
         padding: 10px 15px;
     }
-     .page-title {
+    .page-title {
         font-size: 1.3em;
         margin-left: 10px;
     }
@@ -1049,7 +1111,7 @@ textarea.form-control {
     transition: transform 0.2s ease-out;
 }
 .menu-item.active .menu-link i, .menu-item.active .menu-link span {
-     transform: translateX(0); /* Evitar doble animación */
+    transform: translateX(0); /* Evitar doble animación */
 }
 
 .stats-card, .chart-card, .sale-form-card, .products-selection-card, .sale-summary-card, .data-table, .modal-content {
@@ -1057,14 +1119,14 @@ textarea.form-control {
 }
 
 @keyframes subtlePopIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* Para evitar que el contenido se cargue "feo" antes de que se aplique el JS de las secciones */

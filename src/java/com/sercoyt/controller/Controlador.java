@@ -51,10 +51,10 @@ public class Controlador extends HttpServlet {
                 case "computadoras":
                     String nombreCategoria = capitalizarPrimeraLetra(accion);
                     String sql = "SELECT p.*, m.nombre as nombreMarca, c.nombre as nombreCategoria "
-                               + "FROM productos p "
-                               + "JOIN marcas m ON p.idMarca = m.idMarca "
-                               + "JOIN categorias c ON p.idCategoria = c.idCategoria "
-                               + "WHERE c.nombre = ? AND p.stock > 0 AND p.estadoProducto = 'activo'";
+                            + "FROM productos p "
+                            + "JOIN marcas m ON p.idMarca = m.idMarca "
+                            + "JOIN categorias c ON p.idCategoria = c.idCategoria "
+                            + "WHERE c.nombre = ? AND p.stock > 0 AND p.estadoProducto = 'activo'";
                     List<Producto> productos = pdao.listarConFiltro(sql, nombreCategoria);
                     request.setAttribute("productos", productos);
                     request.getRequestDispatcher("index.jsp").forward(request, response);
@@ -127,7 +127,7 @@ public class Controlador extends HttpServlet {
                     request.setAttribute("carrito", listaCarrito);
                     request.getRequestDispatcher("carrito.jsp").forward(request, response);
                     break;
-                    
+
                 case "Comprar":
                     int idProductoComprar = Integer.parseInt(request.getParameter("id"));
                     Producto productoComprar = pdao.listarId(idProductoComprar);
@@ -171,13 +171,13 @@ public class Controlador extends HttpServlet {
                     break;
             }
         } catch (NumberFormatException e) {
-            response.sendRedirect("Controlador"); 
+            response.sendRedirect("Controlador");
         }
     }
 
     private String capitalizarPrimeraLetra(String str) {
-        return (str == null || str.isEmpty()) 
-            ? str 
-            : str.substring(0, 1).toUpperCase() + str.substring(1);
+        return (str == null || str.isEmpty())
+                ? str
+                : str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 }

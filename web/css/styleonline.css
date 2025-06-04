@@ -189,8 +189,14 @@ img {
 }
 
 @keyframes fadeInDropdown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .account-dropdown:hover .dropdown-content {
@@ -784,11 +790,11 @@ img {
         border-bottom: none;
     }
     .main-nav li a::before { /* Ajuste para nav vertical */
-      left: 0;
-      bottom: -100%;
-      width: 3px;
-      height: 100%;
-      transition: bottom 0.4s ease-in-out;
+        left: 0;
+        bottom: -100%;
+        width: 3px;
+        height: 100%;
+        transition: bottom 0.4s ease-in-out;
     }
     .main-nav li a:hover::before,
     .main-nav li.active a::before {

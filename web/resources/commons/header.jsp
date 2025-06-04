@@ -10,7 +10,7 @@
             <p>Servicio de Computadoras y Tecnología E.I.R.L</p>
         </div>
     </div>
-    
+
     <div class="user-actions">
         <c:choose>
             <c:when test="${param.accion == 'Carrito'}">
@@ -29,7 +29,7 @@
                 </div>
             </c:otherwise>
         </c:choose>
-        
+
         <div class="account-dropdown">
             <button class="account-btn">
                 <i class="fas fa-user-circle"></i>
@@ -48,7 +48,7 @@
                 <c:choose>
                     <c:when test="${not empty sessionScope.usuario}">
                         <a href="UsuarioControlador?accion=perfil"><i class="fas fa-user"></i> Mi Perfil</a>
-                        <a href="VentaControlador?accion=misPedidos"><i class="fas fa-history"></i> Mis Pedidos</a>
+                        <a href="VentaControlador?accion=listarCompras"><i class="fas fa-history"></i> Mis Pedidos</a>
                         <a href="UsuarioControlador?accion=logout"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
                     </c:when>
                     <c:otherwise>

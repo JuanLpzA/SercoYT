@@ -9,15 +9,15 @@ package com.sercoyt.model;
  * @author Arrunategui
  */
 public class DetalleVenta {
-   
+
     private int idDetalle;
     private int idVenta;
     private int idProducto;
     private int cantidad;
     private double precioUnitario;
     private double subtotal;
+
     
-    // Atributos adicionales para relaciones
     private String nombreProducto;
 
     public DetalleVenta() {
@@ -88,7 +88,5 @@ public class DetalleVenta {
     public void setNombreProducto(String nombreProducto) {
         this.nombreProducto = nombreProducto;
     }
-    
-    
-    
+
 }

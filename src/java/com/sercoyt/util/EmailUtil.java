@@ -10,7 +10,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class EmailUtil {
-    // Configuración para Gmail
+
+    // Configuración para el Gmail sercoyt.eirl@gmail.com
     private static final String FROM_EMAIL = "sercoyt.eirl@gmail.com";
     private static final String EMAIL_PASSWORD = "ztubepiniokgsvxz";
     private static final String SMTP_HOST = "smtp.gmail.com";
