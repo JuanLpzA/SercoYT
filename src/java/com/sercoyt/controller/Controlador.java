@@ -163,6 +163,13 @@ public class Controlador extends HttpServlet {
 
                     response.sendRedirect("Controlador?accion=Carrito");
                     break;
+                    
+                case "asesoria":
+                    request.getRequestDispatcher("asesoria.jsp").forward(request, response);
+                    break;
+                case "conocenos":
+                    request.getRequestDispatcher("conocenos.jsp").forward(request, response);
+                    break;
 
                 default:
                     request.setAttribute("productos", pdao.listar());

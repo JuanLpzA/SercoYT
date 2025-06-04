@@ -82,11 +82,11 @@
         <li class="${param.accion == 'computadoras' ? 'active' : ''}">
             <a href="Controlador?accion=computadoras"><i class="fas fa-desktop"></i> Computadoras</a>
         </li>
-        <li>
-            <a href="#"><i class="fas fa-headset"></i> Asesoría</a>
+        <li class="${param.accion == 'asesoria' ? 'active' : ''}">
+            <a href="Controlador?accion=asesoria"><i class="fas fa-headset"></i> Asesoría</a>
         </li>
-        <li>
-            <a href="#"><i class="fas fa-info-circle"></i> Conócenos</a>
+        <li class="${param.accion == 'conocenos' ? 'active' : ''}">
+            <a href="Controlador?accion=conocenos"><i class="fas fa-info-circle"></i> Conócenos</a>
         </li>
     </ul>
 </nav>

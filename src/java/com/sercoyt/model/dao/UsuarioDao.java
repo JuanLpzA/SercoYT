@@ -18,6 +18,10 @@ public class UsuarioDao {
     private static final String SQL_GET_BY_EMAIL = "SELECT * FROM usuarios WHERE correo = ?";
     private static final String SQL_UPDATE_PASSWORD = "UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?";
     private static final String SQL_GET_TIPO_USUARIO = "SELECT nombre FROM tipousuario WHERE idTipoUsuario = ?";
+    private static final String SQL_GET_BY_ID = "SELECT * FROM usuarios WHERE idUsuario = ?";
+    private static final String SQL_UPDATE_PERFIL = "UPDATE usuarios SET nombre = ?, apellido = ?, telefono = ?, direccion = ? WHERE idUsuario = ?";
+    private static final String SQL_UPDATE_PASSWORD_WITH_CHECK = "UPDATE usuarios SET contrasena = ? WHERE idUsuario = ? AND contrasena = ?";
+
 
     public boolean registrarUsuario(Usuario usuario) {
         Connection con = null;
@@ -213,6 +217,83 @@ public class UsuarioDao {
             throw new RuntimeException("Error al obtener tipo de usuario: " + e.getMessage(), e);
         } finally {
             closeResources(con, ps, rs);
+        }
+    }
+    
+    // Creacion para metodos utiles para el apartado de mi perfil
+    public Usuario obtenerUsuarioPorId(int idUsuario) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_GET_BY_ID);
+            ps.setInt(1, idUsuario);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("idUsuario"));
+                usuario.setNombre(rs.getString("nombre"));
+                usuario.setApellido(rs.getString("apellido"));
+                usuario.setCorreo(rs.getString("correo"));
+                usuario.setDni(rs.getString("dni"));
+                usuario.setTelefono(rs.getString("telefono"));
+                usuario.setDireccion(rs.getString("direccion"));
+
+                // Obtener nombre del tipo de usuario
+                int idTipoUsuario = rs.getInt("idTipoUsuario");
+                usuario.setTipoUsuario(obtenerNombreTipoUsuario(idTipoUsuario));
+
+                usuario.setEstado(rs.getString("estadoUsuario"));
+                return usuario;
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al obtener usuario por ID: " + e.getMessage(), e);
+        } finally {
+            closeResources(con, ps, rs);
+        }
+    }
+
+    public boolean actualizarPerfil(Usuario usuario) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_UPDATE_PERFIL);
+            ps.setString(1, usuario.getNombre());
+            ps.setString(2, usuario.getApellido());
+            ps.setString(3, usuario.getTelefono());
+            ps.setString(4, usuario.getDireccion());
+            ps.setInt(5, usuario.getIdUsuario());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar perfil: " + e.getMessage(), e);
+        } finally {
+            closeResources(con, ps, null);
+        }
+    }
+
+    public boolean actualizarContrasenaConValidacion(int idUsuario, String nuevaContrasena, String contrasenaActual) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_UPDATE_PASSWORD_WITH_CHECK);
+            ps.setString(1, PasswordUtil.encriptar(nuevaContrasena));
+            ps.setInt(2, idUsuario);
+            ps.setString(3, PasswordUtil.encriptar(contrasenaActual));
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar contraseña: " + e.getMessage(), e);
+        } finally {
+            closeResources(con, ps, null);
         }
     }
 

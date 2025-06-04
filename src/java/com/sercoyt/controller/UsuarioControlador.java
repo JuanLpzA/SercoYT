@@ -18,6 +18,7 @@ public class UsuarioControlador extends HttpServlet {
     private final String pagLogin = "IngresarUsuario.jsp";
     private final String pagVerificacion = "verificacionCorreo.jsp";
     private final String pagRecuperacion = "recuperarContrasena.jsp";
+    private final String pagPerfil = "perfilUsuario.jsp";
 
     private final UsuarioDao usuarioDao = new UsuarioDao();
 
@@ -58,6 +59,12 @@ public class UsuarioControlador extends HttpServlet {
                 case "logout":
                     logout(request, response);
                     break;
+                case "perfil":
+                    mostrarPerfil(request, response);
+                    break;
+                case "actualizarPerfil":
+                    actualizarPerfil(request, response);
+                    break;  
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -259,6 +266,100 @@ public class UsuarioControlador extends HttpServlet {
             request.getRequestDispatcher(pagLogin).forward(request, response);
         } else {
             throw new RuntimeException("Error al actualizar la contraseña");
+        }
+    }
+
+    // Controladores para el apartado de Mi Perfil
+    private void mostrarPerfil(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Usuario usuarioSesion = (Usuario) session.getAttribute("usuario");
+
+        if (usuarioSesion == null) {
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=login");
+            return;
+        }
+
+        // Obtener datos actualizados del usuario
+        Usuario usuario = usuarioDao.obtenerUsuarioPorId(usuarioSesion.getIdUsuario());
+        request.setAttribute("usuario", usuario);
+        request.getRequestDispatcher(pagPerfil).forward(request, response);
+    }
+
+    private void actualizarPerfil(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Usuario usuarioSesion = (Usuario) session.getAttribute("usuario");
+
+        if (usuarioSesion == null) {
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=login");
+            return;
+        }
+
+        try {
+            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+
+            // Verificar que el usuario que edita es el mismo de la sesión
+            if (usuarioSesion.getIdUsuario() != idUsuario) {
+                throw new RuntimeException("No tienes permiso para editar este perfil");
+            }
+
+            // Obtener datos del formulario
+            String nombre = request.getParameter("nombre");
+            String apellido = request.getParameter("apellido");
+            String telefono = request.getParameter("telefono");
+            String direccion = request.getParameter("direccion");
+            String contrasenaActual = request.getParameter("contrasenaActual");
+            String nuevaContrasena = request.getParameter("nuevaContrasena");
+            String confirmarContrasena = request.getParameter("confirmarContrasena");
+
+            // Validaciones básicas
+            if (nombre == null || nombre.isEmpty() || apellido == null || apellido.isEmpty() || direccion == null || direccion.isEmpty()) {
+                throw new RuntimeException("Nombre, apellido y dirección son campos obligatorios");
+            }
+
+            // Actualizar datos del usuario
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(idUsuario);
+            usuario.setNombre(nombre);
+            usuario.setApellido(apellido);
+            usuario.setTelefono(telefono);
+            usuario.setDireccion(direccion);
+
+            // Actualizar perfil
+            usuarioDao.actualizarPerfil(usuario);
+
+            // Actualizar contraseña si se proporcionó
+            if (nuevaContrasena != null && !nuevaContrasena.isEmpty()) {
+                if (contrasenaActual == null || contrasenaActual.isEmpty()) {
+                    throw new RuntimeException("Debes ingresar tu contraseña actual para cambiarla");
+                }
+
+                if (!nuevaContrasena.equals(confirmarContrasena)) {
+                    throw new RuntimeException("Las contraseñas nuevas no coinciden");
+                }
+
+                if (!PasswordUtil.esContrasenaValida(nuevaContrasena)) {
+                    throw new RuntimeException("La contraseña debe tener al menos 8 caracteres, incluyendo números y letras");
+                }
+
+                boolean contrasenaActualizada = usuarioDao.actualizarContrasenaConValidacion(
+                        idUsuario, nuevaContrasena, contrasenaActual);
+
+                if (!contrasenaActualizada) {
+                    throw new RuntimeException("La contraseña actual es incorrecta");
+                }
+            }
+
+            // Actualizar datos en sesión
+            Usuario usuarioActualizado = usuarioDao.obtenerUsuarioPorId(idUsuario);
+            session.setAttribute("usuario", usuarioActualizado);
+
+            request.setAttribute("success", "Perfil actualizado correctamente");
+            mostrarPerfil(request, response);
+        } catch (Exception e) {
+            request.setAttribute("error", e.getMessage());
+            mostrarPerfil(request, response);
         }
     }
 
