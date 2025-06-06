@@ -178,13 +178,13 @@ public class UsuarioControlador extends HttpServlet {
 
         switch (usuario.getTipoUsuario()) {
             case "administrador":
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/DashboardControlador");
                 break;
             case "vendedor":
                 response.sendRedirect(request.getContextPath() + "/vendedor/dashboard.jsp");
                 break;
             default: // cliente
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                response.sendRedirect(request.getContextPath() + "/Controlador");
         }
     }
 
@@ -228,7 +228,7 @@ public class UsuarioControlador extends HttpServlet {
         if (session != null) {
             session.invalidate();
         }
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/Controlador");
     }
 
     private void cambiarContrasena(HttpServletRequest request, HttpServletResponse response)

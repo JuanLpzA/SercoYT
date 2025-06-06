@@ -24,6 +24,22 @@
         <servlet-name>VentaControlador</servlet-name>
         <servlet-class>com.sercoyt.controller.VentaControlador</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProductoControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.ProductoControlador</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MarcaControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.MarcaControlador</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CategoriaControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.CategoriaControlador</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DashboardControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.DashboardControlador</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ServletContextProvider</servlet-name>
         <url-pattern>/ServletContextProvider</url-pattern>
@@ -48,13 +64,28 @@
         <servlet-name>VentaControlador</servlet-name>
         <url-pattern>/VentaControlador</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProductoControlador</servlet-name>
+        <url-pattern>/ProductoControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MarcaControlador</servlet-name>
+        <url-pattern>/MarcaControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CategoriaControlador</servlet-name>
+        <url-pattern>/CategoriaControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DashboardControlador</servlet-name>
+        <url-pattern>/DashboardControlador</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
     <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>index.html</welcome-file>
+        <welcome-file>Controlador</welcome-file>
     </welcome-file-list>
 </web-app>
