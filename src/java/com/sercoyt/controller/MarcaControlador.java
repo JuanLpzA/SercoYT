@@ -95,15 +95,22 @@ public class MarcaControlador extends HttpServlet {
             Marca marca = new Marca();
             marca.setNombre(request.getParameter("nombre"));
             marca.setEstado("activo");
-            
-            if (marcaDao.insertar(marca) > 0) {
-                response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=listar&exito=guardar");
+
+            int idGenerado = marcaDao.insertar(marca);
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            if (idGenerado > 0) {
+                response.getWriter().write("{\"exito\": true}");
             } else {
-                response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=nuevo&error=guardar");
+                response.getWriter().write("{\"error\": \"Error al guardar la marca\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=nuevo&error=guardar");
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 

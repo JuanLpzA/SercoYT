@@ -277,7 +277,7 @@
                                     </div>
                                     <div class="form-field">
                                         <label for="marca" class="required">Marca</label>
-                                        <select class="form-control select2" id="marca" name="marca" required>
+                                        <select class="form-control select2" id="marca" name="marca" required data-tags="true">
                                             <option value="">Seleccionar marca</option>
                                             <c:forEach var="marca" items="${marcas}">
                                                 <option value="${marca.nombre}">${marca.nombre}</option>
@@ -304,7 +304,7 @@
                                 <div class="form-grid cols-1">
                                     <div class="form-field">
                                         <label for="imagen" class="required">Imagen</label>
-                                        <div class="file-upload-area" onclick="document.getElementById('imagen').click()">
+                                        <div class="file-upload-area" id="nuevoProductoUploadArea">
                                             <div class="file-upload-icon">
                                                 <i class="fas fa-cloud-upload-alt"></i>
                                             </div>
@@ -314,6 +314,9 @@
                                             <div class="file-upload-subtext">
                                                 JPG, PNG, JPEG - Máximo 2MB
                                             </div>
+                                            <div class="image-preview-container" id="nuevoProductoPreview" style="display: none;">
+                                                <img id="nuevoProductoPreviewImage" src="" alt="Vista previa">
+                                            </div>
                                         </div>
                                         <input type="file" class="form-control" id="imagen" name="imagen" 
                                                accept="image/*" required style="display: none;">
@@ -322,7 +325,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -385,7 +388,8 @@
                                 <div class="form-grid cols-2">
                                     <div class="form-field">
                                         <label for="edit_marca" class="required">Marca</label>
-                                        <select class="form-control select2" id="edit_marca" name="marca" required>
+       
+                                        <select class="form-control select2" id="edit_marca" name="marca" required data-tags="true">
                                             <option value="">Seleccionar marca</option>
                                             <c:forEach var="marca" items="${marcas}">
                                                 <option value="${marca.nombre}">${marca.nombre}</option>
@@ -412,7 +416,7 @@
                                 <div class="form-grid cols-1">
                                     <div class="form-field">
                                         <label for="edit_imagen">Nueva Imagen</label>
-                                        <div class="file-upload-area" onclick="document.getElementById('edit_imagen').click()">
+                                        <div class="file-upload-area" onclick="if (document.getElementById('edit_imagen').offsetParent !== null) document.getElementById('edit_imagen').onclick()">
                                             <div class="file-upload-icon">
                                                 <i class="fas fa-cloud-upload-alt"></i>
                                             </div>
@@ -438,7 +442,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -477,7 +481,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >Cancelar</button>
                             <button type="submit" class="btn btn-primary">Actualizar</button>
                         </div>
                     </form>
@@ -499,510 +503,82 @@
                         ¿Está seguro que desea realizar esta acción?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >Cancelar</button>
                         <a href="#" class="btn btn-danger" id="btn-confirmar">Confirmar</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Nueva Marca -->
-        <div class="modal fade" id="nuevaMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Crear Nueva Marca</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form id="nuevaMarcaForm">
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label for="nuevaMarcaNombre">Nombre de la Marca *</label>
-                                <input type="text" class="form-control" id="nuevaMarcaNombre" required
-                                       maxlength="50" pattern="[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s\-]+" 
-                                       title="Solo letras, números y espacios">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Marca</button>
-                        </div>
-                    </form>
-                </div>
+        <!-- Modal Nueva Marca - Versión mejorada -->
+<div class="modal fade" id="nuevaMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-tag"></i> Crear Nueva Marca
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <form id="nuevaMarcaForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nuevaMarcaNombre">Nombre de la Marca *</label>
+                        <input type="text" class="form-control" id="nuevaMarcaNombre" required
+                               maxlength="50" pattern="[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s\-]+" 
+                               title="Solo letras, números y espacios">
+                        <input type="hidden" id="origenMarca" value="">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Marca
+                    </button>
+                </div>
+            </form>
         </div>
-
-        <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
-        <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
-        <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-$(document).ready(function () {
-   // Función para destruir Select2 antes de reinicializar
-   function destroySelect2InModal(modalId) {
-       $(modalId + ' .select2').each(function() {
-           if ($(this).hasClass('select2-hidden-accessible')) {
-               $(this).select2('destroy');
-           }
-       });
-   }
-
-   // Función para inicializar Select2 específicamente para modales
-   function initSelect2InModal(modalId) {
-    $(modalId + ' .select2').select2({
-        placeholder: "Seleccione una opción",
-        allowClear: true,
-        dropdownParent: $(modalId), // Puntero directo al modal
-        width: '100%'
-    });
-}
-
-   // Inicializar Select2 para filtros (fuera de modales)
-   $('.filter-card .select2').select2({
-       placeholder: "Seleccione una opción",
-       allowClear: true,
-       width: '100%'
-   });
-
-   // Mostrar nombre de archivo en input file
-   $('.custom-file-input').on('change', function () {
-       let fileName = $(this).val().split('\\').pop();
-       $(this).next('.custom-file-label').addClass("selected").html(fileName);
-
-       // Agregar clase visual cuando hay archivo
-       $(this).closest('.file-upload-area').addClass('has-file');
-   });
-
-   // Mejorar el área de upload de archivos
-   function setupFileUpload(inputId, areaId) {
-       const $input = $(inputId);
-       const $area = $(areaId);
-
-       $area.on('click', function () {
-           $input.click();
-       });
-
-       $area.on('dragover', function (e) {
-           e.preventDefault();
-           $(this).addClass('dragover');
-       });
-
-       $area.on('dragleave', function (e) {
-           e.preventDefault();
-           $(this).removeClass('dragover');
-       });
-
-       $area.on('drop', function (e) {
-           e.preventDefault();
-           $(this).removeClass('dragover');
-
-           const files = e.originalEvent.dataTransfer.files;
-           if (files.length > 0) {
-               $input[0].files = files;
-               $input.trigger('change');
-           }
-       });
-   }
-
-   // Manejar el botón de nuevo producto
-   $('#btnNuevoProducto').click(function () {
-       $('#nuevoProductoForm')[0].reset();
-       $('#nuevoProductoModal').modal('show');
-   });
-
-   // Evento cuando se muestra el modal de nuevo producto
-   $('#nuevoProductoModal').on('shown.bs.modal', function () {
-       // Esperar un poco más para que el modal se renderice completamente
-       setTimeout(function() {
-           initSelect2InModal('#nuevoProductoModal');
-       }, 500);
-       $(this).find('input[name="nombre"]').focus();
-   });
-
-   // Evento cuando se oculta el modal de nuevo producto
-   $('#nuevoProductoModal').on('hidden.bs.modal', function () {
-       destroySelect2InModal('#nuevoProductoModal');
-   });
-
-   // Evento cuando se muestra el modal de editar producto
-   $('#editarProductoModal').on('shown.bs.modal', function () {
-       setTimeout(function() {
-           initSelect2InModal('#editarProductoModal');
-       }, 500);
-   });
-
-   // Evento cuando se oculta el modal de editar producto
-   $('#editarProductoModal').on('hidden.bs.modal', function () {
-       destroySelect2InModal('#editarProductoModal');
-   });
-
-   // Manejar marcas nuevas con mejor control
-   $(document).on('select2:select', '#marca, #edit_marca', function (e) {
-       const marcaSeleccionada = e.params.data.id;
-       const $select = $(this);
-       const marcasExistentes = [];
-       
-       $select.find('option').each(function() {
-           if ($(this).val() !== '') {
-               marcasExistentes.push($(this).val());
-           }
-       });
-
-       if (marcaSeleccionada && !marcasExistentes.includes(marcaSeleccionada)) {
-           $('#nuevaMarcaNombre').val(marcaSeleccionada);
-           $('#nuevaMarcaModal').modal('show');
-
-           // Prevenir que se seleccione hasta que se confirme
-           $select.val(null).trigger('change');
-       }
-   });
-
-   // Crear nueva marca
-   $('#nuevaMarcaForm').submit(function (e) {
-       e.preventDefault();
-       const nombreMarca = $('#nuevaMarcaNombre').val().trim();
-
-       if (nombreMarca) {
-           const $btn = $(this).find('[type="submit"]');
-           $btn.addClass('btn-loading').prop('disabled', true);
-
-           $.post('${pageContext.request.contextPath}/MarcaControlador?accion=guardar', {
-               nombre: nombreMarca,
-               estado: 'activo'
-           }, function (response) {
-               if (response.exito) {
-                   // Agregar la nueva marca a todos los selects de marca
-                   const newOption = new Option(nombreMarca, nombreMarca, true, true);
-                   $('#marca, #edit_marca').each(function () {
-                       $(this).append(newOption.cloneNode(true));
-                   });
-
-                   // Seleccionar la nueva marca en el select activo
-                   $('#marca').val(nombreMarca).trigger('change');
-
-                   $('#nuevaMarcaModal').modal('hide');
-                   Swal.fire('Éxito', 'Marca creada correctamente', 'success');
-               } else {
-                   Swal.fire('Error', 'No se pudo crear la marca', 'error');
-               }
-           }).fail(function () {
-               Swal.fire('Error', 'Error al comunicarse con el servidor', 'error');
-           }).always(function () {
-               $btn.removeClass('btn-loading').prop('disabled', false);
-           });
-       }
-   });
-
-   // Editar producto
-   $('.btn-editar').click(function () {
-       const id = $(this).data('id');
-       const $btn = $(this);
-
-       $btn.prop('disabled', true);
-
-       $.get('${pageContext.request.contextPath}/ProductoControlador?accion=editar&id=' + id, function (data) {
-           $('#edit_id').val(data.id);
-           $('#edit_nombre').val(data.nombres);
-           $('#edit_descripcion').val(data.descripcion);
-           $('#edit_precio').val(data.precio);
-
-           // Mostrar imagen actual
-           if (data.id) {
-               const imgSrc = '${pageContext.request.contextPath}/ControladorIMG?id=' + data.id;
-               $('#imagen-actual').attr('src', imgSrc);
-               $('#imagen-actual-container').show();
-           } else {
-               $('#imagen-actual-container').hide();
-           }
-
-           // Mostrar el modal
-           $('#editarProductoModal').modal('show');
-
-           // Establecer valores de select después de que el modal se muestre y Select2 esté inicializado
-           $('#editarProductoModal').one('shown.bs.modal', function () {
-               setTimeout(function() {
-                   initSelect2InModal('#editarProductoModal');
-                   
-                   // Esperar otro poco para establecer los valores
-                   setTimeout(function() {
-                       $('#edit_marca').val(data.nombreMarca).trigger('change');
-                       $('#edit_categoria').val(data.nombreCategoria).trigger('change');
-                   }, 200);
-               }, 500);
-           });
-
-       }).fail(function () {
-           Swal.fire('Error', 'No se pudo cargar la información del producto', 'error');
-       }).always(function () {
-           $btn.prop('disabled', false);
-       });
-   });
-
-   // Desactivar producto
-   $('.btn-desactivar').click(function () {
-       const id = $(this).data('id');
-       $('#confirmModalTitle').html('<i class="fas fa-times-circle" style="color: #dc3545"></i> Confirmar Desactivación');
-       $('#confirmModalBody').text('¿Está seguro que desea desactivar este producto?');
-       $('#btn-confirmar').removeClass('btn-success').addClass('btn-danger')
-               .attr('href', '${pageContext.request.contextPath}/ProductoControlador?accion=eliminar&id=' + id);
-       $('#confirmModal').modal('show');
-   });
-
-   // Activar producto
-   $('.btn-activar').click(function () {
-       const id = $(this).data('id');
-       $('#confirmModalTitle').html('<i class="fas fa-check-circle" style="color: #28a745"></i> Confirmar Activación');
-       $('#confirmModalBody').text('¿Está seguro que desea activar este producto?');
-       $('#btn-confirmar').removeClass('btn-danger').addClass('btn-success')
-               .attr('href', '${pageContext.request.contextPath}/ProductoControlador?accion=activar&id=' + id);
-       $('#confirmModal').modal('show');
-   });
-
-   // Actualizar stock con mejor UX
-   $('.btn-stock').click(function () {
-       const id = $(this).data('id');
-       const stockActual = parseInt($(this).data('stock'));
-
-       $('#stock_id').val(id);
-       $('#stock_actual').val(stockActual);
-       $('#cantidad').val('');
-       $('#stock_nuevo').val(stockActual);
-
-       // Actualizar display visual del stock
-       updateStockDisplay(stockActual, 0);
-
-       // Calcular nuevo stock cuando cambia la cantidad
-       $('#cantidad').off('input').on('input', function () {
-           const cantidad = parseInt($(this).val()) || 0;
-           const nuevoStock = stockActual + cantidad;
-           $('#stock_nuevo').val(nuevoStock);
-           updateStockDisplay(stockActual, cantidad);
-       });
-
-       $('#stockModal').modal('show');
-   });
-
-   function updateStockDisplay(stockActual, cantidad) {
-       const nuevoStock = stockActual + cantidad;
-
-       $('.stock-item.current .stock-item-value').text(stockActual);
-       $('.stock-item.add .stock-item-value').text('+' + cantidad);
-       $('.stock-item.new .stock-item-value').text(nuevoStock);
-   }
-
-   // Validación mejorada del formulario de nuevo producto
-   $('#nuevoProductoForm').submit(function (e) {
-       let isValid = true;
-       const $form = $(this);
-
-       // Limpiar validaciones anteriores
-       $form.find('.is-invalid').removeClass('is-invalid');
-       $form.find('.invalid-feedback').remove();
-
-       // Validar campos requeridos
-       $form.find('[required]').each(function () {
-           if (!$(this).val().trim()) {
-               $(this).addClass('is-invalid');
-               $(this).after('<div class="invalid-feedback">Este campo es obligatorio</div>');
-               isValid = false;
-           }
-       });
-
-       // Validar imagen
-       const imagen = $('#imagen')[0].files[0];
-       if (!imagen) {
-           $('#imagen').addClass('is-invalid');
-           $('#imagen').after('<div class="invalid-feedback">Debe seleccionar una imagen</div>');
-           isValid = false;
-       } else if (imagen.size > 2 * 1024 * 1024) {
-           $('#imagen').addClass('is-invalid');
-           $('#imagen').after('<div class="invalid-feedback">La imagen no debe superar los 2MB</div>');
-           isValid = false;
-       }
-
-       // Validar precio
-       const precio = parseFloat($('#precio').val());
-       if (precio <= 0) {
-           $('#precio').addClass('is-invalid');
-           $('#precio').after('<div class="invalid-feedback">El precio debe ser mayor a 0</div>');
-           isValid = false;
-       }
-
-       if (!isValid) {
-           e.preventDefault();
-           // Hacer scroll al primer error
-           const firstError = $form.find('.is-invalid').first();
-           if (firstError.length) {
-               firstError[0].scrollIntoView({behavior: 'smooth', block: 'center'});
-               firstError.focus();
-           }
-           return false;
-       }
-
-       // Mostrar loading en el botón
-       const $submitBtn = $form.find('[type="submit"]');
-       $submitBtn.addClass('btn-loading').prop('disabled', true);
-
-       return true;
-   });
-
-   // Validación del formulario de edición
-   $('#editarProductoForm').submit(function (e) {
-       let isValid = true;
-       const $form = $(this);
-
-       // Limpiar validaciones anteriores
-       $form.find('.is-invalid').removeClass('is-invalid');
-       $form.find('.invalid-feedback').remove();
-
-       // Validar precio
-       const precio = parseFloat($('#edit_precio').val());
-       if (precio <= 0) {
-           $('#edit_precio').addClass('is-invalid');
-           $('#edit_precio').after('<div class="invalid-feedback">El precio debe ser mayor a 0</div>');
-           isValid = false;
-       }
-
-       const imagen = $('#edit_imagen')[0].files[0];
-       if (imagen && imagen.size > 2 * 1024 * 1024) {
-           $('#edit_imagen').addClass('is-invalid');
-           $('#edit_imagen').after('<div class="invalid-feedback">La imagen no debe superar los 2MB</div>');
-           isValid = false;
-       }
-
-       if (!isValid) {
-           e.preventDefault();
-           return false;
-       }
-
-       // Mostrar loading en el botón
-       const $submitBtn = $form.find('[type="submit"]');
-       $submitBtn.addClass('btn-loading').prop('disabled', true);
-
-       return true;
-   });
-
-   // Filtrar productos
-   $('#filtroForm').submit(function (e) {
-       e.preventDefault();
-
-       const nombre = $('#filtroNombre').val();
-       const marca = $('#filtroMarca').val();
-       const categoria = $('#filtroCategoria').val();
-       const stockMin = $('#filtroStockMin').val();
-       const stockMax = $('#filtroStockMax').val();
-
-       // Mostrar loading
-       showLoading();
-
-       // Redirigir con los parámetros de filtro
-       window.location.href = '${pageContext.request.contextPath}/ProductoControlador?accion=filtrar&nombre=' +
-               encodeURIComponent(nombre) + '&marca=' + encodeURIComponent(marca) +
-               '&categoria=' + encodeURIComponent(categoria) + '&stockMin=' + stockMin +
-               '&stockMax=' + stockMax;
-   });
-
-   // Resetear filtros
-   $('#btnResetFiltros').click(function () {
-       $('#filtroForm')[0].reset();
-       $('.filter-card .select2').val(null).trigger('change');
-       showLoading();
-       window.location.href = '${pageContext.request.contextPath}/ProductoControlador';
-   });
-
-   // Funciones de utilidad
-   function showLoading() {
-       if ($('.loading-overlay').length === 0) {
-           $('body').append(`
-               <div class="loading-overlay" style="
-                   position: fixed;
-                   top: 0;
-                   left: 0;
-                   width: 100%;
-                   height: 100%;
-                   background: rgba(255, 255, 255, 0.9);
-                   z-index: 9999;
-                   display: flex;
-                   justify-content: center;
-                   align-items: center;
-               ">
-                   <div class="loading-spinner" style="
-                       width: 40px;
-                       height: 40px;
-                       border: 4px solid #f3f3f3;
-                       border-top: 4px solid #007bff;
-                       border-radius: 50%;
-                       animation: spin 1s linear infinite;
-                   "></div>
-               </div>
-           `);
-       }
-   }
-
-   function hideLoading() {
-       $('.loading-overlay').remove();
-   }
-
-   // Agregar estilos de animación si no existen
-   if (!document.querySelector('style[data-loading-animation]')) {
-       const style = document.createElement('style');
-       style.setAttribute('data-loading-animation', 'true');
-       style.textContent = `
-           @keyframes spin {
-               0% { transform: rotate(0deg); }
-               100% { transform: rotate(360deg); }
-           }
-       `;
-       document.head.appendChild(style);
-   }
-
-   // Mejorar tooltips
-   $('[data-toggle="tooltip"], .btn-action').tooltip({
-       placement: 'top',
-       trigger: 'hover'
-   });
-
-   // Mejorar visualización de stock bajo
-   $('.product-stock.low').each(function () {
-       $(this).attr('title', 'Stock bajo - Considerar reabastecer');
-   });
-
-   // Auto-dismiss alerts después de 5 segundos
-   setTimeout(function () {
-       $('.alert').fadeOut();
-   }, 5000);
-
-   // Limpiar loading overlay cuando la página se carga completamente
-   $(window).on('load', function () {
-       hideLoading();
-   });
-
-   // Setup file upload areas
-   setupFileUpload('#imagen', '.file-upload-area');
-   setupFileUpload('#edit_imagen', '.file-upload-area');
-
-   // Prevenir que los dropdowns de Select2 se abran fuera del viewport del modal
-   $(document).on('select2:open', function(e) {
-       const $modal = $(e.target).closest('.modal');
-       if ($modal.length > 0) {
-           const $dropdown = $('.select2-dropdown');
-           $dropdown.css({
-               'z-index': '1072',
-               'position': 'absolute'
-           });
-       }
-   });
-
-   // Asegurar que Select2 se cierre cuando se cierra el modal
-   $('.modal').on('hidden.bs.modal', function() {
-       $('.select2-dropdown').remove();
-       $('.select2-container--open').removeClass('select2-container--open');
-   });
-});
-
-        </script>
+    </div>
+</div>
+
+<script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Contexto de la aplicación para JS
+    const AppContext = {
+        path: '${pageContext.request.contextPath}',
+        messages: {
+            imageSizeError: 'La imagen no debe superar los 2MB',
+            imageTypeError: 'El archivo debe ser una imagen',
+            requiredField: 'Este campo es obligatorio',
+            invalidPrice: 'El precio debe ser mayor a 0',
+            brandCreated: 'Marca creada correctamente',
+            brandError: 'No se pudo crear la marca'
+        },
+        endpoints: {
+            product: {
+                edit: '${pageContext.request.contextPath}/ProductoControlador?accion=editar&id=',
+                update: '${pageContext.request.contextPath}/ProductoControlador?accion=actualizar',
+                save: '${pageContext.request.contextPath}/ProductoControlador?accion=guardar',
+                filter: '${pageContext.request.contextPath}/ProductoControlador?accion=filtrar',
+                activate: '${pageContext.request.contextPath}/ProductoControlador?accion=activar&id=',
+                deactivate: '${pageContext.request.contextPath}/ProductoControlador?accion=eliminar&id=',
+                stock: '${pageContext.request.contextPath}/ProductoControlador?accion=actualizarStock'
+            },
+            brand: {
+                save: '${pageContext.request.contextPath}/MarcaControlador?accion=guardar'
+            },
+            image: {
+                get: '${pageContext.request.contextPath}/ControladorIMG?id='
+            }
+        }
+    };
+</script>
+<script src="${pageContext.request.contextPath}/js/productos.js"></script>
     </body>
 </html>

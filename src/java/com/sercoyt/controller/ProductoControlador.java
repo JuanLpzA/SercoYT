@@ -150,6 +150,9 @@ public class ProductoControlador extends HttpServlet {
     private void guardarProducto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            request.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("UTF-8");
+          
             String nombreMarca = request.getParameter("marca");
             String nombreCategoria = request.getParameter("categoria");
             
@@ -234,38 +237,46 @@ public class ProductoControlador extends HttpServlet {
         request.getRequestDispatcher("/admin/productos.jsp").forward(request, response);
     }
 
-    private void actualizarProducto(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            Producto producto = new Producto();
-            producto.setId(id);
-            producto.setNombres(request.getParameter("nombre"));
-            producto.setDescripcion(request.getParameter("descripcion"));
-            producto.setPrecio(Double.parseDouble(request.getParameter("precio")));
-            
-            Part filePart = request.getPart("imagen");
-            if (filePart != null && filePart.getSize() > 0) {
-                InputStream fileContent = filePart.getInputStream();
-                producto.setFoto(fileContent);
-            }
-            
-            producto.setNombreMarca(request.getParameter("marca"));
-            producto.setNombreCategoria(request.getParameter("categoria"));
-            
-            if (productoDao.actualizar(producto)) {
-                request.getSession().setAttribute("exito", "Producto actualizado correctamente");
-            } else {
-                request.getSession().setAttribute("error", "Error al actualizar el producto");
-            }
-            
-            response.sendRedirect(request.getContextPath() + "/ProductoControlador");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("error", "Error al actualizar el producto: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/ProductoControlador");
+private void actualizarProducto(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        int id = Integer.parseInt(request.getParameter("id"));
+        
+        Producto producto = new Producto();
+        producto.setId(id);
+        producto.setNombres(request.getParameter("nombre"));
+        producto.setDescripcion(request.getParameter("descripcion"));
+        producto.setPrecio(Double.parseDouble(request.getParameter("precio")));
+        producto.setNombreMarca(request.getParameter("marca"));
+        producto.setNombreCategoria(request.getParameter("categoria"));
+        
+        // Manejo de la imagen
+        Part filePart = request.getPart("imagen");
+        if (filePart != null && filePart.getSize() > 0) {
+            // Si se subió una nueva imagen
+            InputStream fileContent = filePart.getInputStream();
+            producto.setFoto(fileContent);
+        } else {
+            // Si no se subió nueva imagen, establecer foto como null
+            // El DAO se encargará de mantener la imagen actual
+            producto.setFoto(null);
         }
+        
+        if (productoDao.actualizar(producto)) {
+            request.getSession().setAttribute("exito", "Producto actualizado correctamente");
+        } else {
+            request.getSession().setAttribute("error", "Error al actualizar el producto");
+        }
+        
+        response.sendRedirect(request.getContextPath() + "/ProductoControlador");
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Error al actualizar el producto: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/ProductoControlador");
     }
+}
 
     private void eliminarProducto(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

@@ -121,32 +121,60 @@ public class UsuarioControlador extends HttpServlet {
         request.setAttribute("correo", usuario.getCorreo());
         request.getRequestDispatcher(pagVerificacion).forward(request, response);
     }
-
+    
     private void verificar(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
-        String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
-        String codigoIngresado = request.getParameter("codigo");
-
-        if (usuario == null || codigoEnviado == null) {
-            throw new RuntimeException("Sesión expirada o inválida");
-        }
-
-        if (!codigoEnviado.equals(codigoIngresado)) {
-            throw new RuntimeException("Código de verificación incorrecto");
-        }
-
-        if (usuarioDao.registrarUsuario(usuario)) {
-            session.removeAttribute("usuarioPendiente");
-            session.removeAttribute("codigoVerificacion");
-
-            request.setAttribute("registroExitoso", true);
-            request.getRequestDispatcher("registroExitoso.jsp").forward(request, response);
-        } else {
-            throw new RuntimeException("Error al registrar usuario");
-        }
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
+    String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
+    String codigoIngresado = request.getParameter("codigo");
+    
+    if (usuario == null || codigoEnviado == null) {
+        throw new RuntimeException("Sesión expirada o inválida");
     }
+    
+    if (!codigoEnviado.equals(codigoIngresado)) {
+        throw new RuntimeException("Código de verificación incorrecto");
+    }
+    
+    if (usuarioDao.registrarUsuario(usuario)) {
+        session.removeAttribute("usuarioPendiente");
+        session.removeAttribute("codigoVerificacion");
+        
+        // Establecer atributo de éxito y volver a mostrar la página de verificación
+        request.setAttribute("verificacionExitosa", true);
+        request.setAttribute("correo", usuario.getCorreo()); // o como obtengas el correo
+        request.getRequestDispatcher("verificacionCorreo.jsp").forward(request, response);
+    } else {
+        throw new RuntimeException("Error al registrar usuario");
+    }
+}
+
+//    private void verificar(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        HttpSession session = request.getSession();
+//        Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
+//        String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
+//        String codigoIngresado = request.getParameter("codigo");
+//
+//        if (usuario == null || codigoEnviado == null) {
+//            throw new RuntimeException("Sesión expirada o inválida");
+//        }
+//
+//        if (!codigoEnviado.equals(codigoIngresado)) {
+//            throw new RuntimeException("Código de verificación incorrecto");
+//        }
+//
+//        if (usuarioDao.registrarUsuario(usuario)) {
+//            session.removeAttribute("usuarioPendiente");
+//            session.removeAttribute("codigoVerificacion");
+//          
+//            request.setAttribute("registroExitoso", true);
+//            request.getRequestDispatcher("registroExitoso.jsp").forward(request, response);
+//        } else {
+//            throw new RuntimeException("Error al registrar usuario");
+//        }
+//    }
 
     private void nuevo(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

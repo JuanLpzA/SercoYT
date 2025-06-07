@@ -64,6 +64,9 @@
 
 <nav class="main-nav">
     <ul>
+        <li class="${param.accion == '' ? 'active' : ''}">
+            <a href="Controlador"><i class="fas fa-eye"></i> Home</a>
+        </li>
         <li class="${param.accion == 'laptops' ? 'active' : ''}">
             <a href="Controlador?accion=laptops"><i class="fas fa-laptop"></i> Laptops</a>
         </li>

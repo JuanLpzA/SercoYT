@@ -48,14 +48,15 @@ public class AuthFilter implements Filter {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         String tipo = usuario.getTipoUsuario(); // por ejemplo: "cliente", "vendedor", "administrador"
         String uri = httpRequest.getRequestURI();
+       
+        // 1. Acceso a /admin/* => Solo administrador
+        if (uri.contains("/admin/") && !(tipo.equals("administrador") || tipo.equals("vendedor"))) {
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado");
+            return;
+        }
         
-//        // 1. Acceso a /admin/* => Solo administrador
-//         if (uri.contains("/admin/") && !tipo.equals("administrador")) {
-//        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado");
-//        return;
-//        }
         // Reglas de acceso según controlador
-        if (uri.contains("DashboardControlador") || uri.contains("ProductoControlador") || uri.contains("ProductoControlador")  ) {
+        if (uri.contains("DashboardControlador") || uri.contains("ProductoControlador") || uri.contains("ProductoControlador") || uri.contains("MarcaControlador" )) {
             // Solo admin y vendedor acceden al dashboard general
             if (!tipo.equals("administrador") && !tipo.equals("vendedor")) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado");
