@@ -36,32 +36,37 @@
                     <input type="hidden" name="accion" value="guardar">
 
                     <!-- Campos del formulario (se mantienen igual) -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nombre">Nombre <span class="required">*</span></label>
-                            <input type="text" id="nombre" name="nombre" required 
-                                   placeholder="Ingrese su nombre" class="form-control"
-                                   value="${usuario.nombre}">
-                            <i class="fas fa-user input-icon"></i>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="apellido">Apellido <span class="required">*</span></label>
-                            <input type="text" id="apellido" name="apellido" required 
-                                   placeholder="Ingrese su apellido" class="form-control"
-                                   value="${usuario.apellido}">
-                            <i class="fas fa-user input-icon"></i>
-                        </div>
+                    <div class="form-group">
+                        <label for="nombre">Nombre <span class="required">*</span></label>
+                        <input type="text" id="nombre" name="nombre" required 
+                               placeholder="Nombre [Extraído del DNI]" class="form-control"
+                               value="${usuario.nombre}" readonly
+                               style="background-color: #f8f9fa; cursor: not-allowed;">
+                        <i class="fas fa-user input-icon"></i>
                     </div>
 
                     <div class="form-group">
+                        <label for="apellido">Apellido <span class="required">*</span></label>
+                        <input type="text" id="apellido" name="apellido" required 
+                               placeholder="Apellido [Extraído del DNI]" class="form-control"
+                               value="${usuario.apellido}" readonly
+                               style="background-color: #f8f9fa; cursor: not-allowed;">
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                    <div class="form-group">
                         <label for="dni">DNI <span class="required">*</span></label>
-                        <input type="text" id="dni" name="dni" required 
-                               placeholder="Ingrese su DNI (8 dígitos)" pattern="[0-9]{8}" 
-                               title="El DNI debe tener 8 dígitos" class="form-control"
-                               value="${usuario.dni}">
+                        <div class="dni-container">
+                            <input type="text" id="dni" name="dni" required 
+                                   placeholder="Ingrese su DNI (8 dígitos)" pattern="[0-9]{8}" 
+                                   title="El DNI debe tener 8 dígitos" class="form-control"
+                                   value="${usuario.dni}">
+                            <button type="button" id="btnConsultarDni" class="btn-consultar">
+                                <i class="fas fa-search"></i> Consultar
+                            </button>
+                        </div>
                         <i class="fas fa-id-card input-icon"></i>
                     </div>
+
 
                     <div class="form-row">
                         <div class="form-group">

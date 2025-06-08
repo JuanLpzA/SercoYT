@@ -4,6 +4,7 @@ import com.sercoyt.model.Usuario;
 import com.sercoyt.model.dao.UsuarioDao;
 import com.sercoyt.util.EmailUtil;
 import com.sercoyt.util.PasswordUtil;
+import com.sercoyt.util.ReniecAPI;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.JSONObject;
 
 public class UsuarioControlador extends HttpServlet {
 
@@ -64,7 +66,10 @@ public class UsuarioControlador extends HttpServlet {
                     break;
                 case "actualizarPerfil":
                     actualizarPerfil(request, response);
-                    break;  
+                    break;
+                case "consultarDni":
+                    consultarDni(request, response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -388,6 +393,21 @@ public class UsuarioControlador extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
             mostrarPerfil(request, response);
+        }
+    }
+
+    // mETODO PARA LA API DE RENIEC
+    private void consultarDni(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String dni = request.getParameter("dni");
+            JSONObject datos = ReniecAPI.consultarDni(dni);
+
+            response.setContentType("application/json");
+            response.getWriter().write(datos.toString());
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
 

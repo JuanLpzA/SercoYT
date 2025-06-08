@@ -70,7 +70,9 @@
                         <div class="form-group">
                             <label for="codigo">Código de Verificación <span class="required">*</span></label>
                             <input type="text" id="codigo" name="codigo" required 
-                                   placeholder="Ingrese el código enviado a su correo" class="form-control">
+                                   placeholder="Ingrese el código enviado a su correo" 
+                                   pattern="\d{6}" maxlength="6" minlength="6"
+                                   class="form-control">
                             <i class="fas fa-key input-icon"></i>
                         </div>
 

@@ -319,6 +319,30 @@
     75% { transform: translateX(5px); }
 }
 
+.dni-container {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-consultar {
+    background: #4e73df;
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-consultar:hover {
+    background: #2e59d9;
+}
+
+input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .registro-container {

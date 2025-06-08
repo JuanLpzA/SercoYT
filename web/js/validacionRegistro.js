@@ -43,4 +43,53 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
     });
+
+    document.getElementById('btnConsultarDni').addEventListener('click', function () {
+        const dni = document.getElementById('dni').value;
+        const nombreInput = document.getElementById('nombre');
+        const apellidoInput = document.getElementById('apellido');
+
+        if (!/^[0-9]{8}$/.test(dni)) {
+            swal("Error", "El DNI debe tener exactamente 8 dígitos", "error");
+            return;
+        }
+
+        swal({
+            title: "Consultando RENIEC",
+            text: "Por favor espere...",
+            button: false,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+        });
+
+        fetch(`${window.location.pathname}?accion=consultarDni&dni=${dni}`)
+                .then(response => response.json())
+                .then(data => {
+                    swal.close();
+                    if (data.error) {
+                        swal("Error", "No se encontró el DNI. Complete manualmente.", "error");
+                        // Habilitar campos para edición manual
+                        nombreInput.readOnly = false;
+                        apellidoInput.readOnly = false;
+                        nombreInput.placeholder = "Ingrese su nombre manualmente";
+                        apellidoInput.placeholder = "Ingrese su apellido manualmente";
+                        nombreInput.focus(); // Enfocar el campo nombre
+                    } else {
+                        // Autocompletar y bloquear campos
+                        nombreInput.value = data.nombres;
+                        apellidoInput.value = `${data.apellidoPaterno} ${data.apellidoMaterno}`;
+                        swal("Éxito", "Datos encontrados en RENIEC", "success");
+                    }
+                })
+                .catch(error => {
+                    swal.close();
+                    swal("Error", "No se pudo conectar con RENIEC. Complete manualmente.", "error");
+                    // Habilitar campos para edición manual
+                    nombreInput.readOnly = false;
+                    apellidoInput.readOnly = false;
+                    nombreInput.placeholder = "Ingrese su nombre manualmente";
+                    apellidoInput.placeholder = "Ingrese su apellido manualmente";
+                    nombreInput.focus(); // Enfocar el campo nombre
+                });
+    });
 });
