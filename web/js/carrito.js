@@ -148,19 +148,11 @@ $(document).ready(function () {
         // Validar código postal si se ingresó
         const codigoPostal = $('#codigoPostal').val().trim();
         if (codigoPostal !== '') {
-            // Códigos postales válidos para Lambayeque (rangos aproximados)
-            const codigosValidos = {
-                'Chiclayo': /^13[7-8]\d{2}$/,
-                'Ferreñafe': /^141\d{2}$/,
-                'Lambayeque': /^14[0-1]\d{2}$/
-            };
-
-            const provincia = $('#provincia').val();
-            const regex = codigosValidos[provincia];
-
-            if (!regex || !regex.test(codigoPostal)) {
+            // Código postal válido para todo Lambayeque (rango 14000-14099)
+            // Los códigos se comparten entre todas las provincias del departamento
+            if (!/^140\d{2}$/.test(codigoPostal)) {
                 $('#codigoPostal').addClass('input-error');
-                $('#codigoPostalError').text('Código postal no válido para ' + provincia).show();
+                $('#codigoPostalError').text('Código postal no válido para Lambayeque (debe estar entre 14000-14099)').show();
                 isValid = false;
             } else {
                 $('#codigoPostal').removeClass('input-error');
@@ -242,7 +234,7 @@ $(document).ready(function () {
                         text: "Su pedido sera entregado de 1 a 3 dias habiles",
                         icon: "success"
                     }).then(() => {
-                        window.location.href = 'index.jsp';
+                        window.location.href = 'Controlador?accion=ninguno';
                     });
                 } else {
                     swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
@@ -379,10 +371,27 @@ $(document).ready(function () {
                 isValid = false;
             }
 
-            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test($('#expiryDate').val())) {
+            // Validación de formato de fecha de expiración
+            var expiryValue = $('#expiryDate').val();
+            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiryValue)) {
                 $('#expiryDate').addClass('input-error');
-                $('#expiryDateError').show();
+                $('#expiryDateError').text('Formato MM/AA (ej. 12/25)').show();
                 isValid = false;
+            } else {
+                // Validación adicional: verificar si la fecha ya expiró
+                var parts = expiryValue.split('/');
+                var inputMonth = parseInt(parts[0], 10);
+                var inputYear = parseInt('20' + parts[1], 10); // convierte '25' en 2025
+                var today = new Date();
+                var currentMonth = today.getMonth() + 1; // enero = 0
+                var currentYear = today.getFullYear();
+
+                // Verifica que la fecha no haya expirado
+                if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
+                    $('#expiryDate').addClass('input-error');
+                    $('#expiryDateError').text('La tarjeta ya expiró').show();
+                    isValid = false;
+                }
             }
 
             if ($('#cvv').val().length !== 3) {

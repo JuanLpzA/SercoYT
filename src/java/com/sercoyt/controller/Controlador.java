@@ -92,10 +92,16 @@ public class Controlador extends HttpServlet {
                         }
 
                         session.setAttribute("contador", listaCarrito.size());
-                    }
-                    response.sendRedirect(categoriaActual != null ? "Controlador?accion=" + categoriaActual : "Controlador");
-                    break;
 
+                        // Si es una petición AJAX, no redireccionar
+                        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                            response.setContentType("text/plain");
+                            response.getWriter().write("OK");
+                            return;
+                        }
+                        response.sendRedirect(categoriaActual != null ? "Controlador?accion=" + categoriaActual : "Controlador");
+                    }
+                    break;
                 case "Delete":
                     int idproducto = Integer.parseInt(request.getParameter("idp"));
                     listaCarrito.removeIf(item -> item.getIdProducto() == idproducto);
@@ -170,6 +176,10 @@ public class Controlador extends HttpServlet {
                 case "conocenos":
                     request.getRequestDispatcher("conocenos.jsp").forward(request, response);
                     break;
+                case "ObtenerContadorCarrito":
+                    response.setContentType("text/plain");
+                    response.getWriter().write(String.valueOf(listaCarrito.size()));
+                    return;
 
                 default:
                     request.setAttribute("productos", pdao.listar());

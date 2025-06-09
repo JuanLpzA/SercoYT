@@ -17,6 +17,8 @@ import javax.servlet.http.HttpSession;
     "/DashboardControlador", 
     "/MarcaControlador",
     "/ProductoControlador",
+    "/CategoriaControlador",
+    "/ClienteControlador",
     
     "/UsuariosControlador",
     "/carrito.jsp",
@@ -56,7 +58,7 @@ public class AuthFilter implements Filter {
         }
         
         // Reglas de acceso según controlador
-        if (uri.contains("DashboardControlador") || uri.contains("ProductoControlador") || uri.contains("ProductoControlador") || uri.contains("MarcaControlador" )) {
+        if (uri.contains("DashboardControlador") || uri.contains("ProductoControlador") || uri.contains("CategoriaControlador") || uri.contains("ClienteControlador") || uri.contains("ProductoControlador") || uri.contains("MarcaControlador" )) {
             // Solo admin y vendedor acceden al dashboard general
             if (!tipo.equals("administrador") && !tipo.equals("vendedor")) {
                 httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado");

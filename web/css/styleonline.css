@@ -474,6 +474,38 @@ img {
     border-color: #9FB3C8;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+.notificacion-carrito {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    min-width: 200px;
+}
+
+.notificacion-carrito.mostrar {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notificacion-carrito i {
+    font-size: 1.5em;
+}
+
+.notificacion-carrito span {
+    font-weight: 500;
+}
 
 .page-link.active {
     background-color: #3CB371; /* Verde */

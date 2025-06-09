@@ -30,7 +30,7 @@
                             <div class="product-price">S/${p.precio}0</div>
                             <p class="product-description">${p.descripcion}</p>
                             <div class="product-actions">
-                                <a href="Controlador?accion=AgregarCarrito&id=${p.id}&categoria=${param.accion}" class="btn-add-to-cart">
+                                <a href="#" class="btn-add-to-cart" onclick="agregarAlCarrito(${p.id}, '${param.accion}')">
                                     <i class="fas fa-cart-plus"></i> Añadir
                                 </a>
                                 <button class="btn-buy-now" onclick="window.location.href = 'Controlador?accion=Comprar&id=${p.id}'">
@@ -65,5 +65,60 @@
 
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
+        <script>
+function agregarAlCarrito(idProducto, categoria) {
+    fetch('Controlador?accion=AgregarCarrito&id=' + idProducto + '&categoria=' + categoria, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        if (data === 'OK') {
+            mostrarNotificacion('Producto añadido al carrito');
+            actualizarContadorCarrito();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function mostrarNotificacion(mensaje) {
+    const notificacion = document.createElement('div');
+    notificacion.className = 'notificacion-carrito';
+    notificacion.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        <span>Producto Añadido</span>
+    `;
+    
+    document.body.appendChild(notificacion);
+    
+    setTimeout(() => {
+        notificacion.classList.add('mostrar');
+    }, 10);
+    
+    setTimeout(() => {
+        notificacion.classList.remove('mostrar');
+        setTimeout(() => {
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
+}
+
+function actualizarContadorCarrito() {
+    fetch('Controlador?accion=ObtenerContadorCarrito', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.text())
+    .then(count => {
+        const contador = document.querySelector('.cart-count');
+        if (contador) {
+            contador.textContent = count;
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+        </script>
     </body>
 </html>

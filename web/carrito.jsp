@@ -149,7 +149,7 @@
                     <div class="form-group">
                         <label for="codigoPostal">Código postal (Opcional)</label>
                         <input type="text" id="codigoPostal" class="form-control" maxlength="5" pattern="[0-9]{5}">
-                        <small class="text-muted">Ejemplo: 14000 (Chiclayo), 14100 (Ferreñafe), 14001 (Lambayeque)</small>
+                        <small class="text-muted">Ingrese un código postal válido del departamento de Lambayeque (14000-14099)</small>
                         <div class="error-message" id="codigoPostalError"></div>
                     </div>
 
