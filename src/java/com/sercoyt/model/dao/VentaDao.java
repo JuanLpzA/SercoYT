@@ -295,5 +295,30 @@ public class VentaDao {
         }
         return nombres;
     }
+    
+    //para el dashboard
+    public int contarVentasUltimaSemana() throws SQLException {
+    String sql = "SELECT COUNT(*) FROM ventas WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+    try (Connection con = ConnectDB.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+    }
+    return 0;
+}
+
+public double calcularIngresosUltimaSemana() throws SQLException {
+    String sql = "SELECT COALESCE(SUM(total), 0) FROM ventas WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+    try (Connection con = ConnectDB.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            return rs.getDouble(1);
+        }
+    }
+    return 0.0;
+}
 
 }

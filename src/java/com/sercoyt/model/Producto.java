@@ -20,11 +20,12 @@ public class Producto {
     private InputStream foto;
     private String nombreMarca;
     private String nombreCategoria;
+    private String estado;
 
     public Producto() {
     }
 
-    public Producto(int id, String nombres, String descripcion, double precio, int stock, InputStream foto, String nombreMarca, String nombreCategoria) {
+    public Producto(int id, String nombres, String descripcion, double precio, int stock, InputStream foto, String nombreMarca, String nombreCategoria, String estado) {
         this.id = id;
         this.nombres = nombres;
         this.descripcion = descripcion;
@@ -33,14 +34,7 @@ public class Producto {
         this.foto = foto;
         this.nombreMarca = nombreMarca;
         this.nombreCategoria = nombreCategoria;
-    }
-
-    public String getNombreCategoria() {
-        return nombreCategoria;
-    }
-
-    public void setNombreCategoria(String nombreCategoria) {
-        this.nombreCategoria = nombreCategoria;
+        this.estado = estado;
     }
 
     public int getId() {
@@ -99,4 +93,22 @@ public class Producto {
         this.nombreMarca = nombreMarca;
     }
 
+    public String getNombreCategoria() {
+        return nombreCategoria;
+    }
+
+    public void setNombreCategoria(String nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+
+    
 }

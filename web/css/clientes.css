@@ -1,0 +1,790 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 8 jun. 2025, 19:54:05
+    Author     : Arrunategui
+*/
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-color: #e9ecef;
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Estilos generales del dashboard de clientes */
+.dashboard-main {
+    padding: 20px;
+    background-color: #f5f6fa;
+    min-height: calc(100vh - 80px);
+}
+
+/* Header de sección mejorado */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h4 {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header h4::before {
+    content: "👥";
+    font-size: 1.2em;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.header-actions .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-actions .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+}
+
+.header-actions .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Tarjeta de filtros mejorada */
+.filter-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.filter-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    padding: 15px 20px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.filter-card .card-header h5 {
+    margin: 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-card .card-header h5::before {
+    content: "🔍";
+    font-size: 1.1em;
+}
+
+.filter-card .card-body {
+    padding: 25px;
+}
+
+/* Formulario de filtros */
+.filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-weight: 500;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.filter-group input,
+.filter-group select {
+    height: 38px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.btn-filter {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-filter.primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-filter.primary:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.btn-filter.secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-filter.secondary:hover {
+    background: #545b62;
+}
+
+/* Contenedor de tabla mejorado */
+.table-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.table-header {
+    background: var(--light-color);
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-header h5 {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-header h5::before {
+    content: "📋";
+    font-size: 1em;
+}
+
+.table-stats {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+/* Tabla de clientes mejorada */
+.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.clients-table thead {
+    background: var(--light-color);
+}
+
+.clients-table th {
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.clients-table td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.clients-table tbody tr {
+    transition: var(--transition);
+}
+
+.clients-table tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+.clients-table tbody tr:nth-child(even) {
+    background-color: #fafbfc;
+}
+
+.clients-table tbody tr:nth-child(even):hover {
+    background-color: #f8f9ff;
+}
+
+/* Estilos específicos para clientes */
+.client-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+.client-id {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.client-dni {
+    font-weight: 500;
+    color: var(--info-color);
+    font-family: 'Courier New', monospace;
+}
+
+/* Botones de acción */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+    justify-content: flex-start;
+}
+
+.btn-action {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 0.8rem;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-action.edit {
+    background: var(--warning-color);
+    color: #856404;
+}
+
+.btn-action.edit:hover {
+    background: #e0a800;
+}
+
+.btn-action.delete {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-action.delete:hover {
+    background: #c82333;
+}
+
+.btn-action.view {
+    background: var(--info-color);
+    color: white;
+}
+
+.btn-action.view:hover {
+    background: #138496;
+}
+
+/* Modales mejorados */
+.modal-content {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    padding: 20px;
+    border-bottom: none;
+}
+
+.modal-header .modal-title {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-header .close {
+    color: white;
+    opacity: 0.8;
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+    color: white;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    background: var(--light-color);
+    border-top: 1px solid var(--border-color);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Formularios en modales */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-group label.required::after {
+    content: "*";
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    background: #fafbfc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+    background: white;
+}
+
+/* Input groups para búsqueda de DNI */
+.input-group {
+    display: flex;
+    position: relative;
+}
+
+.input-group input {
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+}
+
+.input-group-append {
+    display: flex;
+}
+
+.input-group-append .btn {
+    border-radius: 0 8px 8px 0;
+    border: 2px solid #e1e5e9;
+    border-left: none;
+    background: #f8f9fa;
+    color: var(--dark-color);
+    padding: 8px 15px;
+    transition: var(--transition);
+}
+
+.input-group-append .btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Botones del modal */
+.modal-footer .btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-footer .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-1px);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.modal-footer .btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #c82333);
+    color: white;
+}
+
+.modal-footer .btn-danger:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* Alertas mejoradas */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid var(--danger-color);
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    font-size: 1.2rem;
+    font-weight: 300;
+    opacity: 0.5;
+}
+
+.alert-dismissible .close:hover {
+    opacity: 0.75;
+}
+
+/* Validación visual */
+.form-group input.is-invalid,
+.form-group select.is-invalid {
+    border-color: var(--danger-color);
+    background: #fff5f5;
+}
+
+.form-group input.is-valid,
+.form-group select.is-valid {
+    border-color: var(--success-color);
+    background: #f8fff9;
+}
+
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.valid-feedback {
+    color: var(--success-color);
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Loading en botones */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions {
+        justify-content: stretch;
+    }
+    
+    .btn-filter {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .clients-table {
+        min-width: 600px;
+    }
+    
+    .action-buttons {
+        flex-wrap: nowrap;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-main {
+        padding: 15px;
+    }
+    
+    .filter-card .card-body {
+        padding: 20px;
+    }
+    
+    .clients-table th,
+    .clients-table td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-action {
+        width: 28px;
+        height: 28px;
+        font-size: 0.7rem;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+}
+
+/* Animaciones y efectos */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.table-container,
+.filter-card {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Estados de carga */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+
+/* Toast notifications personalizadas */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary-color);
+    animation: slideInRight 0.3s ease;
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Mejoras específicas para el contexto de clientes */
+.client-info-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e9ecef;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--dark-color);
+    margin-left: 5px;
+}
+
+.client-phone {
+    color: var(--success-color);
+    font-weight: 500;
+}
+
+.client-phone::before {
+    content: "📞 ";
+    font-size: 0.8em;
+}
+
+/* Estados de formulario específicos para clientes */
+.form-text {
+    font-size: 0.8rem;
+    color: var(--secondary-color);
+    margin-top: 5px;
+}
+
+/* Mejoras para la búsqueda de DNI */
+.dni-search-result {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #0c5460;
+}
+
+.dni-search-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #721c24;
+}

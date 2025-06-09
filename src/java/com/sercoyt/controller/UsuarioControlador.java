@@ -4,6 +4,7 @@ import com.sercoyt.model.Usuario;
 import com.sercoyt.model.dao.UsuarioDao;
 import com.sercoyt.util.EmailUtil;
 import com.sercoyt.util.PasswordUtil;
+import com.sercoyt.util.ReniecAPI;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.JSONObject;
 
 public class UsuarioControlador extends HttpServlet {
 
@@ -64,7 +66,10 @@ public class UsuarioControlador extends HttpServlet {
                     break;
                 case "actualizarPerfil":
                     actualizarPerfil(request, response);
-                    break;  
+                    break;
+                case "consultarDni":
+                    consultarDni(request, response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -121,32 +126,34 @@ public class UsuarioControlador extends HttpServlet {
         request.setAttribute("correo", usuario.getCorreo());
         request.getRequestDispatcher(pagVerificacion).forward(request, response);
     }
-
+    
     private void verificar(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
-        String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
-        String codigoIngresado = request.getParameter("codigo");
-
-        if (usuario == null || codigoEnviado == null) {
-            throw new RuntimeException("Sesión expirada o inválida");
-        }
-
-        if (!codigoEnviado.equals(codigoIngresado)) {
-            throw new RuntimeException("Código de verificación incorrecto");
-        }
-
-        if (usuarioDao.registrarUsuario(usuario)) {
-            session.removeAttribute("usuarioPendiente");
-            session.removeAttribute("codigoVerificacion");
-
-            request.setAttribute("registroExitoso", true);
-            request.getRequestDispatcher("registroExitoso.jsp").forward(request, response);
-        } else {
-            throw new RuntimeException("Error al registrar usuario");
-        }
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
+    String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
+    String codigoIngresado = request.getParameter("codigo");
+    
+    if (usuario == null || codigoEnviado == null) {
+        throw new RuntimeException("Sesión expirada o inválida");
     }
+    
+    if (!codigoEnviado.equals(codigoIngresado)) {
+        throw new RuntimeException("Código de verificación incorrecto");
+    }
+    
+    if (usuarioDao.registrarUsuario(usuario)) {
+        session.removeAttribute("usuarioPendiente");
+        session.removeAttribute("codigoVerificacion");
+        
+        // Establecer atributo de éxito y volver a mostrar la página de verificación
+        request.setAttribute("verificacionExitosa", true);
+        request.setAttribute("correo", usuario.getCorreo()); // o como obtengas el correo
+        request.getRequestDispatcher("verificacionCorreo.jsp").forward(request, response);
+    } else {
+        throw new RuntimeException("Error al registrar usuario");
+    }
+}
 
     private void nuevo(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -178,13 +185,13 @@ public class UsuarioControlador extends HttpServlet {
 
         switch (usuario.getTipoUsuario()) {
             case "administrador":
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard.jsp");
+                response.sendRedirect(request.getContextPath() + "/DashboardControlador");
                 break;
             case "vendedor":
                 response.sendRedirect(request.getContextPath() + "/vendedor/dashboard.jsp");
                 break;
             default: // cliente
-                response.sendRedirect(request.getContextPath() + "/index.jsp");
+                response.sendRedirect(request.getContextPath() + "/Controlador");
         }
     }
 
@@ -228,7 +235,7 @@ public class UsuarioControlador extends HttpServlet {
         if (session != null) {
             session.invalidate();
         }
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/Controlador");
     }
 
     private void cambiarContrasena(HttpServletRequest request, HttpServletResponse response)
@@ -360,6 +367,21 @@ public class UsuarioControlador extends HttpServlet {
         } catch (Exception e) {
             request.setAttribute("error", e.getMessage());
             mostrarPerfil(request, response);
+        }
+    }
+
+    // mETODO PARA LA API DE RENIEC
+    private void consultarDni(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String dni = request.getParameter("dni");
+            JSONObject datos = ReniecAPI.consultarDni(dni);
+
+            response.setContentType("application/json");
+            response.getWriter().write(datos.toString());
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
 

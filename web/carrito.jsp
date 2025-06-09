@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -207,8 +207,8 @@
                         </div>
                     </form>
                 </div>
-                
-                <div id="yapeForm" class="payment-form" style="display:none;">
+                    
+                <div id="yapeForm" class="payment-form" >
                     <div class="qr-code">
                         <img src="img/yape-qr.png" alt="Código QR de Yape">
                         <p>Escanea este código con la app de Yape para pagar</p>
