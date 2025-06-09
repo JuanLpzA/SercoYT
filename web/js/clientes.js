@@ -210,4 +210,28 @@ $(document).ready(function() {
         $('#dni').focus();
     });
 
+    $('.modal').on('hidden.bs.modal', function() {
+        $(this).find('form').trigger('reset');
+        $(this).find('.is-invalid').removeClass('is-invalid');
+        $(this).find('.invalid-feedback').remove();
+    });
+
+    // Auto-dismiss alerts
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 5000);
+
+    // Hide loading when page fully loads
+    $(window).on('load', function() {
+        hideLoading();
+    });
+
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: message,
+            timer: 3000
+        });
+    }
 });

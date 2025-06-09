@@ -172,9 +172,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-tag"></i> Nueva Marca
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="nuevaMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=guardar" method="POST">
                         <div class="modal-body">
@@ -186,9 +183,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Marca
                             </button>
@@ -206,9 +200,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-edit"></i> Editar Marca
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="editarMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
@@ -228,9 +219,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Marca
                             </button>
@@ -246,9 +234,6 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="confirmModalTitle">Confirmar Acción</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body" id="confirmModalBody">
                         ¿Está seguro que desea realizar esta acción?

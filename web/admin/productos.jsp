@@ -231,9 +231,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-plus-circle"></i> Nuevo Producto
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="nuevoProductoForm" action="${pageContext.request.contextPath}/ProductoControlador?accion=guardar" 
                           method="POST" enctype="multipart/form-data">
@@ -326,9 +323,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Producto
                             </button>
@@ -346,9 +340,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-edit"></i> Editar Producto
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="editarProductoForm" action="${pageContext.request.contextPath}/ProductoControlador?accion=actualizar" 
                           method="POST" enctype="multipart/form-data">
@@ -443,9 +434,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Producto
                             </button>
@@ -482,7 +470,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >Cancelar</button>
                             <button type="submit" class="btn btn-primary">Actualizar</button>
                         </div>
                     </form>
@@ -496,15 +483,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="confirmModalTitle">Confirmar Acción</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body" id="confirmModalBody">
                         ¿Está seguro que desea realizar esta acción?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="cerrarModal()" >Cancelar</button>
                         <a href="#" class="btn btn-danger" id="btn-confirmar">Confirmar</a>
                     </div>
                 </div>
@@ -519,9 +502,6 @@
                 <h5 class="modal-title">
                     <i class="fas fa-tag"></i> Crear Nueva Marca
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
             <form id="nuevaMarcaForm">
                 <div class="modal-body">
@@ -534,7 +514,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar Marca
                     </button>

@@ -178,9 +178,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-tag"></i> Nueva Categoría
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="nuevaCategoriaForm" action="${pageContext.request.contextPath}/CategoriaControlador?accion=guardar" method="POST">
                         <div class="modal-body">
@@ -192,9 +189,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Categoría
                             </button>
@@ -212,9 +206,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-edit"></i> Editar Categoría
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <form id="editarCategoriaForm" action="${pageContext.request.contextPath}/CategoriaControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
@@ -234,9 +225,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Categoría
                             </button>
@@ -252,9 +240,6 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="confirmModalTitle">Confirmar Acción</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body" id="confirmModalBody">
                         ¿Está seguro que desea realizar esta acción?

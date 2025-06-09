@@ -1,9 +1,3 @@
-<%-- 
-    Document   : clientes
-    Created on : 8 jun. 2025, 18:54:59
-    Author     : Arrunategui
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -131,7 +125,7 @@
                                 <tbody>
                                     <c:forEach var="cliente" items="${clientes}">
                                         <tr>
-                                            <td><strong>#${cliente.id}</strong></td>
+                                            <td><strong>#${cliente.idCliente}</strong></td>
                                             <td>${cliente.nombre}</td>
                                             <td>${cliente.apellido}</td>
                                             <td>${cliente.dni}</td>
@@ -139,12 +133,8 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 
-                                                            data-id="${cliente.id}" title="Editar">
+                                                            data-id="${cliente.idCliente}" title="Editar">
                                                         <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn-action delete btn-eliminar" 
-                                                            data-id="${cliente.id}" title="Eliminar">
-                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
                                             </td>
@@ -166,9 +156,7 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Nuevo Cliente
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+
                     </div>
                     <form id="nuevoClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=guardar" method="POST">
                         <div class="modal-body">
@@ -204,9 +192,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Cliente
                             </button>
@@ -224,9 +209,7 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-edit"></i> Editar Cliente
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+
                     </div>
                     <form id="editarClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
@@ -255,9 +238,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fas fa-times"></i> Cancelar
-                            </button>
+
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Cliente
                             </button>
@@ -273,15 +254,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="confirmModalTitle">Confirmar Eliminación</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body" id="confirmModalBody">
                         ¿Está seguro que desea eliminar este cliente? Esta acción no se puede deshacer.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                         <a href="#" class="btn btn-danger" id="btn-confirmar">Eliminar</a>
                     </div>
                 </div>
