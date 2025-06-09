@@ -11,9 +11,11 @@ import java.util.List;
 
 public class MarcaDao {
     private static final String SQL_SELECT = "SELECT * FROM marcas";
+    private static final String SQL_SELECT2 = "SELECT * FROM marcas WHERE estadoMarca='activo'";
     private static final String SQL_INSERT = "INSERT INTO marcas(nombre, estadoMarca) VALUES(?, ?)";
     private static final String SQL_UPDATE = "UPDATE marcas SET nombre = ?, estadoMarca = ? WHERE idMarca = ?";
     private static final String SQL_DELETE = "UPDATE marcas SET estadoMarca = 'inactivo' WHERE idMarca = ?";
+    private static final String SQL_ACTIVE = "UPDATE marcas SET estadoMarca = 'activo' WHERE idMarca = ?";
     private static final String SQL_GET_BY_ID = "SELECT * FROM marcas WHERE idMarca = ?";
     private static final String SQL_CHECK_NOMBRE = "SELECT COUNT(*) FROM marcas WHERE nombre = ? AND idMarca != ?";
 
@@ -21,6 +23,25 @@ public class MarcaDao {
         List<Marca> marcas = new ArrayList<>();
         try (Connection conn = ConnectDB.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                int id = rs.getInt("idMarca");
+                String nombre = rs.getString("nombre");
+                String estado = rs.getString("estadoMarca");
+                
+                marcas.add(new Marca(id, nombre, estado));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return marcas;
+    }
+    
+    public List<Marca> listarActivo() {
+        List<Marca> marcas = new ArrayList<>();
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT2);
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
@@ -83,6 +104,20 @@ public class MarcaDao {
             return false;
         }
     }
+    
+    public boolean activar(int id) {
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_ACTIVE)) {
+            
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+    
+    
 
     public Marca obtenerPorId(int id) {
         try (Connection conn = ConnectDB.getConnection();

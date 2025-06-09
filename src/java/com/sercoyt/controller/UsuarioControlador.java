@@ -155,32 +155,6 @@ public class UsuarioControlador extends HttpServlet {
     }
 }
 
-//    private void verificar(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        HttpSession session = request.getSession();
-//        Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
-//        String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
-//        String codigoIngresado = request.getParameter("codigo");
-//
-//        if (usuario == null || codigoEnviado == null) {
-//            throw new RuntimeException("Sesión expirada o inválida");
-//        }
-//
-//        if (!codigoEnviado.equals(codigoIngresado)) {
-//            throw new RuntimeException("Código de verificación incorrecto");
-//        }
-//
-//        if (usuarioDao.registrarUsuario(usuario)) {
-//            session.removeAttribute("usuarioPendiente");
-//            session.removeAttribute("codigoVerificacion");
-//          
-//            request.setAttribute("registroExitoso", true);
-//            request.getRequestDispatcher("registroExitoso.jsp").forward(request, response);
-//        } else {
-//            throw new RuntimeException("Error al registrar usuario");
-//        }
-//    }
-
     private void nuevo(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("usuario", new Usuario());

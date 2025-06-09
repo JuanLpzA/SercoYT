@@ -1,3 +1,9 @@
+<%-- 
+    Document   : categorias
+    Created on : 8 jun. 2025, 17:46:52
+    Author     : Arrunategui
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -7,11 +13,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Marcas - SERCOYT</title>
+        <title>Categorías - SERCOYT</title>
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/logo.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/marcas.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/marcas.css"> <!-- Reutiliza estilos -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -24,7 +30,7 @@
                         <button class="sidebar-toggle">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h4>Marcas</h4>
+                        <h4>Categorías</h4>
                     </div>
                     <div class="topbar-right">
                         <div class="user-dropdown">
@@ -65,10 +71,10 @@
                     </c:if>
 
                     <div class="section-header">
-                        <h4>Lista de Marcas</h4>
+                        <h4>Lista de Categorías</h4>
                         <div class="header-actions">
-                            <button class="btn btn-primary" id="btnNuevaMarca">
-                                <i class="fas fa-plus"></i> Nueva Marca
+                            <button class="btn btn-primary" id="btnNuevaCategoria">
+                                <i class="fas fa-plus"></i> Nueva Categoría
                             </button>
                         </div>
                     </div>
@@ -76,7 +82,7 @@
                     <div class="section-content">
                         <div class="filter-card">
                             <div class="card-header">
-                                <h5>Filtrar Marcas</h5>
+                                <h5>Filtrar Categorías</h5>
                             </div>
                             <div class="card-body">
                                 <form id="filtroForm" class="filter-form">
@@ -108,9 +114,9 @@
 
                         <div class="table-container">
                             <div class="table-header">
-                                <h5>Lista de Marcas</h5>
+                                <h5>Lista de Categorías</h5>
                                 <div class="table-stats">
-                                    <span>Total: <strong>${fn:length(marcas)}</strong> marcas</span>
+                                    <span>Total: <strong>${fn:length(categorias)}</strong> categorías</span>
                                 </div>
                             </div>
                             <table class="products-table">
@@ -123,31 +129,31 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="marca" items="${marcas}">
+                                    <c:forEach var="categoria" items="${categorias}">
                                         <tr>
-                                            <td><strong>#${marca.id}</strong></td>
-                                            <td>${marca.nombre}</td>
+                                            <td><strong>#${categoria.id}</strong></td>
+                                            <td>${categoria.nombre}</td>
                                             <td>
-                                                <span class="status-badge ${marca.estado eq 'activo' ? 'active' : 'inactive'}">
-                                                    ${marca.estado eq 'activo' ? 'Activo' : 'Inactivo'}
+                                                <span class="status-badge ${categoria.estado eq 'activo' ? 'active' : 'inactive'}">
+                                                    ${categoria.estado eq 'activo' ? 'Activo' : 'Inactivo'}
                                                 </span>
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 
-                                                            data-id="${marca.id}" title="Editar">
+                                                            data-id="${categoria.id}" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     <c:choose>
-                                                        <c:when test="${marca.estado eq 'activo'}">
+                                                        <c:when test="${categoria.estado eq 'activo'}">
                                                             <button class="btn-action deactivate btn-desactivar" 
-                                                                    data-id="${marca.id}" title="Desactivar">
+                                                                    data-id="${categoria.id}" title="Desactivar">
                                                                 <i class="fas fa-times"></i>
                                                             </button>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <button class="btn-action activate btn-activar" 
-                                                                    data-id="${marca.id}" title="Activar">
+                                                                    data-id="${categoria.id}" title="Activar">
                                                                 <i class="fas fa-check"></i>
                                                             </button>
                                                         </c:otherwise>
@@ -164,19 +170,19 @@
             </div>
         </div>
 
-        <!-- Modal Nueva Marca -->
-        <div class="modal fade" id="nuevaMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Modal Nueva Categoría -->
+        <div class="modal fade" id="nuevaCategoriaModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-tag"></i> Nueva Marca
+                            <i class="fas fa-tag"></i> Nueva Categoría
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="nuevaMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=guardar" method="POST">
+                    <form id="nuevaCategoriaForm" action="${pageContext.request.contextPath}/CategoriaControlador?accion=guardar" method="POST">
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="nombre" class="required">Nombre *</label>
@@ -190,7 +196,7 @@
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Marca
+                                <i class="fas fa-save"></i> Guardar Categoría
                             </button>
                         </div>
                     </form>
@@ -198,19 +204,19 @@
             </div>
         </div>
 
-        <!-- Modal Editar Marca -->
-        <div class="modal fade" id="editarMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Modal Editar Categoría -->
+        <div class="modal fade" id="editarCategoriaModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-edit"></i> Editar Marca
+                            <i class="fas fa-edit"></i> Editar Categoría
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="editarMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=actualizar" method="POST">
+                    <form id="editarCategoriaForm" action="${pageContext.request.contextPath}/CategoriaControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="modal-body">
                             <div class="form-group">
@@ -232,7 +238,7 @@
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Actualizar Marca
+                                <i class="fas fa-save"></i> Actualizar Categoría
                             </button>
                         </div>
                     </form>
@@ -271,23 +277,23 @@
                 path: '${pageContext.request.contextPath}',
                 messages: {
                     requiredField: 'Este campo es obligatorio',
-                    marcaCreated: 'Marca creada correctamente',
-                    marcaUpdated: 'Marca actualizada correctamente',
-                    marcaError: 'Error al procesar la marca'
+                    categoriaCreated: 'Categoría creada correctamente',
+                    categoriaUpdated: 'Categoría actualizada correctamente',
+                    categoriaError: 'Error al procesar la categoría'
                 },
                 endpoints: {
-                    marca: {
-                        list: '${pageContext.request.contextPath}/MarcaControlador?accion=listatodas',
-                        filter: '${pageContext.request.contextPath}/MarcaControlador?accion=filtrar',
-                        edit: '${pageContext.request.contextPath}/MarcaControlador?accion=editar&id=',
-                        save: '${pageContext.request.contextPath}/MarcaControlador?accion=guardar',
-                        update: '${pageContext.request.contextPath}/MarcaControlador?accion=actualizar',
-                        activate: '${pageContext.request.contextPath}/MarcaControlador?accion=activar&id=',
-                        deactivate: '${pageContext.request.contextPath}/MarcaControlador?accion=eliminar&id='
+                    categoria: {
+                        list: '${pageContext.request.contextPath}/CategoriaControlador?accion=listar',
+                        filter: '${pageContext.request.contextPath}/CategoriaControlador?accion=filtrar',
+                        edit: '${pageContext.request.contextPath}/CategoriaControlador?accion=editar&id=',
+                        save: '${pageContext.request.contextPath}/CategoriaControlador?accion=guardar',
+                        update: '${pageContext.request.contextPath}/CategoriaControlador?accion=actualizar',
+                        activate: '${pageContext.request.contextPath}/CategoriaControlador?accion=activar&id=',
+                        deactivate: '${pageContext.request.contextPath}/CategoriaControlador?accion=eliminar&id='
                     }
                 }
             };
         </script>
-        <script src="${pageContext.request.contextPath}/js/marcas.js"></script>
+        <script src="${pageContext.request.contextPath}/js/categorias.js"></script>
     </body>
 </html>

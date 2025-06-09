@@ -93,8 +93,8 @@ public class ProductoControlador extends HttpServlet {
     private void listarProductos(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Producto> productos = productoDao.listarTodos();
-        List<Marca> marcas = marcaDao.listar();
-        List<Categoria> categorias = categoriaDao.listar();
+        List<Marca> marcas = marcaDao.listarActivo();
+        List<Categoria> categorias = categoriaDao.listarActivo();
         
         request.setAttribute("productos", productos);
         request.setAttribute("marcas", marcas);

@@ -12,6 +12,11 @@
                 <i class="fas fa-tachometer-alt"></i> Dashboard
             </a>
         </li>
+        <li class="${pageContext.request.requestURI.contains('ventapresencial') ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/VentaPresencialControlador">
+                <i class="fas fa-credit-card"></i> Venta Presencial
+            </a>
+        </li>
         <li class="${pageContext.request.requestURI.contains('Producto') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/ProductoControlador">
                 <i class="fas fa-box"></i> Productos
@@ -33,7 +38,7 @@
             </a>
         </li>
         <li class="${pageContext.request.requestURI.contains('clientes') ? 'active' : ''}">
-            <a href="#">
+            <a href="${pageContext.request.contextPath}/ClienteControlador">
                 <i class="fas fa-users"></i> Clientes
             </a>
         </li>

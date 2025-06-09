@@ -18,16 +18,38 @@ import java.util.List;
  */
 public class CategoriaDao {
     private static final String SQL_SELECT = "SELECT * FROM categorias";
+    private static final String SQL_SELECT2 = "SELECT * FROM categorias WHERE estadoCategoria='activo'";
     private static final String SQL_INSERT = "INSERT INTO categorias(nombre, estadoCategoria) VALUES(?, ?)";
     private static final String SQL_UPDATE = "UPDATE categorias SET nombre = ?, estadoCategoria = ? WHERE idCategoria = ?";
     private static final String SQL_DELETE = "UPDATE categorias SET estadoCategoria = 'inactivo' WHERE idCategoria = ?";
     private static final String SQL_GET_BY_ID = "SELECT * FROM categorias WHERE idCategoria = ?";
     private static final String SQL_CHECK_NOMBRE = "SELECT COUNT(*) FROM categorias WHERE nombre = ? AND idCategoria != ?";
+    private static final String SQL_ACTIVE = "UPDATE categorias SET estadoCategoria = 'activo' WHERE idCategoria = ?";
 
+    
     public List<Categoria> listar() {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = ConnectDB.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SQL_SELECT);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                int id = rs.getInt("idCategoria");
+                String nombre = rs.getString("nombre");
+                String estado = rs.getString("estadoCategoria");
+                
+                categorias.add(new Categoria(id, nombre, estado));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return categorias;
+    }
+    
+    public List<Categoria> listarActivo() {
+        List<Categoria> categorias = new ArrayList<>();
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SQL_SELECT2);
              ResultSet rs = stmt.executeQuery()) {
             
             while (rs.next()) {
@@ -127,4 +149,16 @@ public class CategoriaDao {
         }
         return false;
     }
+    
+    public boolean activar(int id) {
+    try (Connection conn = ConnectDB.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(SQL_ACTIVE)) {
+        
+        stmt.setInt(1, id);
+        return stmt.executeUpdate() > 0;
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        return false;
+    }
+}
 }

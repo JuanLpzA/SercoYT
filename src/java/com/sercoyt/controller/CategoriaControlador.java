@@ -4,6 +4,7 @@ import com.sercoyt.model.Categoria;
 import com.sercoyt.model.dao.CategoriaDao;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,10 +29,16 @@ public class CategoriaControlador extends HttpServlet {
                     mostrarFormularioNuevo(request, response);
                     break;
                 case "editar":
-                    mostrarFormularioEditar(request, response);
+                    obtenerCategoriaParaEdicion(request, response);
                     break;
                 case "eliminar":
                     eliminarCategoria(request, response);
+                    break;
+                case "activar":
+                    activarCategoria(request, response);
+                    break;
+                case "filtrar":
+                    filtrarCategorias(request, response);
                     break;
                 default:
                     listarCategorias(request, response);
@@ -135,6 +142,69 @@ public class CategoriaControlador extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/CategoriaControlador?accion=listar&exito=eliminar");
         } else {
             response.sendRedirect(request.getContextPath() + "/CategoriaControlador?accion=listar&error=eliminar");
+        }
+    }
+    
+    private void activarCategoria(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    int id = Integer.parseInt(request.getParameter("id"));
+    
+    if (categoriaDao.activar(id)) {
+        response.sendRedirect(request.getContextPath() + "/CategoriaControlador?accion=listar&exito=activar");
+    } else {
+        response.sendRedirect(request.getContextPath() + "/CategoriaControlador?accion=listar&error=activar");
+    }
+}
+
+private void filtrarCategorias(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    String nombre = request.getParameter("nombre");
+    String estado = request.getParameter("estado");
+
+    List<Categoria> categorias = categoriaDao.listar();
+
+    // Aplicar filtros
+    if (nombre != null && !nombre.isEmpty()) {
+        categorias = categorias.stream()
+                .filter(c -> c.getNombre().toLowerCase().contains(nombre.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    if (estado != null && !estado.isEmpty()) {
+        categorias = categorias.stream()
+                    .filter(c -> c.getEstado().equals(estado))
+                    .collect(Collectors.toList());
+        }
+
+        request.setAttribute("categorias", categorias);
+        request.setAttribute("filtroNombre", nombre);
+        request.setAttribute("filtroEstado", estado);
+        request.getRequestDispatcher("/admin/categorias.jsp").forward(request, response);
+    }
+
+    private void obtenerCategoriaParaEdicion(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Categoria categoria = categoriaDao.obtenerPorId(id);
+
+            if (categoria != null) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+
+                // Crear un objeto JSON manualmente
+                String json = String.format("{\"id\": %d, \"nombre\": \"%s\", \"estado\": \"%s\"}",
+                        categoria.getId(), categoria.getNombre(), categoria.getEstado());
+
+                response.getWriter().write(json);
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Categoría no encontrada");
+            }
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener la categoría");
         }
     }
 }

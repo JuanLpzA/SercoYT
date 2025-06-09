@@ -1,3 +1,9 @@
+<%-- 
+    Document   : clientes
+    Created on : 8 jun. 2025, 18:54:59
+    Author     : Arrunategui
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -7,11 +13,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Marcas - SERCOYT</title>
+        <title>Clientes - SERCOYT</title>
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/logo.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/marcas.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/clientes.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -24,7 +30,7 @@
                         <button class="sidebar-toggle">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h4>Marcas</h4>
+                        <h4>Clientes</h4>
                     </div>
                     <div class="topbar-right">
                         <div class="user-dropdown">
@@ -65,10 +71,10 @@
                     </c:if>
 
                     <div class="section-header">
-                        <h4>Lista de Marcas</h4>
+                        <h4>Lista de Clientes</h4>
                         <div class="header-actions">
-                            <button class="btn btn-primary" id="btnNuevaMarca">
-                                <i class="fas fa-plus"></i> Nueva Marca
+                            <button class="btn btn-primary" id="btnNuevoCliente">
+                                <i class="fas fa-plus"></i> Nuevo Cliente
                             </button>
                         </div>
                     </div>
@@ -76,23 +82,21 @@
                     <div class="section-content">
                         <div class="filter-card">
                             <div class="card-header">
-                                <h5>Filtrar Marcas</h5>
+                                <h5>Filtrar Clientes</h5>
                             </div>
                             <div class="card-body">
                                 <form id="filtroForm" class="filter-form">
                                     <div class="filter-group">
-                                        <label for="filtroNombre">Nombre</label>
+                                        <label for="filtroNombre">Nombre/Apellido</label>
                                         <input type="text" class="form-control" id="filtroNombre" name="nombre" 
                                                value="${filtroNombre != null ? filtroNombre : ''}"
-                                               placeholder="Buscar por nombre...">
+                                               placeholder="Buscar por nombre o apellido...">
                                     </div>
                                     <div class="filter-group">
-                                        <label for="filtroEstado">Estado</label>
-                                        <select class="form-control" id="filtroEstado" name="estado">
-                                            <option value="">Todos los estados</option>
-                                            <option value="activo" ${filtroEstado eq 'activo' ? 'selected' : ''}>Activo</option>
-                                            <option value="inactivo" ${filtroEstado eq 'inactivo' ? 'selected' : ''}>Inactivo</option>
-                                        </select>
+                                        <label for="filtroDni">DNI</label>
+                                        <input type="text" class="form-control" id="filtroDni" name="dni" 
+                                               value="${filtroDni != null ? filtroDni : ''}"
+                                               placeholder="Buscar por DNI..." maxlength="8">
                                     </div>
                                 </form>
                                 <div class="filter-actions">
@@ -108,50 +112,40 @@
 
                         <div class="table-container">
                             <div class="table-header">
-                                <h5>Lista de Marcas</h5>
+                                <h5>Lista de Clientes</h5>
                                 <div class="table-stats">
-                                    <span>Total: <strong>${fn:length(marcas)}</strong> marcas</span>
+                                    <span>Total: <strong>${fn:length(clientes)}</strong> clientes</span>
                                 </div>
                             </div>
-                            <table class="products-table">
+                            <table class="clients-table">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Nombre</th>
-                                        <th>Estado</th>
+                                        <th>Apellido</th>
+                                        <th>DNI</th>
+                                        <th>Teléfono</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="marca" items="${marcas}">
+                                    <c:forEach var="cliente" items="${clientes}">
                                         <tr>
-                                            <td><strong>#${marca.id}</strong></td>
-                                            <td>${marca.nombre}</td>
-                                            <td>
-                                                <span class="status-badge ${marca.estado eq 'activo' ? 'active' : 'inactive'}">
-                                                    ${marca.estado eq 'activo' ? 'Activo' : 'Inactivo'}
-                                                </span>
-                                            </td>
+                                            <td><strong>#${cliente.id}</strong></td>
+                                            <td>${cliente.nombre}</td>
+                                            <td>${cliente.apellido}</td>
+                                            <td>${cliente.dni}</td>
+                                            <td>${cliente.telefono}</td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 
-                                                            data-id="${marca.id}" title="Editar">
+                                                            data-id="${cliente.id}" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
-                                                    <c:choose>
-                                                        <c:when test="${marca.estado eq 'activo'}">
-                                                            <button class="btn-action deactivate btn-desactivar" 
-                                                                    data-id="${marca.id}" title="Desactivar">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <button class="btn-action activate btn-activar" 
-                                                                    data-id="${marca.id}" title="Activar">
-                                                                <i class="fas fa-check"></i>
-                                                            </button>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                    <button class="btn-action delete btn-eliminar" 
+                                                            data-id="${cliente.id}" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -164,25 +158,49 @@
             </div>
         </div>
 
-        <!-- Modal Nueva Marca -->
-        <div class="modal fade" id="nuevaMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Modal Nuevo Cliente -->
+        <div class="modal fade" id="nuevoClienteModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-tag"></i> Nueva Marca
+                            <i class="fas fa-user-plus"></i> Nuevo Cliente
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="nuevaMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=guardar" method="POST">
+                    <form id="nuevoClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=guardar" method="POST">
                         <div class="modal-body">
+                            <div class="form-group">
+                                <label for="dni" class="required">DNI *</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="dni" name="dni" required
+                                           maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDni">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">Ingrese el DNI para buscar automáticamente</small>
+                            </div>
                             <div class="form-group">
                                 <label for="nombre" class="required">Nombre *</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" required
-                                       maxlength="50" pattern="[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s\-]+" 
-                                       title="Solo letras, números y espacios">
+                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                       title="Solo letras y espacios">
+                            </div>
+                            <div class="form-group">
+                                <label for="apellido" class="required">Apellido *</label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" required
+                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                       title="Solo letras y espacios">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" class="form-control" id="telefono" name="telefono"
+                                       maxlength="9" pattern="[0-9]{9}" title="Ingrese 9 dígitos numéricos">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -190,7 +208,7 @@
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Marca
+                                <i class="fas fa-save"></i> Guardar Cliente
                             </button>
                         </div>
                     </form>
@@ -198,33 +216,42 @@
             </div>
         </div>
 
-        <!-- Modal Editar Marca -->
-        <div class="modal fade" id="editarMarcaModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <!-- Modal Editar Cliente -->
+        <div class="modal fade" id="editarClienteModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-edit"></i> Editar Marca
+                            <i class="fas fa-user-edit"></i> Editar Cliente
                         </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form id="editarMarcaForm" action="${pageContext.request.contextPath}/MarcaControlador?accion=actualizar" method="POST">
+                    <form id="editarClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="edit_nombre" class="required">Nombre *</label>
-                                <input type="text" class="form-control" id="edit_nombre" name="nombre" required
-                                       maxlength="50" pattern="[A-Za-z0-9áéíóúÁÉÍÓÚñÑ\s\-]+" 
-                                       title="Solo letras, números y espacios">
+                                <label for="edit_dni" class="required">DNI *</label>
+                                <input type="text" class="form-control" id="edit_dni" name="dni" required
+                                       maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
                             </div>
                             <div class="form-group">
-                                <label for="edit_estado" class="required">Estado *</label>
-                                <select class="form-control" id="edit_estado" name="estado" required>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                </select>
+                                <label for="edit_nombre" class="required">Nombre *</label>
+                                <input type="text" class="form-control" id="edit_nombre" name="nombre" required
+                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                       title="Solo letras y espacios">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_apellido" class="required">Apellido *</label>
+                                <input type="text" class="form-control" id="edit_apellido" name="apellido" required
+                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
+                                       title="Solo letras y espacios">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_telefono">Teléfono</label>
+                                <input type="text" class="form-control" id="edit_telefono" name="telefono"
+                                       maxlength="9" pattern="[0-9]{9}" title="Ingrese 9 dígitos numéricos">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -232,7 +259,7 @@
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Actualizar Marca
+                                <i class="fas fa-save"></i> Actualizar Cliente
                             </button>
                         </div>
                     </form>
@@ -245,17 +272,17 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="confirmModalTitle">Confirmar Acción</h5>
+                        <h5 class="modal-title" id="confirmModalTitle">Confirmar Eliminación</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body" id="confirmModalBody">
-                        ¿Está seguro que desea realizar esta acción?
+                        ¿Está seguro que desea eliminar este cliente? Esta acción no se puede deshacer.
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <a href="#" class="btn btn-danger" id="btn-confirmar">Confirmar</a>
+                        <a href="#" class="btn btn-danger" id="btn-confirmar">Eliminar</a>
                     </div>
                 </div>
             </div>
@@ -271,23 +298,25 @@
                 path: '${pageContext.request.contextPath}',
                 messages: {
                     requiredField: 'Este campo es obligatorio',
-                    marcaCreated: 'Marca creada correctamente',
-                    marcaUpdated: 'Marca actualizada correctamente',
-                    marcaError: 'Error al procesar la marca'
+                    clienteCreated: 'Cliente creado correctamente',
+                    clienteUpdated: 'Cliente actualizado correctamente',
+                    clienteError: 'Error al procesar el cliente',
+                    dniInvalid: 'El DNI debe tener 8 dígitos numéricos',
+                    telefonoInvalid: 'El teléfono debe tener 9 dígitos numéricos'
                 },
                 endpoints: {
-                    marca: {
-                        list: '${pageContext.request.contextPath}/MarcaControlador?accion=listatodas',
-                        filter: '${pageContext.request.contextPath}/MarcaControlador?accion=filtrar',
-                        edit: '${pageContext.request.contextPath}/MarcaControlador?accion=editar&id=',
-                        save: '${pageContext.request.contextPath}/MarcaControlador?accion=guardar',
-                        update: '${pageContext.request.contextPath}/MarcaControlador?accion=actualizar',
-                        activate: '${pageContext.request.contextPath}/MarcaControlador?accion=activar&id=',
-                        deactivate: '${pageContext.request.contextPath}/MarcaControlador?accion=eliminar&id='
+                    cliente: {
+                        list: '${pageContext.request.contextPath}/ClienteControlador?accion=listar',
+                        filter: '${pageContext.request.contextPath}/ClienteControlador?accion=filtrar',
+                        edit: '${pageContext.request.contextPath}/ClienteControlador?accion=editar&id=',
+                        save: '${pageContext.request.contextPath}/ClienteControlador?accion=guardar',
+                        update: '${pageContext.request.contextPath}/ClienteControlador?accion=actualizar',
+                        delete: '${pageContext.request.contextPath}/ClienteControlador?accion=eliminar&id=',
+                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni='
                     }
                 }
             };
         </script>
-        <script src="${pageContext.request.contextPath}/js/marcas.js"></script>
+        <script src="${pageContext.request.contextPath}/js/clientes.js"></script>
     </body>
 </html>
