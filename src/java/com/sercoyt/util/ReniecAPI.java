@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class ReniecAPI {
     private static final String API_URL = "https://api.apis.net.pe/v2/reniec/dni?numero=";
-    private static final String TOKEN = "Bearer apis-token-15638.ohYOvAVirRjjGuOhXtksC9eZpnkMzimr";
+    private static final String TOKEN = "Bearer apis-token-16031.5qKEr2NSEEHNUwXl3C9KiEYret6W9Tte";
 
     public static JSONObject consultarDni(String dni) throws Exception {
         URL url = new URL(API_URL + dni);

@@ -17,7 +17,7 @@ import org.json.JSONObject;
 public class SunatAPI {
     private static final String API_URL_BASIC = "https://api.apis.net.pe/v2/sunat/ruc?numero=";
     private static final String API_URL_FULL = "https://api.apis.net.pe/v2/sunat/ruc/full?numero=";
-    private static final String TOKEN = "Bearer apis-token-15638.ohYOvAVirRjjGuOhXtksC9eZpnkMzimr";
+    private static final String TOKEN = "Bearer apis-token-16031.5qKEr2NSEEHNUwXl3C9KiEYret6W9Tte";
     
     public static JSONObject consultarRucBasico(String ruc) throws Exception {
         return consultarRuc(ruc, false);

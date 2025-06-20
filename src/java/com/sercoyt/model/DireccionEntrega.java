@@ -12,15 +12,25 @@ public class DireccionEntrega {
 
     private int idEntrega;
     private int idVenta;
+    private String nombreReceptor;
+    private String telefono;
+    private String provincia;
     private String direccion;
+    private String referencia;
+    private String codigoPostal;
 
     public DireccionEntrega() {
     }
 
-    public DireccionEntrega(int idEntrega, int idVenta, String direccion) {
+    public DireccionEntrega(int idEntrega, int idVenta, String nombreReceptor, String telefono, String provincia, String direccion, String referencia, String codigoPostal) {
         this.idEntrega = idEntrega;
         this.idVenta = idVenta;
+        this.nombreReceptor = nombreReceptor;
+        this.telefono = telefono;
+        this.provincia = provincia;
         this.direccion = direccion;
+        this.referencia = referencia;
+        this.codigoPostal = codigoPostal;
     }
 
     public int getIdEntrega() {
@@ -39,6 +49,30 @@ public class DireccionEntrega {
         this.idVenta = idVenta;
     }
 
+    public String getNombreReceptor() {
+        return nombreReceptor;
+    }
+
+    public void setNombreReceptor(String nombreReceptor) {
+        this.nombreReceptor = nombreReceptor;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getProvincia() {
+        return provincia;
+    }
+
+    public void setProvincia(String provincia) {
+        this.provincia = provincia;
+    }
+
     public String getDireccion() {
         return direccion;
     }
@@ -46,5 +80,23 @@ public class DireccionEntrega {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
+
+    public String getReferencia() {
+        return referencia;
+    }
+
+    public void setReferencia(String referencia) {
+        this.referencia = referencia;
+    }
+
+    public String getCodigoPostal() {
+        return codigoPostal;
+    }
+
+    public void setCodigoPostal(String codigoPostal) {
+        this.codigoPostal = codigoPostal;
+    }
+
+    
 
 }

@@ -107,10 +107,23 @@ public class VentaControlador extends HttpServlet {
             // 6. Registrar venta y detalles
             int idVenta = ventaDao.registrarVenta(venta, detalles);
 
-            // 7. Registrar dirección de entrega
+            // 7. Registrar dirección de entrega (MODIFICADO)
             DireccionEntrega direccion = new DireccionEntrega();
             direccion.setIdVenta(idVenta);
-            direccion.setDireccion(construirDireccionCompleta(direccionJson));
+            direccion.setNombreReceptor(direccionJson.getString("nombreReceptor"));
+            direccion.setTelefono(direccionJson.getString("telefono"));
+            direccion.setProvincia(direccionJson.getString("provincia"));
+            direccion.setDireccion(direccionJson.getString("direccion"));
+
+            // Campos opcionales
+            if (direccionJson.has("referencia") && !direccionJson.getString("referencia").isEmpty()) {
+                direccion.setReferencia(direccionJson.getString("referencia"));
+            }
+
+            if (direccionJson.has("codigoPostal") && !direccionJson.getString("codigoPostal").isEmpty()) {
+                direccion.setCodigoPostal(direccionJson.getString("codigoPostal"));
+            }
+
             ventaDao.registrarDireccionEntrega(direccion);
 
             // 8. Generar y guardar PDF
