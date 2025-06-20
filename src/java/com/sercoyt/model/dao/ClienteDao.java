@@ -7,23 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDao {
-    private static final String SQL_SELECT = "SELECT * FROM clientes";
-    private static final String SQL_INSERT = "INSERT INTO clientes(nombre, apellido, dni, telefono) VALUES(?, ?, ?, ?)";
-    private static final String SQL_UPDATE = "UPDATE clientes SET nombre = ?, apellido = ?, dni = ?, telefono = ? WHERE idCliente = ?";
+    private static final String SQL_SELECT = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, tc.descripcion as tipoCliente FROM clientes c INNER JOIN tipoCliente tc ON c.idTipoCliente = tc.idTipoCliente";
+    private static final String SQL_INSERT = "INSERT INTO clientes(nombre, apellido, documento, telefono, idTipoCliente) VALUES(?, ?, ?, ?, ?)";
+    private static final String SQL_UPDATE = "UPDATE clientes SET nombre = ?, apellido = ?, documento = ?, telefono = ? WHERE idCliente = ?";
     private static final String SQL_DELETE = "DELETE FROM clientes WHERE idCliente = ?";
     private static final String SQL_GET_BY_ID = "SELECT * FROM clientes WHERE idCliente = ?";
-    private static final String SQL_CHECK_DNI = "SELECT COUNT(*) FROM clientes WHERE dni = ? AND idCliente != ?";
+    private static final String SQL_CHECK_DNI = "SELECT COUNT(*) FROM clientes WHERE documento = ? AND idCliente != ?";
 
     public int registrarCliente(Cliente cliente) throws SQLException {
-        String sql = "INSERT INTO clientes (nombre, apellido, dni, telefono) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (nombre, apellido, documento, telefono, idTipoCliente) VALUES (?, ?, ?, ?, ?)";
         int idCliente = 0;
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, cliente.getNombre());
             ps.setString(2, cliente.getApellido());
-            ps.setString(3, cliente.getDni());
+            ps.setString(3, cliente.getDocumento());
             ps.setString(4, cliente.getTelefono());
+            ps.setInt(5, 1);
 
             int affectedRows = ps.executeUpdate();
 
@@ -41,7 +42,7 @@ public class ClienteDao {
     }
 
     public Integer obtenerIdClientePorDni(String dni) throws SQLException {
-        String sql = "SELECT idCliente FROM clientes WHERE dni = ?";
+        String sql = "SELECT idCliente FROM clientes WHERE documento = ?";
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
@@ -81,8 +82,9 @@ public class ClienteDao {
                     rs.getInt("idCliente"),
                     rs.getString("nombre"),
                     rs.getString("apellido"),
-                    rs.getString("dni"),
-                    rs.getString("telefono")
+                    rs.getString("documento"),
+                    rs.getString("telefono"),
+                    rs.getString("tipoCliente")
                 ));
             }
         } catch (SQLException ex) {
@@ -97,9 +99,9 @@ public class ClienteDao {
             
             stmt.setString(1, cliente.getNombre());
             stmt.setString(2, cliente.getApellido());
-            stmt.setString(3, cliente.getDni());
+            stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getTelefono());
-            
+            stmt.setInt(5, 1);
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -120,7 +122,7 @@ public class ClienteDao {
             
             stmt.setString(1, cliente.getNombre());
             stmt.setString(2, cliente.getApellido());
-            stmt.setString(3, cliente.getDni());
+            stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getTelefono());
             stmt.setInt(5, cliente.getIdCliente());
             
@@ -154,8 +156,9 @@ public class ClienteDao {
                         rs.getInt("idCliente"),
                         rs.getString("nombre"),
                         rs.getString("apellido"),
-                        rs.getString("dni"),
-                        rs.getString("telefono")
+                        rs.getString("documento"),
+                        rs.getString("telefono"),
+                        rs.getString("tipoDocumento")
                     );
                 }
             }

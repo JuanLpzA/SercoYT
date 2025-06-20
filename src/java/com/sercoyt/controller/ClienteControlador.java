@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -82,6 +83,11 @@ public class ClienteControlador extends HttpServlet {
 
     private void listarClientes(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+
+        // Obtener los mensajes de la sesión
+        String exito = (String) session.getAttribute("exito");
+        String error = (String) session.getAttribute("error");
         List<Cliente> clientes = clienteDao.listarTodos();
         request.setAttribute("clientes", clientes);
         request.getRequestDispatcher("/admin/clientes.jsp").forward(request, response);
@@ -93,7 +99,7 @@ public class ClienteControlador extends HttpServlet {
             Cliente cliente = new Cliente();
             cliente.setNombre(request.getParameter("nombre"));
             cliente.setApellido(request.getParameter("apellido"));
-            cliente.setDni(request.getParameter("dni"));
+            cliente.setDocumento(request.getParameter("dni"));
             cliente.setTelefono(request.getParameter("telefono"));
 
             int idGenerado = clienteDao.insertar(cliente);
@@ -119,7 +125,7 @@ public class ClienteControlador extends HttpServlet {
             cliente.setIdCliente(Integer.parseInt(request.getParameter("id")));
             cliente.setNombre(request.getParameter("nombre"));
             cliente.setApellido(request.getParameter("apellido"));
-            cliente.setDni(request.getParameter("dni"));
+            cliente.setDocumento(request.getParameter("dni"));
             cliente.setTelefono(request.getParameter("telefono"));
 
             if (clienteDao.actualizar(cliente)) {
@@ -164,7 +170,7 @@ public class ClienteControlador extends HttpServlet {
 
         if (dni != null && !dni.isEmpty()) {
             clientes = clientes.stream()
-                    .filter(c -> c.getDni().contains(dni))
+                    .filter(c -> c.getDocumento().contains(dni))
                     .collect(Collectors.toList());
         }
 
@@ -186,7 +192,7 @@ public class ClienteControlador extends HttpServlet {
 
                 String json = String.format(
                     "{\"id\": %d, \"nombre\": \"%s\", \"apellido\": \"%s\", \"dni\": \"%s\", \"telefono\": \"%s\"}",
-                    cliente.getIdCliente(), cliente.getNombre(), cliente.getApellido(), cliente.getDni(), cliente.getTelefono()
+                    cliente.getIdCliente(), cliente.getNombre(), cliente.getApellido(), cliente.getDocumento(), cliente.getTelefono()
                 );
 
                 response.getWriter().write(json);

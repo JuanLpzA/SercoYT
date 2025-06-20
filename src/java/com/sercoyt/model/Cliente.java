@@ -13,18 +13,28 @@ public class Cliente {
     private int idCliente;
     private String nombre;
     private String apellido;
-    private String dni;
+    private String documento;
     private String telefono;
+    private String tipoCliente;
 
     public Cliente() {
     }
 
-    public Cliente(int idCliente, String nombre, String apellido, String dni, String telefono) {
+    public Cliente(int idCliente, String nombre, String apellido, String documento, String telefono, String tipoCliente) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.apellido = apellido;
-        this.dni = dni;
+        this.documento = documento;
         this.telefono = telefono;
+        this.tipoCliente = tipoCliente;
+    }
+
+    public String getTipoCliente() {
+        return tipoCliente;
+    }
+
+    public void setTipoCliente(String tipoCliente) {
+        this.tipoCliente = tipoCliente;
     }
 
     public int getIdCliente() {
@@ -51,12 +61,12 @@ public class Cliente {
         this.apellido = apellido;
     }
 
-    public String getDni() {
-        return dni;
+    public String getDocumento() {
+        return documento;
     }
 
-    public void setDni(String dni) {
-        this.dni = dni;
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
     public String getTelefono() {
@@ -66,5 +76,8 @@ public class Cliente {
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
+
+    
+    
 
 }

@@ -235,7 +235,7 @@ public class VentaDao {
         String sql = "SELECT v.*, "
                 + "tv.nombre AS tipoVentaNombre, "
                 + "CONCAT(c.nombre, ' ', c.apellido) AS clienteNombre, "
-                + "c.dni AS clienteDni, "
+                + "c.documento AS clienteDni, "
                 + "ed.descripcion AS estadoNombre, "
                 + "fp.metodo AS metodoPagoNombre "
                 + "FROM ventas v "
@@ -243,7 +243,7 @@ public class VentaDao {
                 + "JOIN clientes c ON v.idCliente = c.idCliente "
                 + "JOIN estadodespacho ed ON v.idEstado = ed.idEstado "
                 + "JOIN formapago fp ON v.idPago = fp.idPago "
-                + "WHERE c.dni = ? "
+                + "WHERE c.documento = ? "
                 + "ORDER BY v.fecha DESC";
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -281,7 +281,7 @@ public class VentaDao {
         String sql = "SELECT "
                 + "tv.nombre AS tipoVentaNombre, "
                 + "CONCAT(c.nombre, ' ', c.apellido) AS clienteNombre, "
-                + "c.dni AS clienteDni, "
+                + "c.documento AS clienteDni, "
                 + "ed.descripcion AS estadoNombre, "
                 + "fp.metodo AS metodoPagoNombre "
                 + "FROM ventas v "

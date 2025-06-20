@@ -90,7 +90,7 @@
                                         <label for="filtroDni">DNI</label>
                                         <input type="text" class="form-control" id="filtroDni" name="dni" 
                                                value="${filtroDni != null ? filtroDni : ''}"
-                                               placeholder="Buscar por DNI..." maxlength="8">
+                                               placeholder="Buscar por Documento..." maxlength="8">
                                     </div>
                                 </form>
                                 <div class="filter-actions">
@@ -117,8 +117,9 @@
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th>Apellido</th>
-                                        <th>DNI</th>
+                                        <th>DNI/RUC</th>
                                         <th>Teléfono</th>
+                                        <th>Categoria</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -128,8 +129,9 @@
                                             <td><strong>#${cliente.idCliente}</strong></td>
                                             <td>${cliente.nombre}</td>
                                             <td>${cliente.apellido}</td>
-                                            <td>${cliente.dni}</td>
+                                            <td>${cliente.documento}</td>
                                             <td>${cliente.telefono}</td>
+                                            <td>${cliente.tipoCliente}</td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 

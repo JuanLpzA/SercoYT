@@ -141,23 +141,6 @@ public class VentaControlador extends HttpServlet {
         }
     }
 
-    private String construirDireccionCompleta(JSONObject direccionJson) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Receptor: ").append(direccionJson.getString("nombreReceptor"));
-        sb.append(" | Tel: ").append(direccionJson.getString("telefono"));
-        sb.append(" | Provincia: ").append(direccionJson.getString("provincia"));
-        sb.append(" | Dirección: ").append(direccionJson.getString("direccion"));
-
-        if (direccionJson.has("referencia") && !direccionJson.getString("referencia").isEmpty()) {
-            sb.append(" | Ref: ").append(direccionJson.getString("referencia"));
-        }
-
-        if (direccionJson.has("codigoPostal") && !direccionJson.getString("codigoPostal").isEmpty()) {
-            sb.append(" | CP: ").append(direccionJson.getString("codigoPostal"));
-        }
-
-        return sb.toString();
-    }
 
     private String generarYGuardarBoleta(int idVenta)
             throws SQLException, IOException, DocumentException {
@@ -207,7 +190,7 @@ public class VentaControlador extends HttpServlet {
             Cliente cliente = new Cliente();
             cliente.setNombre(usuario.getNombre());
             cliente.setApellido(usuario.getApellido());
-            cliente.setDni(usuario.getDni());
+            cliente.setDocumento(usuario.getDni());
             cliente.setTelefono(usuario.getTelefono());
 
             idCliente = clienteDao.registrarCliente(cliente);
