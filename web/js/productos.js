@@ -295,10 +295,9 @@ $(document).ready(function () {
         });
     });
 
-    // Form validation
     function validateProductForm($form, isEdit = false) {
         let isValid = true;
-
+        
         // Clear previous validations
         $form.find('.is-invalid').removeClass('is-invalid');
         $form.find('.invalid-feedback').remove();
@@ -335,41 +334,151 @@ $(document).ready(function () {
         $element.after(`<div class="invalid-feedback">${message}</div>`);
     }
 
+    // Función para enviar el formulario finalmente
+    function submitRealForm($form) {
+        const formData = new FormData($form[0]);
+        
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                // Cerrar modal antes de recargar
+                $form.closest('.modal').modal('hide');
+                
+                // Mostrar mensaje de éxito y recargar
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Producto guardado correctamente',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            },
+            error: function(xhr) {
+                let errorMessage = 'Error al guardar el producto';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    errorMessage = response.message || errorMessage;
+                } catch (e) {
+                    errorMessage = xhr.responseText || errorMessage;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonText: 'Entendido'
+                });
+            }
+        });
+    }
+
     // New product form submission
-    $('#nuevoProductoForm').submit(function (e) {
-        if (!validateProductForm($(this))) {
-            e.preventDefault();
+    $('#nuevoProductoForm').submit(function(e) {
+        e.preventDefault(); // Siempre prevenir el envío normal del formulario
+        const $form = $(this);
+        
+        if (!validateProductForm($form)) {
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        verifyProductDuplicate($form, false);
     });
 
     // Edit product form submission
-    $('#editarProductoForm').submit(function (e) {
-        // Validar que si se subió una imagen, tenga el tipo correcto
+    $('#editarProductoForm').submit(function(e) {
+        e.preventDefault(); // Siempre prevenir el envío normal del formulario
+        const $form = $(this);
+        
+        // Validar imagen primero
         const imagenInput = document.getElementById('edit_imagen');
-        if (imagenInput.files.length > 0) {
+        if (imagenInput && imagenInput.files.length > 0) {
             const file = imagenInput.files[0];
             if (!file.type.match('image.*')) {
-                e.preventDefault();
                 showError(AppContext.messages.imageTypeError);
                 return false;
             }
             if (file.size > MAX_IMAGE_SIZE) {
-                e.preventDefault();
                 showError(AppContext.messages.imageSizeError);
                 return false;
             }
         }
 
-        if (!validateProductForm($(this), true)) {
-            e.preventDefault();
+        if (!validateProductForm($form, true)) {
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        verifyProductDuplicate($form, true);
     });
+
+    // Función para verificar duplicados
+    function verifyProductDuplicate($form, isEdit) {
+        const $submitBtn = $form.find('[type="submit"]');
+        const originalBtnText = $submitBtn.html();
+        
+        // Mostrar loading en el botón
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Verificando...');
+        
+        $.ajax({
+            url: AppContext.endpoints.product.verificar,
+            type: 'POST',
+            data: {
+                nombre: $form.find('[name="nombre"]').val().trim(),
+                marca: $form.find('[name="marca"]').val(),
+                categoria: $form.find('[name="categoria"]').val(),
+                id: isEdit ? $form.find('[name="id"]').val() : 0
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.existe) {
+                    // Producto duplicado encontrado - mostrar alerta y NO cerrar modal
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¡Producto Duplicado!',
+                        html: `Ya existe un producto idéntico:<br><br>
+                               <strong>Nombre:</strong> ${response.nombre}<br>
+                               <strong>Marca:</strong> ${response.marca}<br>
+                               <strong>Categoría:</strong> ${response.categoria}`,
+                        confirmButtonText: 'Entendido',
+                        footer: 'Modifica alguno de estos campos para continuar'
+                    }).then(() => {
+                        // Enfocar el campo nombre para que el usuario pueda modificar
+                        $form.find('[name="nombre"]').focus();
+                    });
+                } else {
+                    // No hay duplicados - proceder con el guardado
+                    submitRealForm($form);
+                }
+            },
+            error: function(xhr) {
+                let errorMessage = 'Error al verificar duplicados';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    errorMessage = response.message || errorMessage;
+                } catch (e) {
+                    errorMessage = xhr.responseText || errorMessage;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonText: 'Entendido'
+                });
+            },
+            complete: function() {
+                // Restaurar botón solo si no se va a enviar el formulario
+                $submitBtn.prop('disabled', false).html(originalBtnText);
+            }
+        });
+    }
 
     function scrollToFirstError() {
         const $firstError = $('.is-invalid').first();
@@ -379,12 +488,6 @@ $(document).ready(function () {
             }, 500);
             $firstError.focus();
         }
-    }
-
-    function showButtonLoading($btn) {
-        $btn.addClass('btn-loading')
-                .prop('disabled', true)
-                .html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
     }
 
     // Filter form
@@ -434,6 +537,9 @@ $(document).ready(function () {
         $(this).find('form').trigger('reset');
         $(this).find('.image-preview-container').hide();
         $(this).find('.file-upload-area').removeClass('has-file');
+        // Limpiar validaciones
+        $(this).find('.is-invalid').removeClass('is-invalid');
+        $(this).find('.invalid-feedback').remove();
     });
 
     // Initialize file uploads

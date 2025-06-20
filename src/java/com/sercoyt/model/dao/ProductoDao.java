@@ -446,6 +446,25 @@ public boolean activar(int id) {
     }
 }
 
+public boolean existeProducto(String nombre, String marca, String categoria) throws SQLException {
+    String sql = "SELECT COUNT(*) FROM productos p " +
+                "JOIN marcas m ON p.idMarca = m.idMarca " +
+                "JOIN categorias c ON p.idCategoria = c.idCategoria " +
+                "WHERE p.nombre = ? AND m.nombre = ? AND c.nombre = ? AND p.estadoProducto = 'activo'";
+    
+    try (Connection conn = ConnectDB.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, nombre);
+        stmt.setString(2, marca);
+        stmt.setString(3, categoria);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+}
+
     
     
     //dashboard

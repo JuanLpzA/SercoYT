@@ -108,46 +108,86 @@ public class MarcaControlador extends HttpServlet {
 
     private void guardarMarca(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         try {
+            String nombre = request.getParameter("nombre");
+
+            // Validar que el nombre no esté vacío
+            if (nombre == null || nombre.trim().isEmpty()) {
+                response.getWriter().write("{\"success\": false, \"message\": \"El nombre es obligatorio\"}");
+                return;
+            }
+
+            nombre = nombre.trim();
+
+            // Validar si ya existe una marca con ese nombre (excluyendo ID 0 para nueva marca)
+            if (marcaDao.existeNombre(nombre, 0)) {
+                response.getWriter().write("{\"success\": false, \"message\": \"Ya existe una marca con ese nombre\"}");
+                return;
+            }
+
+            // Crear y guardar la marca
             Marca marca = new Marca();
-            marca.setNombre(request.getParameter("nombre"));
+            marca.setNombre(nombre);
             marca.setEstado("activo");
 
             int idGenerado = marcaDao.insertar(marca);
 
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-
             if (idGenerado > 0) {
-                response.getWriter().write("{\"exito\": true}");
+                response.getWriter().write("{\"success\": true, \"message\": \"Marca creada correctamente\", \"id\": " + idGenerado + "}");
             } else {
-                response.getWriter().write("{\"error\": \"Error al guardar la marca\"}");
+                response.getWriter().write("{\"success\": false, \"message\": \"Error al guardar la marca en la base de datos\"}");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+            response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor: " + e.getMessage() + "\"}");
         }
     }
 
     private void actualizarMarca(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         try {
             int id = Integer.parseInt(request.getParameter("id"));
+            String nombre = request.getParameter("nombre");
+            String estado = request.getParameter("estado");
+
+            // Validar que el nombre no esté vacío
+            if (nombre == null || nombre.trim().isEmpty()) {
+                response.getWriter().write("{\"success\": false, \"message\": \"El nombre es obligatorio\"}");
+                return;
+            }
+
+            nombre = nombre.trim();
+
+            // Validar si ya existe una marca con ese nombre (excluyendo el ID actual)
+            if (marcaDao.existeNombre(nombre, id)) {
+                response.getWriter().write("{\"success\": false, \"message\": \"Ya existe una marca con ese nombre\"}");
+                return;
+            }
+
+            // Crear y actualizar la marca
             Marca marca = new Marca();
             marca.setId(id);
-            marca.setNombre(request.getParameter("nombre"));
-            marca.setEstado(request.getParameter("estado"));
-            
+            marca.setNombre(nombre);
+            marca.setEstado(estado);
+
             if (marcaDao.actualizar(marca)) {
-                response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=listar&exito=actualizar");
+                response.getWriter().write("{\"success\": true, \"message\": \"Marca actualizada correctamente\"}");
             } else {
-                response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=editar&id=" + id + "&error=actualizar");
+                response.getWriter().write("{\"success\": false, \"message\": \"Error al actualizar la marca en la base de datos\"}");
             }
+
+        } catch (NumberFormatException e) {
+            response.getWriter().write("{\"success\": false, \"message\": \"ID de marca inválido\"}");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/MarcaControlador?accion=editar&id=" + request.getParameter("id") + "&error=actualizar");
+            response.getWriter().write("{\"success\": false, \"message\": \"Error interno del servidor: " + e.getMessage() + "\"}");
         }
     }
 

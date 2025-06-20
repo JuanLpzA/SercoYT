@@ -538,7 +538,7 @@
             requiredField: 'Este campo es obligatorio',
             invalidPrice: 'El precio debe ser mayor a 0',
             brandCreated: 'Marca creada correctamente',
-            brandError: 'No se pudo crear la marca'
+            brandError: 'No se pudo crear la marca porque ya existe'
         },
         endpoints: {
             product: {
@@ -548,6 +548,7 @@
                 filter: '${pageContext.request.contextPath}/ProductoControlador?accion=filtrar',
                 activate: '${pageContext.request.contextPath}/ProductoControlador?accion=activar&id=',
                 deactivate: '${pageContext.request.contextPath}/ProductoControlador?accion=eliminar&id=',
+                verificar: '${pageContext.request.contextPath}/ProductoControlador?accion=verificarDuplicado',
                 stock: '${pageContext.request.contextPath}/ProductoControlador?accion=actualizarStock'
             },
             brand: {

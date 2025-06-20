@@ -1,6 +1,7 @@
 package com.sercoyt.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.sercoyt.model.Producto;
 import com.sercoyt.model.dao.CategoriaDao;
 import com.sercoyt.model.dao.MarcaDao;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import com.sercoyt.model.*;
+import java.io.PrintWriter;
 
 @MultipartConfig
 public class ProductoControlador extends HttpServlet {
@@ -79,7 +81,10 @@ public class ProductoControlador extends HttpServlet {
                     break;
                 case "actualizarStock":
                     actualizarStock(request, response);
-                    break;    
+                    break;
+                case "verificarDuplicado":
+                    verificarProductoDuplicado(request, response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -92,6 +97,23 @@ public class ProductoControlador extends HttpServlet {
 
     private void listarProductos(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession();
+
+        // Obtener los mensajes de la sesión
+        String exito = (String) session.getAttribute("exito");
+        String error = (String) session.getAttribute("error");
+
+        // Limpiar los mensajes de la sesión
+        session.removeAttribute("exito");
+        session.removeAttribute("error");
+
+        // Pasar los mensajes al request para mostrarlos
+        if (exito != null) {
+            request.setAttribute("exito", exito);
+        }
+        if (error != null) {
+            request.setAttribute("error", error);
+        }
         List<Producto> productos = productoDao.listarTodos();
         List<Marca> marcas = marcaDao.listarActivo();
         List<Categoria> categorias = categoriaDao.listarActivo();
@@ -152,10 +174,17 @@ public class ProductoControlador extends HttpServlet {
         try {
             request.setCharacterEncoding("UTF-8");
             response.setCharacterEncoding("UTF-8");
-          
+
+            String nombre = request.getParameter("nombre");
             String nombreMarca = request.getParameter("marca");
             String nombreCategoria = request.getParameter("categoria");
-            
+
+            if (productoDao.existeProducto(nombre, nombreMarca, nombreCategoria)) {
+                request.getSession().setAttribute("error", "El producto ya existe con el mismo nombre, marca y categoría");
+                response.sendRedirect(request.getContextPath() + "/ProductoControlador");
+                return;
+            }
+
             // Verificar si la marca existe, si no, crearla
             if (!productoDao.existeMarca(nombreMarca)) {
                 Marca nuevaMarca = new Marca();
@@ -243,7 +272,24 @@ private void actualizarProducto(HttpServletRequest request, HttpServletResponse 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
         int id = Integer.parseInt(request.getParameter("id"));
+        String nombre = request.getParameter("nombre");
+        String nombreMarca = request.getParameter("marca");
+        String nombreCategoria = request.getParameter("categoria");
         
+        Producto productoActual = productoDao.listarId(id);
+        
+        // Validar si los campos clave cambiaron y si el nuevo combo ya existe
+       if ((!productoActual.getNombres().equals(nombre) || 
+            !productoActual.getNombreMarca().equals(nombreMarca) || 
+            !productoActual.getNombreCategoria().equals(nombreCategoria))) {
+            
+            if (productoDao.existeProducto(nombre, nombreMarca, nombreCategoria)) {
+                request.getSession().setAttribute("error", "Ya existe un producto con el mismo nombre, marca y categoría");
+                response.sendRedirect(request.getContextPath() + "/ProductoControlador");
+                return;
+            }
+        }
+       
         Producto producto = new Producto();
         producto.setId(id);
         producto.setNombres(request.getParameter("nombre"));
@@ -314,7 +360,47 @@ private void actualizarProducto(HttpServletRequest request, HttpServletResponse 
         } else {
             request.getSession().setAttribute("error", "Error al actualizar el stock");
         }
-        
+
         response.sendRedirect(request.getContextPath() + "/ProductoControlador");
+    }
+
+    private void verificarProductoDuplicado(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        String nombre = request.getParameter("nombre");
+        String marca = request.getParameter("marca");
+        String categoria = request.getParameter("categoria");
+        String idStr = request.getParameter("id");
+        int id = idStr != null && !idStr.isEmpty() ? Integer.parseInt(idStr) : 0;
+
+        try {
+            boolean existe = productoDao.existeProducto(nombre, marca, categoria);
+            boolean esElMismo = false;
+
+            // Si estamos editando, verificar si es el mismo producto
+            if (id > 0 && existe) {
+                Producto productoActual = productoDao.listarId(id);
+                esElMismo = productoActual.getNombres().equals(nombre)
+                        && productoActual.getNombreMarca().equals(marca)
+                        && productoActual.getNombreCategoria().equals(categoria);
+            }
+
+            // Construir respuesta más detallada
+            JsonObject jsonResponse = new JsonObject();
+            jsonResponse.addProperty("existe", existe && !esElMismo);
+            if (existe && !esElMismo) {
+                jsonResponse.addProperty("nombre", nombre);
+                jsonResponse.addProperty("marca", marca);
+                jsonResponse.addProperty("categoria", categoria);
+            }
+
+            out.print(jsonResponse.toString());
+        } catch (Exception e) {
+            JsonObject error = new JsonObject();
+            error.addProperty("error", e.getMessage());
+            out.print(error.toString());
+        }
     }
 }

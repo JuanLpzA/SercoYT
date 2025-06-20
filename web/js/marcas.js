@@ -5,7 +5,7 @@ $(document).ready(function() {
         $('#nuevaMarcaModal').modal('show');
     });
 
-// Edit brand button
+    // Edit brand button
     $(document).on('click', '.btn-editar', function () {
         const id = $(this).data('id');
         const $btn = $(this);
@@ -19,7 +19,6 @@ $(document).ready(function() {
                 $('#edit_id').val(data.id);
                 $('#edit_nombre').val(data.nombre);
                 $('#edit_estado').val(data.estado);
-
                 $('#editarMarcaModal').modal('show');
             },
             error: function (xhr) {
@@ -62,22 +61,142 @@ $(document).ready(function() {
 
     // New brand form submission
     $('#nuevaMarcaForm').submit(function(e) {
+        e.preventDefault(); // Siempre prevenir el envío normal del formulario
+        
         if (!validateMarcaForm($(this))) {
-            e.preventDefault();
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        const $form = $(this);
+        const $submitBtn = $form.find('[type="submit"]');
+        const originalBtnText = $submitBtn.html();
+        
+        // Mostrar loading en el botón
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Cerrar modal
+                    $('#nuevaMarcaModal').modal('hide');
+                    
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Recargar la página para mostrar la nueva marca
+                        window.location.reload();
+                    });
+                } else {
+                    // Mostrar error específico
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al crear la marca',
+                        text: response.message,
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            },
+            error: function(xhr) {
+                let errorMessage = 'Error al procesar la solicitud';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    errorMessage = response.message || errorMessage;
+                } catch (e) {
+                    errorMessage = xhr.responseText || errorMessage;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonText: 'Entendido'
+                });
+            },
+            complete: function() {
+                // Restaurar botón
+                $submitBtn.prop('disabled', false).html(originalBtnText);
+            }
+        });
     });
 
     // Edit brand form submission
     $('#editarMarcaForm').submit(function(e) {
+        e.preventDefault(); // Siempre prevenir el envío normal del formulario
+        
         if (!validateMarcaForm($(this))) {
-            e.preventDefault();
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        const $form = $(this);
+        const $submitBtn = $form.find('[type="submit"]');
+        const originalBtnText = $submitBtn.html();
+        
+        // Mostrar loading en el botón
+        $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Actualizando...');
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Cerrar modal
+                    $('#editarMarcaModal').modal('hide');
+                    
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Recargar la página para mostrar los cambios
+                        window.location.reload();
+                    });
+                } else {
+                    // Mostrar error específico
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error al actualizar la marca',
+                        text: response.message,
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            },
+            error: function(xhr) {
+                let errorMessage = 'Error al procesar la solicitud';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    errorMessage = response.message || errorMessage;
+                } catch (e) {
+                    errorMessage = xhr.responseText || errorMessage;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMessage,
+                    confirmButtonText: 'Entendido'
+                });
+            },
+            complete: function() {
+                // Restaurar botón
+                $submitBtn.prop('disabled', false).html(originalBtnText);
+            }
+        });
     });
 
     function scrollToFirstError() {
@@ -88,12 +207,6 @@ $(document).ready(function() {
             }, 500);
             $firstError.focus();
         }
-    }
-
-    function showButtonLoading($btn) {
-        $btn.addClass('btn-loading')
-            .prop('disabled', true)
-            .html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
     }
 
     // Filter form
@@ -179,13 +292,4 @@ $(document).ready(function() {
     $(window).on('load', function() {
         hideLoading();
     });
-
-    function showError(message) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message,
-            timer: 3000
-        });
-    }
 });
