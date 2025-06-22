@@ -2,8 +2,64 @@ $(document).ready(function() {
     // New client button
     $('#btnNuevoCliente').click(function() {
         $('#nuevoClienteForm')[0].reset();
+        $('#tipoDni').prop('checked', true);
+        toggleFormFields('1');
         $('#nuevoClienteModal').modal('show');
     });
+
+    // Toggle form fields based on client type (New client modal)
+    $('input[name="tipoCliente"]').change(function() {
+        toggleFormFields($(this).val());
+    });
+
+    // Toggle form fields based on client type (Edit client modal)
+    $(document).on('change', '#editarClienteModal input[name="tipoCliente"]', function() {
+    toggleEditFormFields($(this).val());
+});
+
+    function toggleFormFields(tipo) {
+    if (tipo === '1') { // DNI
+        $('#labelDocumento').text('DNI *');
+        $('#labelNombre').text('Nombre *');
+        $('#helpDocumento').text('Ingrese el DNI para buscar automáticamente');
+        $('#dni').attr('maxlength', '8').attr('pattern', '[0-9]{8}').attr('title', 'Ingrese 8 dígitos numéricos');
+        $('#grupoApellido').show();
+        $('#apellido').prop('required', true);
+        $('#nombre').attr('maxlength', '50').attr('pattern', '[A-Za-záéíóúÁÉÍÓÚñÑ\\s]+');
+    } else { // RUC
+        $('#labelDocumento').text('RUC *');
+        $('#labelNombre').text('Razón Social *');
+        $('#helpDocumento').text('Ingrese el RUC para buscar automáticamente');
+        $('#dni').attr('maxlength', '11').attr('pattern', '[0-9]{11}').attr('title', 'Ingrese 11 dígitos numéricos');
+        $('#grupoApellido').hide();
+        $('#apellido').prop('required', false).val('');
+        $('#nombre').attr('maxlength', '100').removeAttr('pattern');
+    }
+    // Clear validation states
+    $('#dni, #nombre, #apellido').removeClass('is-invalid').next('.invalid-feedback').remove();
+}
+
+    function toggleEditFormFields(tipo) {
+    if (tipo === '1') { // DNI
+        $('#editLabelDocumento').text('DNI *');
+        $('#editLabelNombre').text('Nombre *');
+        $('#editHelpDocumento').text('Ingrese el DNI para buscar automáticamente');
+        $('#edit_dni').attr('maxlength', '8').attr('pattern', '[0-9]{8}').attr('title', 'Ingrese 8 dígitos numéricos');
+        $('#editGrupoApellido').show();
+        $('#edit_apellido').prop('required', true);
+        $('#edit_nombre').attr('maxlength', '50').attr('pattern', '[A-Za-záéíóúÁÉÍÓÚñÑ\\s]+');
+    } else { // RUC
+        $('#editLabelDocumento').text('RUC *');
+        $('#editLabelNombre').text('Razón Social *');
+        $('#editHelpDocumento').text('Ingrese el RUC para buscar automáticamente');
+        $('#edit_dni').attr('maxlength', '11').attr('pattern', '[0-9]{11}').attr('title', 'Ingrese 11 dígitos numéricos');
+        $('#editGrupoApellido').hide();
+        $('#edit_apellido').prop('required', false).val('');
+        $('#edit_nombre').attr('maxlength', '100').removeAttr('pattern');
+    }
+    // Clear validation states
+    $('#edit_dni, #edit_nombre, #edit_apellido').removeClass('is-invalid').next('.invalid-feedback').remove();
+}
 
     // Edit client button
     $(document).on('click', '.btn-editar', function() {
@@ -21,6 +77,18 @@ $(document).ready(function() {
                 $('#edit_nombre').val(data.nombre);
                 $('#edit_apellido').val(data.apellido);
                 $('#edit_telefono').val(data.telefono);
+                
+                // Set the client type based on document length or tipoCliente
+                const tipoCliente = data.tipoCliente || (data.dni.length === 8 ? '1' : '2');
+                $('#edit_tipoClienteOriginal').val(tipoCliente);
+                
+                if (data.tipoCliente === 1 || data.tipoCliente === '1') {
+                    $('#editTipoDni').prop('checked', true);
+                    toggleEditFormFields('1');
+                } else {
+                    $('#editTipoRuc').prop('checked', true);
+                    toggleEditFormFields('2');
+                }
 
                 $('#editarClienteModal').modal('show');
             },
@@ -40,60 +108,127 @@ $(document).ready(function() {
 
     // Form validation
     function validateClienteForm($form) {
-        let isValid = true;
-        
-        // Clear previous validations
-        $form.find('.is-invalid').removeClass('is-invalid');
-        $form.find('.invalid-feedback').remove();
+    let isValid = true;
+    
+    // Clear previous validations
+    $form.find('.is-invalid').removeClass('is-invalid');
+    $form.find('.invalid-feedback').remove();
 
-        // Validate required fields
-        $form.find('[required]').each(function() {
-            if (!$(this).val().trim()) {
-                markAsInvalid($(this), AppContext.messages.requiredField);
-                isValid = false;
-            }
-        });
-
-        // Validate DNI format (8 digits)
-        const $dni = $form.find('[name="dni"]');
-        if ($dni.length && !/^\d{8}$/.test($dni.val())) {
-            markAsInvalid($dni, AppContext.messages.dniInvalid);
+    // Validate required fields
+    $form.find('[required]').each(function() {
+        if (!$(this).val().trim()) {
+            markAsInvalid($(this), AppContext.messages.requiredField);
             isValid = false;
         }
+    });
 
-        // Validate phone format (9 digits if provided)
-        const $telefono = $form.find('[name="telefono"]');
-        if ($telefono.length && $telefono.val() && !/^\d{9}$/.test($telefono.val())) {
-            markAsInvalid($telefono, AppContext.messages.telefonoInvalid);
+    // Validate document format
+    const $documento = $form.find('[name="dni"]');
+    const tipoCliente = $form.find('input[name="tipoCliente"]:checked').val() || '1';
+    
+    if (tipoCliente === '1') { // DNI
+        if ($documento.length && !/^\d{8}$/.test($documento.val())) {
+            markAsInvalid($documento, 'El DNI debe tener 8 dígitos numéricos');
             isValid = false;
         }
-
-        return isValid;
+    } else { // RUC
+        if ($documento.length && !/^\d{11}$/.test($documento.val())) {
+            markAsInvalid($documento, 'El RUC debe tener 11 dígitos numéricos');
+            isValid = false;
+        }
     }
 
+    // Validate phone format (9 digits if provided)
+    const $telefono = $form.find('[name="telefono"]');
+    if ($telefono.length && $telefono.val() && !/^\d{9}$/.test($telefono.val())) {
+        markAsInvalid($telefono, AppContext.messages.telefonoInvalid);
+        isValid = false;
+    }
+
+    return isValid;
+}
     function markAsInvalid($element, message) {
         $element.addClass('is-invalid');
         $element.after(`<div class="invalid-feedback">${message}</div>`);
     }
 
+    // Validate unique document
+    function validateUniqueDocument(documento, id, callback) {
+        $.ajax({
+            url: AppContext.endpoints.cliente.validarDocumento,
+            type: 'GET',
+            data: { documento: documento, id: id || '' },
+            dataType: 'json',
+            success: function(data) {
+                callback(!data.existe);
+            },
+            error: function() {
+                callback(true); // En caso de error, permitir continuar
+            }
+        });
+    }
+
     // New client form submission
     $('#nuevoClienteForm').submit(function(e) {
+        e.preventDefault();
+        
         if (!validateClienteForm($(this))) {
-            e.preventDefault();
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        const documento = $('#dni').val();
+        const $btn = $(this).find('[type="submit"]');
+        
+        showButtonLoading($btn);
+        
+        validateUniqueDocument(documento, null, function(isUnique) {
+            if (!isUnique) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Documento duplicado',
+                    text: 'Este documento ya está registrado. Por favor verifique.',
+                    timer: 3000
+                });
+                resetButton($btn);
+                return;
+            }
+            
+            // Submit form
+            $('#nuevoClienteForm')[0].submit();
+        });
     });
 
     // Edit client form submission
     $('#editarClienteForm').submit(function(e) {
+        e.preventDefault();
+        
         if (!validateClienteForm($(this))) {
-            e.preventDefault();
             scrollToFirstError();
             return false;
         }
-        showButtonLoading($(this).find('[type="submit"]'));
+
+        const documento = $('#edit_dni').val();
+        const id = $('#edit_id').val();
+        const $btn = $(this).find('[type="submit"]');
+        
+        showButtonLoading($btn, 'edit');
+        
+        validateUniqueDocument(documento, id, function(isUnique) {
+            if (!isUnique) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Documento duplicado',
+                    text: 'Este documento ya está registrado. Por favor verifique.',
+                    timer: 3000
+                });
+                resetEditButton($btn);
+                return;
+            }
+            
+            // Submit form
+            $('#editarClienteForm')[0].submit();
+        });
     });
 
     function scrollToFirstError() {
@@ -106,10 +241,22 @@ $(document).ready(function() {
         }
     }
 
-    function showButtonLoading($btn) {
+    function showButtonLoading($btn, type = 'new') {
         $btn.addClass('btn-loading')
             .prop('disabled', true)
             .html('<i class="fas fa-spinner fa-spin"></i> Procesando...');
+    }
+
+    function resetButton($btn) {
+        $btn.removeClass('btn-loading')
+            .prop('disabled', false)
+            .html('<i class="fas fa-save"></i> Guardar Cliente');
+    }
+
+    function resetEditButton($btn) {
+        $btn.removeClass('btn-loading')
+            .prop('disabled', false)
+            .html('<i class="fas fa-save"></i> Actualizar Cliente');
     }
 
     // Filter form
@@ -137,16 +284,50 @@ $(document).ready(function() {
         $('#btn-confirmar').attr('href', AppContext.endpoints.cliente.delete + id);
     });
 
-    // Consult DNI API
-    $('#btnConsultarDni').click(function() {
-        const dni = $('#dni').val().trim();
+    // Consult document API for new client modal
+    $('#btnConsultarDocumento').click(function() {
+        const documento = $('#dni').val().trim();
+        const tipoCliente = $('input[name="tipoCliente"]:checked').val();
         
-        if (!dni || !/^\d{8}$/.test(dni)) {
-            markAsInvalid($('#dni'), AppContext.messages.dniInvalid);
-            return;
+        if (tipoCliente === '1') { // DNI
+            if (!documento || !/^\d{8}$/.test(documento)) {
+                markAsInvalid($('#dni'), 'El DNI debe tener 8 dígitos numéricos');
+                return;
+            }
+            consultarDni(documento, false);
+        } else { // RUC
+            if (!documento || !/^\d{11}$/.test(documento)) {
+                markAsInvalid($('#dni'), 'El RUC debe tener 11 dígitos numéricos');
+                return;
+            }
+            consultarRuc(documento, false);
         }
+    });
+
+    // Consult document API for edit client modal
+    $('#btnConsultarDocumentoEdit').click(function() {
+        const documento = $('#edit_dni').val().trim();
+        const tipoCliente = $('#editarClienteModal input[name="tipoCliente"]:checked').val();
         
-        const $btn = $(this);
+        if (tipoCliente === '1') { // DNI
+            if (!documento || !/^\d{8}$/.test(documento)) {
+                markAsInvalid($('#edit_dni'), 'El DNI debe tener 8 dígitos numéricos');
+                return;
+            }
+            consultarDni(documento, true);
+        } else { // RUC
+            if (!documento || !/^\d{11}$/.test(documento)) {
+                markAsInvalid($('#edit_dni'), 'El RUC debe tener 11 dígitos numéricos');
+                return;
+            }
+            consultarRuc(documento, true);
+        }
+    });
+
+    function consultarDni(dni, isEdit = false) {
+        const btnId = isEdit ? '#btnConsultarDocumentoEdit' : '#btnConsultarDocumento';
+        const $btn = $(btnId);
+        
         $btn.prop('disabled', true)
             .html('<i class="fas fa-spinner fa-spin"></i> Buscando...');
         
@@ -156,9 +337,13 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(data) {
                 if (data.nombres && data.apellidoPaterno && data.apellidoMaterno) {
-                    $('#nombre').val(data.nombres);
-                    $('#apellido').val(data.apellidoPaterno + ' ' + data.apellidoMaterno);
-                    $('#telefono').focus();
+                    const nombreField = isEdit ? '#edit_nombre' : '#nombre';
+                    const apellidoField = isEdit ? '#edit_apellido' : '#apellido';
+                    const telefonoField = isEdit ? '#edit_telefono' : '#telefono';
+                    
+                    $(nombreField).val(data.nombres);
+                    $(apellidoField).val(data.apellidoPaterno + ' ' + data.apellidoMaterno);
+                    $(telefonoField).focus();
                     
                     Swal.fire({
                         icon: 'success',
@@ -188,7 +373,57 @@ $(document).ready(function() {
                     .html('<i class="fas fa-search"></i> Buscar');
             }
         });
-    });
+    }
+
+    function consultarRuc(ruc, isEdit = false) {
+        const btnId = isEdit ? '#btnConsultarDocumentoEdit' : '#btnConsultarDocumento';
+        const $btn = $(btnId);
+        
+        $btn.prop('disabled', true)
+            .html('<i class="fas fa-spinner fa-spin"></i> Buscando...');
+        
+        $.ajax({
+            url: AppContext.endpoints.cliente.consultarRuc + ruc,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (data.nombre || data.razonSocial) {
+                    const nombreField = isEdit ? '#edit_nombre' : '#nombre';
+                    const telefonoField = isEdit ? '#edit_telefono' : '#telefono';
+                    
+                    const razonSocial = data.nombre || data.razonSocial;
+                    $(nombreField).val(razonSocial);
+                    $(telefonoField).focus();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Datos encontrados',
+                        text: 'Los datos del RUC se han cargado automáticamente',
+                        timer: 2000
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Datos no encontrados',
+                        text: 'No se encontraron datos para este RUC. Por favor ingréselos manualmente.',
+                        timer: 2000
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: xhr.responseJSON?.error || 'Error al consultar el RUC',
+                    timer: 3000
+                });
+            },
+            complete: function() {
+                $btn.prop('disabled', false)
+                    .html('<i class="fas fa-search"></i> Buscar');
+            }
+        });
+    }
 
     // Loading overlay
     function showLoading() {
@@ -210,6 +445,10 @@ $(document).ready(function() {
         $('#dni').focus();
     });
 
+    $('#editarClienteModal').on('shown.bs.modal', function() {
+        $('#edit_dni').focus();
+    });
+
     $('.modal').on('hidden.bs.modal', function() {
         $(this).find('form').trigger('reset');
         $(this).find('.is-invalid').removeClass('is-invalid');
@@ -225,13 +464,4 @@ $(document).ready(function() {
     $(window).on('load', function() {
         hideLoading();
     });
-
-    function showError(message) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message,
-            timer: 3000
-        });
-    }
 });

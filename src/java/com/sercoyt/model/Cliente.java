@@ -16,6 +16,7 @@ public class Cliente {
     private String documento;
     private String telefono;
     private String tipoCliente;
+    private int IdTipoCliente;
 
     public Cliente() {
     }
@@ -28,6 +29,7 @@ public class Cliente {
         this.telefono = telefono;
         this.tipoCliente = tipoCliente;
     }
+    
 
     public String getTipoCliente() {
         return tipoCliente;
@@ -75,6 +77,14 @@ public class Cliente {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    public int getIdTipoCliente() {
+        return IdTipoCliente;
+    }
+
+    public void setIdTipoCliente(int IdTipoCliente) {
+        this.IdTipoCliente = IdTipoCliente;
     }
 
     

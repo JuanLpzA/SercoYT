@@ -7,6 +7,7 @@ package com.sercoyt.controller;
 import com.sercoyt.model.Cliente;
 import com.sercoyt.model.dao.ClienteDao;
 import com.sercoyt.util.ReniecAPI;
+import com.sercoyt.util.SunatAPI;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -49,6 +50,12 @@ public class ClienteControlador extends HttpServlet {
                     break;
                 case "filtrar":
                     filtrarClientes(request, response);
+                    break;
+                case "consultarRuc":
+                    consultarRucApi(request, response);
+                    break;
+                case "validarDocumento":
+                    validarDocumentoUnico(request, response);
                     break;
                 default:
                     listarClientes(request, response);
@@ -96,13 +103,26 @@ public class ClienteControlador extends HttpServlet {
     private void guardarCliente(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            String documento = request.getParameter("dni");
+
+            // Validar si el documento ya existe
+            if (clienteDao.existeDocumento(documento, 0)) {
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"error\": \"El documento ya está registrado\", \"existe\": true}");
+                return;
+            }
+
             Cliente cliente = new Cliente();
             cliente.setNombre(request.getParameter("nombre"));
             cliente.setApellido(request.getParameter("apellido"));
-            cliente.setDocumento(request.getParameter("dni"));
+            cliente.setDocumento(documento);
             cliente.setTelefono(request.getParameter("telefono"));
 
-            int idGenerado = clienteDao.insertar(cliente);
+            // Determinar tipo de cliente por longitud del documento
+            int tipoCliente = (documento.length() == 8) ? 1 : 2;
+
+            int idGenerado = clienteDao.insertar(cliente, tipoCliente);
 
             if (idGenerado > 0) {
                 request.getSession().setAttribute("exito", "Cliente creado correctamente");
@@ -119,27 +139,40 @@ public class ClienteControlador extends HttpServlet {
     }
 
     private void actualizarCliente(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            Cliente cliente = new Cliente();
-            cliente.setIdCliente(Integer.parseInt(request.getParameter("id")));
-            cliente.setNombre(request.getParameter("nombre"));
-            cliente.setApellido(request.getParameter("apellido"));
-            cliente.setDocumento(request.getParameter("dni"));
-            cliente.setTelefono(request.getParameter("telefono"));
-
-            if (clienteDao.actualizar(cliente)) {
-                request.getSession().setAttribute("exito", "Cliente actualizado correctamente");
-            } else {
-                request.getSession().setAttribute("error", "Error al actualizar el cliente");
-            }
-            response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("error", "Error al actualizar el cliente: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
+        throws ServletException, IOException {
+    try {
+        int id = Integer.parseInt(request.getParameter("id"));
+        String documento = request.getParameter("dni");
+        
+        // Validar si el documento ya existe (excluyendo el registro actual)
+        if (clienteDao.existeDocumento(documento, id)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"El documento ya está registrado\", \"existe\": true}");
+            return;
         }
+        
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(id);
+        cliente.setNombre(request.getParameter("nombre"));
+        cliente.setApellido(request.getParameter("apellido"));
+        cliente.setDocumento(documento);
+        cliente.setTelefono(request.getParameter("telefono"));
+        
+        int tipoCliente = Integer.parseInt(request.getParameter("tipoCliente"));
+
+         if (clienteDao.actualizar(cliente, tipoCliente)) {
+            request.getSession().setAttribute("exito", "Cliente actualizado correctamente");
+        } else {
+            request.getSession().setAttribute("error", "Error al actualizar el cliente");
+        }
+        response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Error al actualizar el cliente: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
     }
+}   
 
     private void eliminarCliente(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -154,31 +187,41 @@ public class ClienteControlador extends HttpServlet {
     }
 
     private void filtrarClientes(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String nombre = request.getParameter("nombre");
-        String dni = request.getParameter("dni");
+        throws ServletException, IOException {
+    String nombre = request.getParameter("nombre");
+    String dni = request.getParameter("dni");
+    String categoria = request.getParameter("categoria"); // AGREGAR ESTA LÍNEA
 
-        List<Cliente> clientes = clienteDao.listarTodos();
+    List<Cliente> clientes = clienteDao.listarTodos();
 
-        // Aplicar filtros
-        if (nombre != null && !nombre.isEmpty()) {
-            final String nombreFilter = nombre.toLowerCase();
-            clientes = clientes.stream()
-                    .filter(c -> (c.getNombre() + " " + c.getApellido()).toLowerCase().contains(nombreFilter))
-                    .collect(Collectors.toList());
-        }
-
-        if (dni != null && !dni.isEmpty()) {
-            clientes = clientes.stream()
-                    .filter(c -> c.getDocumento().contains(dni))
-                    .collect(Collectors.toList());
-        }
-
-        request.setAttribute("clientes", clientes);
-        request.setAttribute("filtroNombre", nombre);
-        request.setAttribute("filtroDni", dni);
-        request.getRequestDispatcher("/admin/clientes.jsp").forward(request, response);
+    // Aplicar filtros
+    if (nombre != null && !nombre.isEmpty()) {
+        final String nombreFilter = nombre.toLowerCase();
+        clientes = clientes.stream()
+                .filter(c -> (c.getNombre() + " " + c.getApellido()).toLowerCase().contains(nombreFilter))
+                .collect(Collectors.toList());
     }
+
+    if (dni != null && !dni.isEmpty()) {
+        clientes = clientes.stream()
+                .filter(c -> c.getDocumento().contains(dni))
+                .collect(Collectors.toList());
+    }
+
+    // AGREGAR ESTE BLOQUE:
+    if (categoria != null && !categoria.isEmpty()) {
+        int tipoClienteFilter = Integer.parseInt(categoria);
+        clientes = clientes.stream()
+                .filter(c -> c.getIdTipoCliente() == tipoClienteFilter)
+                .collect(Collectors.toList());
+    }
+
+    request.setAttribute("clientes", clientes);
+    request.setAttribute("filtroNombre", nombre);
+    request.setAttribute("filtroDni", dni);
+    request.setAttribute("filtroCategoria", categoria); // AGREGAR ESTA LÍNEA
+    request.getRequestDispatcher("/admin/clientes.jsp").forward(request, response);
+}
 
     private void obtenerClienteParaEdicion(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -191,8 +234,9 @@ public class ClienteControlador extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
 
                 String json = String.format(
-                    "{\"id\": %d, \"nombre\": \"%s\", \"apellido\": \"%s\", \"dni\": \"%s\", \"telefono\": \"%s\"}",
-                    cliente.getIdCliente(), cliente.getNombre(), cliente.getApellido(), cliente.getDocumento(), cliente.getTelefono()
+                        "{\"id\": %d, \"nombre\": \"%s\", \"apellido\": \"%s\", \"dni\": \"%s\", \"telefono\": \"%s\", \"tipoCliente\": %d}",
+                        cliente.getIdCliente(), cliente.getNombre(), cliente.getApellido(),
+                        cliente.getDocumento(), cliente.getTelefono(), cliente.getIdTipoCliente()
                 );
 
                 response.getWriter().write(json);
@@ -222,4 +266,41 @@ public class ClienteControlador extends HttpServlet {
             response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
+    
+    private void consultarRucApi(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        String ruc = request.getParameter("ruc");
+        JSONObject datos = SunatAPI.consultarRucBasico(ruc);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(datos.toString());
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+    }
+}
+
+private void validarDocumentoUnico(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        String documento = request.getParameter("documento");
+        String idStr = request.getParameter("id");
+        int idExcluir = (idStr != null && !idStr.isEmpty()) ? Integer.parseInt(idStr) : 0;
+        
+        boolean existe = clienteDao.existeDocumento(documento, idExcluir);
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"existe\": " + existe + "}");
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
+    }
+}
+    
+    
 }

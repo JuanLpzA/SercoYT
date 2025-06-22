@@ -87,10 +87,18 @@
                                                placeholder="Buscar por nombre o apellido...">
                                     </div>
                                     <div class="filter-group">
-                                        <label for="filtroDni">DNI</label>
+                                        <label for="filtroDni">DNI/RUC</label>
                                         <input type="text" class="form-control" id="filtroDni" name="dni" 
                                                value="${filtroDni != null ? filtroDni : ''}"
-                                               placeholder="Buscar por Documento..." maxlength="8">
+                                               placeholder="Buscar por Documento..." maxlength="11">
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="filtroCategoria">Categoría</label>
+                                        <select class="form-control" id="filtroCategoria" name="categoria">
+                                            <option value="">Todas las categorías</option>
+                                            <option value="1" ${filtroCategoriaj == '1' ? 'selected' : ''}>Persona Natural (DNI)</option>
+                                            <option value="2" ${filtroCategoria == '2' ? 'selected' : ''}>Persona Jurídica (RUC)</option>
+                                        </select>
                                     </div>
                                 </form>
                                 <div class="filter-actions">
@@ -158,35 +166,54 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Nuevo Cliente
                         </h5>
-
                     </div>
                     <form id="nuevoClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=guardar" method="POST">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="dni" class="required">DNI *</label>
+                                <label class="required">Tipo de Cliente </label>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoDni" value="1" checked>
+                                        <label class="form-check-label" for="tipoDni">
+                                            <i class="fas fa-user"></i> Persona Natural (DNI)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoRuc" value="2">
+                                        <label class="form-check-label" for="tipoRuc">
+                                            <i class="fas fa-building"></i> Persona Jurídica (RUC)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dni" class="required" id="labelDocumento">DNI </label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="dni" name="dni" required
                                            maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDni">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDocumento">
                                             <i class="fas fa-search"></i> Buscar
                                         </button>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted">Ingrese el DNI para buscar automáticamente</small>
+                                <small class="form-text text-muted" id="helpDocumento">Ingrese el DNI para buscar automáticamente</small>
                             </div>
+
                             <div class="form-group">
-                                <label for="nombre" class="required">Nombre *</label>
+                                <label for="nombre" class="required" id="labelNombre">Nombre </label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" required
-                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
-                                       title="Solo letras y espacios">
+                                       maxlength="100" title="Ingrese el nombre o razón social">
                             </div>
-                            <div class="form-group">
-                                <label for="apellido" class="required">Apellido *</label>
+
+                            <div class="form-group" id="grupoApellido">
+                                <label for="apellido" class="required">Apellido </label>
                                 <input type="text" class="form-control" id="apellido" name="apellido" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
+
                             <div class="form-group">
                                 <label for="telefono">Teléfono</label>
                                 <input type="text" class="form-control" id="telefono" name="telefono"
@@ -204,6 +231,8 @@
         </div>
 
         <!-- Modal Editar Cliente -->
+
+        <!-- Modal Editar Cliente -->
         <div class="modal fade" id="editarClienteModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -211,28 +240,57 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-edit"></i> Editar Cliente
                         </h5>
-
                     </div>
                     <form id="editarClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
+                        <input type="hidden" id="edit_tipoClienteOriginal" name="tipoClienteOriginal">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="edit_dni" class="required">DNI *</label>
-                                <input type="text" class="form-control" id="edit_dni" name="dni" required
-                                       maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
+                                <label class="required">Tipo de Cliente </label>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoDni" value="1">
+                                        <label class="form-check-label" for="editTipoDni">
+                                            <i class="fas fa-user"></i> Persona Natural (DNI)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoRuc" value="2">
+                                        <label class="form-check-label" for="editTipoRuc">
+                                            <i class="fas fa-building"></i> Persona Jurídica (RUC)
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
+
                             <div class="form-group">
-                                <label for="edit_nombre" class="required">Nombre *</label>
+                                <label for="edit_dni" class="required" id="editLabelDocumento">DNI </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="edit_dni" name="dni" required
+                                           maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDocumentoEdit">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted" id="editHelpDocumento">Ingrese el DNI para buscar automáticamente</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="edit_nombre" class="required" id="editLabelNombre">Nombre </label>
                                 <input type="text" class="form-control" id="edit_nombre" name="nombre" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
-                            <div class="form-group">
-                                <label for="edit_apellido" class="required">Apellido *</label>
+
+                            <div class="form-group" id="editGrupoApellido">
+                                <label for="edit_apellido" class="required">Apellido </label>
                                 <input type="text" class="form-control" id="edit_apellido" name="apellido" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
+
                             <div class="form-group">
                                 <label for="edit_telefono">Teléfono</label>
                                 <input type="text" class="form-control" id="edit_telefono" name="telefono"
@@ -240,7 +298,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Cliente
                             </button>
@@ -291,7 +348,9 @@
                         save: '${pageContext.request.contextPath}/ClienteControlador?accion=guardar',
                         update: '${pageContext.request.contextPath}/ClienteControlador?accion=actualizar',
                         delete: '${pageContext.request.contextPath}/ClienteControlador?accion=eliminar&id=',
-                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni='
+                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni=',
+                        consultarRuc: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarRuc&ruc=',
+                        validarDocumento: '${pageContext.request.contextPath}/ClienteControlador?accion=validarDocumento'
                     }
                 }
             };
