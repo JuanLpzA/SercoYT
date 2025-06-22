@@ -1,0 +1,163 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 22 jun. 2025, 05:02:53
+    Author     : Arrunategui
+*/
+
+/* Estilos específicos para la página de usuarios */
+.tipo-usuario-options {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.tipo-option {
+    flex: 0 0 30%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tipo-option:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+}
+
+.tipo-option i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.tipo-option h5 {
+    margin-bottom: 5px;
+}
+
+.tipo-option p {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Estilos para la tabla de usuarios */
+.products-table th, .products-table td {
+    vertical-align: middle;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn-action {
+    background: none;
+    border: none;
+    color: #6c757d;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.3s;
+    padding: 5px;
+}
+
+.btn-action:hover {
+    color: #007bff;
+}
+
+.btn-action.edit:hover {
+    color: #28a745;
+}
+
+.btn-action.promote:hover {
+    color: #ffc107;
+}
+
+.btn-action.password:hover {
+    color: #17a2b8;
+}
+
+.btn-action.deactivate:hover {
+    color: #dc3545;
+}
+
+.btn-action.activate:hover {
+    color: #28a745;
+}
+
+/* Estilos para los badges de estado */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Estilos para el formulario de filtro */
+.filter-card {
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.filter-card .card-header {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.filter-card .card-body {
+    padding: 15px;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.filter-group {
+    margin-bottom: 0;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-filter {
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.btn-filter.primary {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.btn-filter.secondary {
+    background-color: #6c757d;
+    color: white;
+    border: 1px solid #6c757d;
+}
+
+.btn-filter:hover {
+    opacity: 0.9;
+}

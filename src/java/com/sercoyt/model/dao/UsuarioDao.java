@@ -1,12 +1,15 @@
 package com.sercoyt.model.dao;
 
 import com.sercoyt.config.ConnectDB;
+import com.sercoyt.model.TipoUsuario;
 import com.sercoyt.model.Usuario;
 import com.sercoyt.util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class UsuarioDao {
@@ -21,7 +24,6 @@ public class UsuarioDao {
     private static final String SQL_GET_BY_ID = "SELECT * FROM usuarios WHERE idUsuario = ?";
     private static final String SQL_UPDATE_PERFIL = "UPDATE usuarios SET nombre = ?, apellido = ?, telefono = ?, direccion = ? WHERE idUsuario = ?";
     private static final String SQL_UPDATE_PASSWORD_WITH_CHECK = "UPDATE usuarios SET contrasena = ? WHERE idUsuario = ? AND contrasena = ?";
-
 
     public boolean registrarUsuario(Usuario usuario) {
         Connection con = null;
@@ -75,11 +77,11 @@ public class UsuarioDao {
         }
     }
 
-    private boolean existeDni(String dni) throws SQLException {
+    public boolean existeDni(String dni) throws SQLException {
         return checkExistence(SQL_CHECK_DNI, dni);
     }
 
-    private boolean existeCorreo(String correo) throws SQLException {
+    public boolean existeCorreo(String correo) throws SQLException {
         return checkExistence(SQL_CHECK_EMAIL, correo);
     }
 
@@ -219,7 +221,7 @@ public class UsuarioDao {
             closeResources(con, ps, rs);
         }
     }
-    
+
     // Creacion para metodos utiles para el apartado de mi perfil
     public Usuario obtenerUsuarioPorId(int idUsuario) {
         Connection con = null;
@@ -292,6 +294,250 @@ public class UsuarioDao {
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar contraseña: " + e.getMessage(), e);
+        } finally {
+            closeResources(con, ps, null);
+        }
+    }
+
+    // POST AVANCE 3
+    public List<Usuario> listarTodos() {
+        List<Usuario> usuarios = new ArrayList<>();
+        String SQL_SELECT_ALL = "SELECT u.*, t.nombre as tipoNombre FROM usuarios u JOIN tipousuario t ON u.idTipoUsuario = t.idTipoUsuario";
+
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ALL); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(rs.getInt("idUsuario"));
+                usuario.setNombre(rs.getString("nombre"));
+                usuario.setApellido(rs.getString("apellido"));
+                usuario.setCorreo(rs.getString("correo"));
+                usuario.setDni(rs.getString("dni"));
+                usuario.setTelefono(rs.getString("telefono"));
+                usuario.setDireccion(rs.getString("direccion"));
+                usuario.setTipoUsuario(rs.getString("tipoNombre"));
+                usuario.setEstado(rs.getString("estadoUsuario"));
+
+                usuarios.add(usuario);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return usuarios;
+    }
+
+// Método para filtrar usuarios
+    public List<Usuario> filtrarUsuarios(String nombre, String correo, String dni, String telefono, String tipoUsuario, String estado) {
+        List<Usuario> usuarios = new ArrayList<>();
+
+        StringBuilder SQL = new StringBuilder("SELECT u.*, t.nombre as tipoNombre FROM usuarios u JOIN tipousuario t ON u.idTipoUsuario = t.idTipoUsuario WHERE 1=1");
+        List<Object> params = new ArrayList<>();
+
+        if (nombre != null && !nombre.isEmpty()) {
+            SQL.append(" AND (u.nombre LIKE ? OR u.apellido LIKE ?)");
+            params.add("%" + nombre + "%");
+            params.add("%" + nombre + "%");
+        }
+
+        if (correo != null && !correo.isEmpty()) {
+            SQL.append(" AND u.correo LIKE ?");
+            params.add("%" + correo + "%");
+        }
+
+        if (dni != null && !dni.isEmpty()) {
+            SQL.append(" AND u.dni LIKE ?");
+            params.add("%" + dni + "%");
+        }
+
+        if (telefono != null && !telefono.isEmpty()) {
+            SQL.append(" AND u.telefono LIKE ?");
+            params.add("%" + telefono + "%");
+        }
+
+        if (tipoUsuario != null && !tipoUsuario.isEmpty()) {
+            SQL.append(" AND u.idTipoUsuario = ?");
+            params.add(Integer.parseInt(tipoUsuario));
+        }
+
+        if (estado != null && !estado.isEmpty()) {
+            SQL.append(" AND u.estadoUsuario = ?");
+            params.add(estado);
+        }
+
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL.toString())) {
+
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setIdUsuario(rs.getInt("idUsuario"));
+                    usuario.setNombre(rs.getString("nombre"));
+                    usuario.setApellido(rs.getString("apellido"));
+                    usuario.setCorreo(rs.getString("correo"));
+                    usuario.setDni(rs.getString("dni"));
+                    usuario.setTelefono(rs.getString("telefono"));
+                    usuario.setDireccion(rs.getString("direccion"));
+                    usuario.setTipoUsuario(rs.getString("tipoNombre"));
+                    usuario.setEstado(rs.getString("estadoUsuario"));
+
+                    usuarios.add(usuario);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return usuarios;
+    }
+
+// Método para listar tipos de usuario
+    public List<TipoUsuario> listarTiposUsuario() {
+        List<TipoUsuario> tipos = new ArrayList<>();
+        String SQL_SELECT_TIPOS = "SELECT * FROM tipousuario WHERE estadoTipo = 'activo'";
+
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_TIPOS); ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                TipoUsuario tipo = new TipoUsuario();
+                tipo.setIdTipoUsuario(rs.getInt("idTipoUsuario"));
+                tipo.setNombre(rs.getString("nombre"));
+                tipo.setEstadoTipo(rs.getString("estadoTipo"));
+
+                tipos.add(tipo);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return tipos;
+    }
+
+// Método para registrar usuario desde admin
+    public boolean registrarUsuarioAdmin(Usuario usuario, int tipoUsuario) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        try {
+            con = ConnectDB.getConnection();
+            con.setAutoCommit(false);
+
+            // Verificar si DNI ya existe
+            if (existeDni(usuario.getDni())) {
+                return false;
+            }
+
+            // Verificar si correo ya existe (si se proporcionó)
+            if (usuario.getCorreo() != null && !usuario.getCorreo().isEmpty() && existeCorreo(usuario.getCorreo())) {
+                return false;
+            }
+
+            // Insertar nuevo usuario
+            ps = con.prepareStatement(SQL_INSERT, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, usuario.getNombre());
+            ps.setString(2, usuario.getApellido());
+            ps.setString(3, usuario.getCorreo());
+            ps.setString(4, usuario.getContraseña());
+            ps.setString(5, usuario.getDni());
+            ps.setString(6, usuario.getTelefono());
+            ps.setString(7, usuario.getDireccion());
+            ps.setInt(8, tipoUsuario);
+            ps.setString(9, usuario.getEstado());
+
+            int result = ps.executeUpdate();
+
+            if (result > 0) {
+                con.commit();
+                return true;
+            } else {
+                con.rollback();
+                return false;
+            }
+        } catch (SQLException e) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException ex) {
+                }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeResources(con, ps, null);
+        }
+    }
+
+// Método para actualizar usuario desde admin
+    public boolean actualizarUsuarioAdmin(Usuario usuario) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        String SQL_UPDATE = "UPDATE usuarios SET nombre = ?, apellido = ?, correo = ?, dni = ?, telefono = ?, direccion = ?, estadoUsuario = ? WHERE idUsuario = ?";
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_UPDATE);
+
+            ps.setString(1, usuario.getNombre());
+            ps.setString(2, usuario.getApellido());
+            ps.setString(3, usuario.getCorreo());
+            ps.setString(4, usuario.getDni());
+            ps.setString(5, usuario.getTelefono());
+            ps.setString(6, usuario.getDireccion());
+            ps.setString(7, usuario.getEstado());
+            ps.setInt(8, usuario.getIdUsuario());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeResources(con, ps, null);
+        }
+    }
+
+// Método para cambiar rol de usuario
+    public boolean cambiarRolUsuario(int idUsuario, int nuevoRol) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        String SQL_UPDATE_ROL = "UPDATE usuarios SET idTipoUsuario = ? WHERE idUsuario = ?";
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_UPDATE_ROL);
+
+            ps.setInt(1, nuevoRol);
+            ps.setInt(2, idUsuario);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeResources(con, ps, null);
+        }
+    }
+
+// Método para cambiar estado de usuario
+    public boolean cambiarEstadoUsuario(int idUsuario, String estado) {
+        Connection con = null;
+        PreparedStatement ps = null;
+
+        String SQL_UPDATE_ESTADO = "UPDATE usuarios SET estadoUsuario = ? WHERE idUsuario = ?";
+
+        try {
+            con = ConnectDB.getConnection();
+            ps = con.prepareStatement(SQL_UPDATE_ESTADO);
+
+            ps.setString(1, estado);
+            ps.setInt(2, idUsuario);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         } finally {
             closeResources(con, ps, null);
         }

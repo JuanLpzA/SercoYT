@@ -44,7 +44,7 @@
         </li>
         <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
             <li class="${pageContext.request.requestURI.contains('cuentas') ? 'active' : ''}">
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=listarAdmin">
                     <i class="fas fa-user-cog"></i> Cuentas
                 </a>
             </li>

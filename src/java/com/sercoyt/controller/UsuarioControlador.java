@@ -1,11 +1,13 @@
 package com.sercoyt.controller;
 
+import com.sercoyt.model.TipoUsuario;
 import com.sercoyt.model.Usuario;
 import com.sercoyt.model.dao.UsuarioDao;
 import com.sercoyt.util.EmailUtil;
 import com.sercoyt.util.PasswordUtil;
 import com.sercoyt.util.ReniecAPI;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -70,6 +72,35 @@ public class UsuarioControlador extends HttpServlet {
                 case "consultarDni":
                     consultarDni(request, response);
                     break;
+
+                case "listarAdmin":
+                    listarUsuariosAdmin(request, response);
+                    break;
+                case "filtrarAdmin":
+                    filtrarUsuariosAdmin(request, response);
+                    break;
+                case "editarAdmin":
+                    editarUsuarioAdmin(request, response);
+                    break;
+                case "activarAdmin":
+                    activarUsuarioAdmin(request, response);
+                    break;
+                case "desactivarAdmin":
+                    desactivarUsuarioAdmin(request, response);
+                    break;
+
+                case "guardarAdmin":
+                    guardarUsuarioAdmin(request, response);
+                    break;
+                case "actualizarAdmin":
+                    actualizarUsuarioAdmin(request, response);
+                    break;
+                case "cambiarRol":
+                    cambiarRolUsuario(request, response);
+                    break;
+                case "cambiarContrasenaAdmin":
+                    cambiarContrasenaAdmin(request, response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -126,34 +157,34 @@ public class UsuarioControlador extends HttpServlet {
         request.setAttribute("correo", usuario.getCorreo());
         request.getRequestDispatcher(pagVerificacion).forward(request, response);
     }
-    
+
     private void verificar(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
-    HttpSession session = request.getSession();
-    Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
-    String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
-    String codigoIngresado = request.getParameter("codigo");
-    
-    if (usuario == null || codigoEnviado == null) {
-        throw new RuntimeException("Sesión expirada o inválida");
+            throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        Usuario usuario = (Usuario) session.getAttribute("usuarioPendiente");
+        String codigoEnviado = (String) session.getAttribute("codigoVerificacion");
+        String codigoIngresado = request.getParameter("codigo");
+
+        if (usuario == null || codigoEnviado == null) {
+            throw new RuntimeException("Sesión expirada o inválida");
+        }
+
+        if (!codigoEnviado.equals(codigoIngresado)) {
+            throw new RuntimeException("Código de verificación incorrecto");
+        }
+
+        if (usuarioDao.registrarUsuario(usuario)) {
+            session.removeAttribute("usuarioPendiente");
+            session.removeAttribute("codigoVerificacion");
+
+            // Establecer atributo de éxito y volver a mostrar la página de verificación
+            request.setAttribute("verificacionExitosa", true);
+            request.setAttribute("correo", usuario.getCorreo()); // o como obtengas el correo
+            request.getRequestDispatcher("verificacionCorreo.jsp").forward(request, response);
+        } else {
+            throw new RuntimeException("Error al registrar usuario");
+        }
     }
-    
-    if (!codigoEnviado.equals(codigoIngresado)) {
-        throw new RuntimeException("Código de verificación incorrecto");
-    }
-    
-    if (usuarioDao.registrarUsuario(usuario)) {
-        session.removeAttribute("usuarioPendiente");
-        session.removeAttribute("codigoVerificacion");
-        
-        // Establecer atributo de éxito y volver a mostrar la página de verificación
-        request.setAttribute("verificacionExitosa", true);
-        request.setAttribute("correo", usuario.getCorreo()); // o como obtengas el correo
-        request.getRequestDispatcher("verificacionCorreo.jsp").forward(request, response);
-    } else {
-        throw new RuntimeException("Error al registrar usuario");
-    }
-}
 
     private void nuevo(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -382,6 +413,336 @@ public class UsuarioControlador extends HttpServlet {
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().write("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+    // POST AVANCE 3
+    // Método para listar usuarios en el panel de administración
+    private void listarUsuariosAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            List<Usuario> usuarios = usuarioDao.listarTodos();
+            List<TipoUsuario> tiposUsuario = usuarioDao.listarTiposUsuario();
+
+            request.setAttribute("usuarios", usuarios);
+            request.setAttribute("tiposUsuario", tiposUsuario);
+            request.getRequestDispatcher("/admin/usuarios.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al listar usuarios");
+        }
+    }
+
+// Método para filtrar usuarios
+    private void filtrarUsuariosAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String nombre = request.getParameter("nombre");
+            String correo = request.getParameter("correo");
+            String dni = request.getParameter("dni");
+            String telefono = request.getParameter("telefono");
+            String tipoUsuario = request.getParameter("tipoUsuario");
+            String estado = request.getParameter("estado");
+
+            List<Usuario> usuarios = usuarioDao.filtrarUsuarios(nombre, correo, dni, telefono, tipoUsuario, estado);
+            List<TipoUsuario> tiposUsuario = usuarioDao.listarTiposUsuario();
+
+            request.setAttribute("usuarios", usuarios);
+            request.setAttribute("tiposUsuario", tiposUsuario);
+            request.setAttribute("filtroNombre", nombre);
+            request.setAttribute("filtroCorreo", correo);
+            request.setAttribute("filtroDni", dni);
+            request.setAttribute("filtroTelefono", telefono);
+            request.setAttribute("filtroTipoUsuario", tipoUsuario);
+            request.setAttribute("filtroEstado", estado);
+
+            request.getRequestDispatcher("/admin/usuarios.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al filtrar usuarios");
+        }
+    }
+
+// Método para editar usuario (devuelve JSON)
+    private void editarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            Usuario usuario = usuarioDao.obtenerUsuarioPorId(id);
+
+            if (usuario == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Usuario no encontrado");
+                return;
+            }
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+
+            // Crear objeto JSON manualmente
+            String json = String.format(
+                    "{\"idUsuario\":%d,\"nombre\":\"%s\",\"apellido\":\"%s\",\"dni\":\"%s\",\"correo\":\"%s\",\"telefono\":\"%s\",\"direccion\":\"%s\",\"tipoUsuario\":\"%s\",\"estado\":\"%s\"}",
+                    usuario.getIdUsuario(),
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getDni(),
+                    usuario.getCorreo() != null ? usuario.getCorreo() : "",
+                    usuario.getTelefono() != null ? usuario.getTelefono() : "",
+                    usuario.getDireccion() != null ? usuario.getDireccion() : "",
+                    usuario.getTipoUsuario(),
+                    usuario.getEstado()
+            );
+
+            response.getWriter().write(json);
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al obtener usuario");
+        }
+    }
+
+// Método para guardar nuevo usuario desde admin
+    private void guardarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            String nombre = request.getParameter("nombre");
+            String apellido = request.getParameter("apellido");
+            String dni = request.getParameter("dni");
+            String correo = request.getParameter("correo");
+            String telefono = request.getParameter("telefono");
+            String direccion = request.getParameter("direccion");
+            String contrasena = request.getParameter("contrasena");
+            String confirmarContrasena = request.getParameter("confirmarContrasena");
+            int tipoUsuario = Integer.parseInt(request.getParameter("tipoUsuario"));
+
+            // Validaciones básicas
+            if (nombre == null || nombre.trim().isEmpty()
+                    || apellido == null || apellido.trim().isEmpty()
+                    || dni == null || dni.trim().isEmpty()) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Nombre, apellido y DNI son campos obligatorios\"}");
+                return;
+            }
+
+            if (dni.length() != 8 || !dni.matches("\\d+")) {
+                response.getWriter().write("{\"success\":false,\"message\":\"El DNI debe tener 8 dígitos numéricos\"}");
+                return;
+            }
+
+            if (!contrasena.equals(confirmarContrasena)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Las contraseñas no coinciden\"}");
+                return;
+            }
+
+            if (!contrasena.matches("(?=.*[a-zA-Z])(?=.*[0-9]).{8,}")) {
+                response.getWriter().write("{\"success\":false,\"message\":\"La contraseña debe tener al menos 8 caracteres con números y letras\"}");
+                return;
+            }
+
+            // Verificar si DNI ya existe
+            if (usuarioDao.existeDni(dni)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Ya existe un usuario con este DNI\"}");
+                return;
+            }
+
+            // Verificar si correo ya existe (si se proporcionó)
+            if (correo != null && !correo.isEmpty() && usuarioDao.existeCorreo(correo)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Ya existe un usuario con este correo electrónico\"}");
+                return;
+            }
+
+            // Crear y guardar el usuario
+            Usuario usuario = new Usuario();
+            usuario.setNombre(nombre);
+            usuario.setApellido(apellido);
+            usuario.setDni(dni);
+            usuario.setCorreo(correo);
+            usuario.setTelefono(telefono);
+            usuario.setDireccion(direccion);
+            usuario.setContraseña(PasswordUtil.encriptar(contrasena));
+            usuario.setTipoUsuario(tipoUsuario == 1 ? "administrador" : tipoUsuario == 2 ? "vendedor" : "cliente");
+            usuario.setEstado("activo");
+
+            if (usuarioDao.registrarUsuarioAdmin(usuario, tipoUsuario)) {
+                response.getWriter().write("{\"success\":true,\"message\":\"Usuario creado correctamente\"}");
+            } else {
+                response.getWriter().write("{\"success\":false,\"message\":\"Error al guardar el usuario en la base de datos\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
+        }
+    }
+
+// Método para actualizar usuario desde admin
+    private void actualizarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+            String nombre = request.getParameter("nombre");
+            String apellido = request.getParameter("apellido");
+            String dni = request.getParameter("dni");
+            String correo = request.getParameter("correo");
+            String telefono = request.getParameter("telefono");
+            String direccion = request.getParameter("direccion");
+            String estado = request.getParameter("estado");
+
+            // Validaciones básicas
+            if (nombre == null || nombre.trim().isEmpty()
+                    || apellido == null || apellido.trim().isEmpty()
+                    || dni == null || dni.trim().isEmpty()) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Nombre, apellido y DNI son campos obligatorios\"}");
+                return;
+            }
+
+            if (dni.length() != 8 || !dni.matches("\\d+")) {
+                response.getWriter().write("{\"success\":false,\"message\":\"El DNI debe tener 8 dígitos numéricos\"}");
+                return;
+            }
+
+            // Obtener usuario actual para comparar DNI
+            Usuario usuarioActual = usuarioDao.obtenerUsuarioPorId(idUsuario);
+            if (usuarioActual == null) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Usuario no encontrado\"}");
+                return;
+            }
+
+            // Verificar si DNI ya existe (excluyendo el usuario actual)
+            if (!usuarioActual.getDni().equals(dni) && usuarioDao.existeDni(dni)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Ya existe un usuario con este DNI\"}");
+                return;
+            }
+
+            // Verificar si correo ya existe (si se proporcionó y ha cambiado)
+            if (correo != null && !correo.isEmpty()
+                    && (usuarioActual.getCorreo() == null || !usuarioActual.getCorreo().equals(correo))
+                    && usuarioDao.existeCorreo(correo)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Ya existe un usuario con este correo electrónico\"}");
+                return;
+            }
+
+            // Actualizar usuario
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(idUsuario);
+            usuario.setNombre(nombre);
+            usuario.setApellido(apellido);
+            usuario.setDni(dni);
+            usuario.setCorreo(correo);
+            usuario.setTelefono(telefono);
+            usuario.setDireccion(direccion);
+            usuario.setEstado(estado);
+
+            if (usuarioDao.actualizarUsuarioAdmin(usuario)) {
+                response.getWriter().write("{\"success\":true,\"message\":\"Usuario actualizado correctamente\"}");
+            } else {
+                response.getWriter().write("{\"success\":false,\"message\":\"Error al actualizar el usuario en la base de datos\"}");
+            }
+        } catch (NumberFormatException e) {
+            response.getWriter().write("{\"success\":false,\"message\":\"ID de usuario inválido\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
+        }
+    }
+
+// Método para cambiar rol de usuario
+    private void cambiarRolUsuario(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+            int nuevoRol = Integer.parseInt(request.getParameter("nuevoRol"));
+
+            if (usuarioDao.cambiarRolUsuario(idUsuario, nuevoRol)) {
+                response.getWriter().write("{\"success\":true,\"message\":\"Rol de usuario actualizado correctamente\"}");
+            } else {
+                response.getWriter().write("{\"success\":false,\"message\":\"Error al actualizar el rol del usuario\"}");
+            }
+        } catch (NumberFormatException e) {
+            response.getWriter().write("{\"success\":false,\"message\":\"ID de usuario o rol inválido\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
+        }
+    }
+
+// Método para cambiar contraseña desde admin
+    private void cambiarContrasenaAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+            String nuevaContrasena = request.getParameter("nuevaContrasena");
+            String confirmarContrasena = request.getParameter("confirmarNuevaContrasena");
+
+            // Validaciones básicas
+            if (!nuevaContrasena.equals(confirmarContrasena)) {
+                response.getWriter().write("{\"success\":false,\"message\":\"Las contraseñas no coinciden\"}");
+                return;
+            }
+
+            if (!nuevaContrasena.matches("(?=.*[a-zA-Z])(?=.*[0-9]).{8,}")) {
+                response.getWriter().write("{\"success\":false,\"message\":\"La contraseña debe tener al menos 8 caracteres con números y letras\"}");
+                return;
+            }
+
+            if (usuarioDao.actualizarContrasena(idUsuario, PasswordUtil.encriptar(nuevaContrasena))) {
+                response.getWriter().write("{\"success\":true,\"message\":\"Contraseña actualizada correctamente\"}");
+            } else {
+                response.getWriter().write("{\"success\":false,\"message\":\"Error al actualizar la contraseña\"}");
+            }
+        } catch (NumberFormatException e) {
+            response.getWriter().write("{\"success\":false,\"message\":\"ID de usuario inválido\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
+        }
+    }
+
+// Método para activar usuario
+    private void activarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            if (usuarioDao.cambiarEstadoUsuario(id, "activo")) {
+                response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&exito=Usuario activado correctamente");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=Error al activar usuario");
+            }
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=ID inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=Error al activar usuario");
+        }
+    }
+
+// Método para desactivar usuario
+    private void desactivarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+
+            if (usuarioDao.cambiarEstadoUsuario(id, "inactivo")) {
+                response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&exito=Usuario desactivado correctamente");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=Error al desactivar usuario");
+            }
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=ID inválido");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=Error al desactivar usuario");
         }
     }
 
