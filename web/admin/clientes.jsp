@@ -96,10 +96,20 @@
                                         <label for="filtroCategoria">Categoría</label>
                                         <select class="form-control" id="filtroCategoria" name="categoria">
                                             <option value="">Todas las categorías</option>
-                                            <option value="1" ${filtroCategoriaj == '1' ? 'selected' : ''}>Persona Natural (DNI)</option>
+                                            <option value="1" ${filtroCategoria == '1' ? 'selected' : ''}>Persona Natural (DNI)</option>
                                             <option value="2" ${filtroCategoria == '2' ? 'selected' : ''}>Persona Jurídica (RUC)</option>
+                                            <option value="2" ${filtroCategoria == '3' ? 'selected' : ''}>Persona Extranjera (Carnet de Extranjeria)</option>
                                         </select>
                                     </div>
+                                    <div class="filter-group">
+                                        <label for="filtroEstado">Estado</label>
+                                        <select class="form-control" id="filtroEstado" name="estado">
+                                            <option value="todos">Todos los estados</option>
+                                            <option value="activo" ${filtroEstado == 'activo' ? 'selected' : ''}>Activo</option>
+                                            <option value="inactivo" ${filtroEstado == 'inactivo' ? 'selected' : ''}>Inactivo</option>
+                                        </select>
+                                    </div>    
+
                                 </form>
                                 <div class="filter-actions">
                                     <button type="button" class="btn-filter secondary" id="btnResetFiltros">
@@ -123,11 +133,11 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
+                                        <th>Nombre Completo</th>
                                         <th>DNI/RUC</th>
                                         <th>Teléfono</th>
                                         <th>Categoria</th>
+                                        <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -135,17 +145,40 @@
                                     <c:forEach var="cliente" items="${clientes}">
                                         <tr>
                                             <td><strong>#${cliente.idCliente}</strong></td>
-                                            <td>${cliente.nombre}</td>
-                                            <td>${cliente.apellido}</td>
+                                            <td>
+                                                ${cliente.nombre} 
+                                                <c:if test="${not empty cliente.apellido}">
+                                                    ${cliente.apellido}
+                                                </c:if>
+                                            </td>
                                             <td>${cliente.documento}</td>
-                                            <td>${cliente.telefono}</td>
+                                            <td>${not empty cliente.telefono ? cliente.telefono : 'S/D'}</td>
                                             <td>${cliente.tipoCliente}</td>
+                                            <td>
+                                                <span class="status-badge ${cliente.estadoCliente eq 'activo' ? 'active' : 'inactive'}">
+                                                    ${cliente.estadoCliente eq 'activo' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 
                                                             data-id="${cliente.idCliente}" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+                                                    <c:choose>
+                                                        <c:when test="${cliente.estadoCliente == 'activo'}">
+                                                            <button class="btn-action deactivate btn-cambiar-estado" 
+                                                                    data-id="${cliente.idCliente}" data-estado="inactivo" title="Desactivar">
+                                                                <i class="fas fa-toggle-on"></i>
+                                                            </button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button class="btn-action activate btn-cambiar-estado" 
+                                                                    data-id="${cliente.idCliente}" data-estado="activo" title="Activar">
+                                                                <i class="fas fa-toggle-off"></i>
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </div>
                                             </td>
                                         </tr>
@@ -184,6 +217,14 @@
                                             <i class="fas fa-building"></i> Persona Jurídica (RUC)
                                         </label>
                                     </div>
+                                    
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoCarnet" value="3" checked>
+                                        <label class="form-check-label" for="tipoCarnet">
+                                            <i class="fas fa-user"></i> Extranjero (Carnet de Extranjeria)
+                                        </label>
+                                    </div>
+                                    
                                 </div>
                             </div>
 
@@ -249,13 +290,13 @@
                                 <label class="required">Tipo de Cliente </label>
                                 <div class="radio-group">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoDni" value="1">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoDni" value="1" disabled>
                                         <label class="form-check-label" for="editTipoDni">
                                             <i class="fas fa-user"></i> Persona Natural (DNI)
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoRuc" value="2">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoRuc" value="2" disabled>
                                         <label class="form-check-label" for="editTipoRuc">
                                             <i class="fas fa-building"></i> Persona Jurídica (RUC)
                                         </label>
@@ -350,6 +391,7 @@
                         delete: '${pageContext.request.contextPath}/ClienteControlador?accion=eliminar&id=',
                         consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni=',
                         consultarRuc: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarRuc&ruc=',
+                        cambiarEstado: '${pageContext.request.contextPath}/ClienteControlador?accion=cambiarEstado',
                         validarDocumento: '${pageContext.request.contextPath}/ClienteControlador?accion=validarDocumento'
                     }
                 }

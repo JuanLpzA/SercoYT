@@ -57,6 +57,9 @@ public class ClienteControlador extends HttpServlet {
                 case "validarDocumento":
                     validarDocumentoUnico(request, response);
                     break;
+                case "cambiarEstado":
+                    cambiarEstadoCliente(request, response);
+                    break;
                 default:
                     listarClientes(request, response);
             }
@@ -79,6 +82,10 @@ public class ClienteControlador extends HttpServlet {
                 case "actualizar":
                     actualizarCliente(request, response);
                     break;
+                case "cambiarEstado":
+                cambiarEstadoCliente(request, response);
+                break;
+                
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
             }
@@ -101,42 +108,41 @@ public class ClienteControlador extends HttpServlet {
     }
 
     private void guardarCliente(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            String documento = request.getParameter("dni");
+        throws ServletException, IOException {
+    try {
+        String documento = request.getParameter("dni");
 
-            // Validar si el documento ya existe
-            if (clienteDao.existeDocumento(documento, 0)) {
-                response.setContentType("application/json");
-                response.setCharacterEncoding("UTF-8");
-                response.getWriter().write("{\"error\": \"El documento ya está registrado\", \"existe\": true}");
-                return;
-            }
+        if (clienteDao.existeDocumento(documento, 0)) {
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"error\": \"El documento ya está registrado\", \"existe\": true}");
+            return;
+        }
 
-            Cliente cliente = new Cliente();
-            cliente.setNombre(request.getParameter("nombre"));
-            cliente.setApellido(request.getParameter("apellido"));
-            cliente.setDocumento(documento);
-            cliente.setTelefono(request.getParameter("telefono"));
+        Cliente cliente = new Cliente();
+        cliente.setNombre(request.getParameter("nombre"));
+        cliente.setApellido(request.getParameter("apellido"));
+        cliente.setDocumento(documento);
+        cliente.setTelefono(request.getParameter("telefono"));
 
-            // Determinar tipo de cliente por longitud del documento
-            int tipoCliente = (documento.length() == 8) ? 1 : 2;
+        int tipoCliente = Integer.parseInt(request.getParameter("tipoCliente"));
+        int api = request.getParameter("api") != null ? 1 : 0; // 1 si viene de API, 0 si es manual
 
-            int idGenerado = clienteDao.insertar(cliente, tipoCliente);
+        int idGenerado = clienteDao.insertar(cliente, tipoCliente, api);
 
-            if (idGenerado > 0) {
-                request.getSession().setAttribute("exito", "Cliente creado correctamente");
-                response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
-            } else {
-                request.getSession().setAttribute("error", "Error al guardar el cliente");
-                response.sendRedirect(request.getContextPath() + "/admin/clientes.jsp");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.getSession().setAttribute("error", "Error al procesar el cliente: " + e.getMessage());
+        if (idGenerado > 0) {
+            request.getSession().setAttribute("exito", "Cliente creado correctamente");
+            response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
+        } else {
+            request.getSession().setAttribute("error", "Error al guardar el cliente");
             response.sendRedirect(request.getContextPath() + "/admin/clientes.jsp");
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Error al procesar el cliente: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/admin/clientes.jsp");
     }
+}
 
     private void actualizarCliente(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
@@ -187,10 +193,11 @@ public class ClienteControlador extends HttpServlet {
     }
 
     private void filtrarClientes(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+    throws ServletException, IOException {
     String nombre = request.getParameter("nombre");
     String dni = request.getParameter("dni");
-    String categoria = request.getParameter("categoria"); // AGREGAR ESTA LÍNEA
+    String categoria = request.getParameter("categoria");
+    String estado = request.getParameter("estado"); // Nuevo filtro por estado
 
     List<Cliente> clientes = clienteDao.listarTodos();
 
@@ -208,7 +215,6 @@ public class ClienteControlador extends HttpServlet {
                 .collect(Collectors.toList());
     }
 
-    // AGREGAR ESTE BLOQUE:
     if (categoria != null && !categoria.isEmpty()) {
         int tipoClienteFilter = Integer.parseInt(categoria);
         clientes = clientes.stream()
@@ -216,10 +222,18 @@ public class ClienteControlador extends HttpServlet {
                 .collect(Collectors.toList());
     }
 
+    // Nuevo filtro por estado
+    if (estado != null && !estado.isEmpty() && !estado.equals("todos")) {
+        clientes = clientes.stream()
+                .filter(c -> c.getEstadoCliente().equalsIgnoreCase(estado))
+                .collect(Collectors.toList());
+    }
+
     request.setAttribute("clientes", clientes);
     request.setAttribute("filtroNombre", nombre);
     request.setAttribute("filtroDni", dni);
-    request.setAttribute("filtroCategoria", categoria); // AGREGAR ESTA LÍNEA
+    request.setAttribute("filtroCategoria", categoria);
+    request.setAttribute("filtroEstado", estado); // Nuevo atributo para mantener el filtro
     request.getRequestDispatcher("/admin/clientes.jsp").forward(request, response);
 }
 
@@ -300,6 +314,56 @@ private void validarDocumentoUnico(HttpServletRequest request, HttpServletRespon
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         response.getWriter().write("{\"error\": \"" + e.getMessage() + "\"}");
     }
+}
+
+private void cambiarEstadoCliente(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        // Obtener parámetros
+        String idParam = request.getParameter("id");
+        String estado = request.getParameter("estado");
+        
+        // Validar parámetros
+        if (idParam == null || idParam.trim().isEmpty()) {
+            request.getSession().setAttribute("error", "ID de cliente no válido");
+            response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
+            return;
+        }
+        
+        if (estado == null || (!estado.equals("activo") && !estado.equals("inactivo"))) {
+            request.getSession().setAttribute("error", "Estado no válido");
+            response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
+            return;
+        }
+        
+        int id = Integer.parseInt(idParam);
+        
+        // Debug
+        System.out.println("Cambiando estado - ID: " + id + ", Estado: " + estado);
+        
+        // Ejecutar cambio de estado
+        boolean resultado = clienteDao.cambiarEstado(id, estado);
+        
+        if (resultado) {
+            String mensaje = estado.equals("activo") ? "Cliente activado correctamente" : "Cliente desactivado correctamente";
+            request.getSession().setAttribute("exito", mensaje);
+            System.out.println("Estado cambiado exitosamente");
+        } else {
+            request.getSession().setAttribute("error", "No se pudo cambiar el estado del cliente");
+            System.out.println("Error al cambiar estado en la base de datos");
+        }
+        
+    } catch (NumberFormatException e) {
+        System.out.println("Error: ID no es un número válido - " + e.getMessage());
+        request.getSession().setAttribute("error", "ID de cliente no válido");
+    } catch (Exception e) {
+        System.out.println("Error general al cambiar estado: " + e.getMessage());
+        e.printStackTrace();
+        request.getSession().setAttribute("error", "Error al cambiar estado: " + e.getMessage());
+    }
+    
+    // Siempre redirigir a la lista
+    response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
 }
     
     

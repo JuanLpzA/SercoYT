@@ -675,38 +675,41 @@ public class UsuarioControlador extends HttpServlet {
 
 // Método para cambiar contraseña desde admin
     private void cambiarContrasenaAdmin(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        throws ServletException, IOException {
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
 
-        try {
-            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
-            String nuevaContrasena = request.getParameter("nuevaContrasena");
-            String confirmarContrasena = request.getParameter("confirmarNuevaContrasena");
+    try {
+        int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+        String nuevaContrasena = request.getParameter("nuevaContrasena");
+        String confirmarContrasena = request.getParameter("confirmarNuevaContrasena");
 
-            // Validaciones básicas
-            if (!nuevaContrasena.equals(confirmarContrasena)) {
-                response.getWriter().write("{\"success\":false,\"message\":\"Las contraseñas no coinciden\"}");
-                return;
-            }
-
-            if (!nuevaContrasena.matches("(?=.*[a-zA-Z])(?=.*[0-9]).{8,}")) {
-                response.getWriter().write("{\"success\":false,\"message\":\"La contraseña debe tener al menos 8 caracteres con números y letras\"}");
-                return;
-            }
-
-            if (usuarioDao.actualizarContrasena(idUsuario, PasswordUtil.encriptar(nuevaContrasena))) {
-                response.getWriter().write("{\"success\":true,\"message\":\"Contraseña actualizada correctamente\"}");
-            } else {
-                response.getWriter().write("{\"success\":false,\"message\":\"Error al actualizar la contraseña\"}");
-            }
-        } catch (NumberFormatException e) {
-            response.getWriter().write("{\"success\":false,\"message\":\"ID de usuario inválido\"}");
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
+        // Validaciones básicas
+        if (!nuevaContrasena.equals(confirmarContrasena)) {
+            response.getWriter().write("{\"success\":false,\"message\":\"Las contraseñas no coinciden\"}");
+            return;
         }
+
+        if (!nuevaContrasena.matches("(?=.*[a-zA-Z])(?=.*[0-9]).{8,}")) {
+            response.getWriter().write("{\"success\":false,\"message\":\"La contraseña debe tener al menos 8 caracteres con números y letras\"}");
+            return;
+        }
+
+        // Agrega este log para depuración
+        System.out.println("Actualizando contraseña para usuario ID: " + idUsuario);
+
+        if (usuarioDao.actualizarContrasena(idUsuario, PasswordUtil.encriptar(nuevaContrasena))) {
+            response.getWriter().write("{\"success\":true,\"message\":\"Contraseña actualizada correctamente\"}");
+        } else {
+            response.getWriter().write("{\"success\":false,\"message\":\"Error al actualizar la contraseña. Verifica que el usuario existe.\"}");
+        }
+    } catch (NumberFormatException e) {
+        response.getWriter().write("{\"success\":false,\"message\":\"ID de usuario inválido\"}");
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.getWriter().write("{\"success\":false,\"message\":\"Error interno del servidor: " + e.getMessage() + "\"}");
     }
+}
 
 // Método para activar usuario
     private void activarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)

@@ -1,0 +1,669 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 25 jun. 2025, 15:07:55
+    Author     : Arrunategui
+*/
+
+/* Variables CSS para consistencia con el sistema */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-color: #e9ecef;
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Contenedor principal de gestión de roles */
+.roles-management {
+    padding: 20px;
+    background-color: #f5f6fa;
+    min-height: calc(100vh - 80px);
+}
+
+/* Header de sección mejorado */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h2 {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-header h2::before {
+    content: "👥";
+    font-size: 1.5rem;
+}
+
+/* Botón de nuevo rol */
+.btn-nuevo-rol {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-light);
+}
+
+.btn-nuevo-rol::before {
+    content: "➕";
+    font-size: 1rem;
+}
+
+.btn-nuevo-rol:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-nuevo-rol:active {
+    transform: translateY(0);
+}
+
+/* Contenedor de tabla mejorado */
+.table-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    margin-top: 20px;
+}
+
+.table-header {
+    background: linear-gradient(135deg, var(--light-color), #e9ecef);
+    padding: 18px 25px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-header h5 {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.table-header h5::before {
+    content: "📋";
+    font-size: 1rem;
+}
+
+.table-stats {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: 500;
+}
+
+/* Tabla de roles mejorada */
+.roles-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.roles-table thead {
+    background: linear-gradient(135deg, var(--light-color), #f1f3f4);
+}
+
+.roles-table th {
+    padding: 18px 20px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--dark-color);
+    border-bottom: 3px solid var(--primary-color);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.roles-table th::after {
+    content: "";
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), transparent);
+}
+
+.roles-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+    font-size: 0.95rem;
+    color: var(--dark-color);
+}
+
+.roles-table tbody tr {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.roles-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9ff, #ffffff);
+    transform: translateX(2px);
+    box-shadow: inset 4px 0 0 var(--primary-color);
+}
+
+/* Estilo para ID de rol */
+.role-id {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1rem;
+    padding: 4px 8px;
+    background: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* Nombre del rol */
+.role-name {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 1rem;
+}
+
+/* Badges de estado mejorados */
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 90px;
+    justify-content: center;
+    box-shadow: var(--shadow-light);
+}
+
+.status-badge.activo {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border: 2px solid #b8dabd;
+}
+
+.status-badge.activo::before {
+    content: "✅";
+    font-size: 0.8rem;
+}
+
+.status-badge.inactivo {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    border: 2px solid #f1b0b7;
+}
+
+.status-badge.inactivo::before {
+    content: "❌";
+    font-size: 0.8rem;
+}
+
+/* Botones de acción mejorados */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-action {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-action::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: var(--transition);
+}
+
+.btn-action:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-action:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: var(--shadow-medium);
+}
+
+.btn-action.edit {
+    background: linear-gradient(135deg, var(--warning-color), #e0a800);
+    color: #856404;
+}
+
+.btn-action.edit:hover {
+    background: linear-gradient(135deg, #e0a800, #d39e00);
+}
+
+/* Modales mejorados */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.07);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    padding: 25px 30px;
+    border: none;
+    position: relative;
+}
+
+.modal-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.3), transparent);
+}
+
+.modal-header .modal-title {
+    font-weight: 600;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.modal-header .modal-title::before {
+    content: "🛠️";
+    font-size: 1.2rem;
+}
+
+.modal-header .close {
+    color: white;
+    opacity: 0.8;
+    font-size: 1.5rem;
+    transition: var(--transition);
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 30px;
+    background: #fafbfc;
+}
+
+.modal-footer {
+    background: linear-gradient(135deg, var(--light-color), #e9ecef);
+    border-top: 2px solid var(--border-color);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Formularios en modales mejorados */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.form-group label::before {
+    content: "📝";
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e1e5e9;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    font-size: 0.95rem;
+    background: white;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+    outline: none;
+    background: #fafbfc;
+}
+
+.form-group input[required]:focus,
+.form-group select[required]:focus {
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+}
+
+/* Select personalizado */
+.form-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 45px;
+    appearance: none;
+}
+
+/* Botones del modal mejorados */
+.modal-footer .btn {
+    padding: 12px 28px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow-light);
+}
+
+.modal-footer .btn-secondary {
+    background: linear-gradient(135deg, var(--secondary-color), #545b62);
+    color: white;
+}
+
+.modal-footer .btn-secondary::before {
+    content: "❌";
+    font-size: 0.9rem;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: linear-gradient(135deg, #545b62, #495057);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+}
+
+.modal-footer .btn-primary::before {
+    content: "💾";
+    font-size: 0.9rem;
+}
+
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+/* Alertas mejoradas */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    box-shadow: var(--shadow-light);
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-warning::before {
+    content: "⚠️";
+    font-size: 1.2rem;
+}
+
+/* Estados de carga */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+.loading-text {
+    color: var(--dark-color);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-container {
+    animation: fadeInUp 0.5s ease;
+}
+
+.modal.fade .modal-dialog {
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    transform: translateY(-50px) scale(0.95);
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .roles-management {
+        padding: 15px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn-nuevo-rol {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .roles-table {
+        min-width: 600px;
+    }
+    
+    .roles-table th,
+    .roles-table td {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .roles-table th,
+    .roles-table td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-action {
+        width: 34px;
+        height: 34px;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+        min-width: 80px;
+    }
+    
+    .role-id {
+        font-size: 0.9rem;
+        padding: 3px 6px;
+    }
+}
+
+/* Efectos hover adicionales */
+.table-container:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.btn-nuevo-rol:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Validación de formularios */
+.form-group input.is-invalid,
+.form-group select.is-invalid {
+    border-color: var(--danger-color);
+    background: #fff5f5;
+    box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+}
+
+.form-group input.is-valid,
+.form-group select.is-valid {
+    border-color: var(--success-color);
+    background: #f8fff9;
+    box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1);
+}
+
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    font-weight: 500;
+    display: block;
+}
+
+.valid-feedback {
+    color: var(--success-color);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    font-weight: 500;
+    display: block;
+}

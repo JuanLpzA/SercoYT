@@ -44,6 +44,14 @@
         <servlet-name>ClienteControlador</servlet-name>
         <servlet-class>com.sercoyt.controller.ClienteControlador</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>TipoUsuarioControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.TipoUsuarioControlador</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReporteControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.ReporteControlador</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ServletContextProvider</servlet-name>
         <url-pattern>/ServletContextProvider</url-pattern>
@@ -87,6 +95,14 @@
     <servlet-mapping>
         <servlet-name>ClienteControlador</servlet-name>
         <url-pattern>/ClienteControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TipoUsuarioControlador</servlet-name>
+        <url-pattern>/TipoUsuarioControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReporteControlador</servlet-name>
+        <url-pattern>/ReporteControlador</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

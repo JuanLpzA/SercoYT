@@ -192,6 +192,10 @@ public class VentaControlador extends HttpServlet {
             cliente.setApellido(usuario.getApellido());
             cliente.setDocumento(usuario.getDni());
             cliente.setTelefono(usuario.getTelefono());
+            cliente.setIdTipoCliente(1);
+            cliente.setEstadoCliente(usuario.getEstado());
+            cliente.setApi(1);
+   
 
             idCliente = clienteDao.registrarCliente(cliente);
         }

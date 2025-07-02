@@ -17,27 +17,33 @@ public class Cliente {
     private String telefono;
     private String tipoCliente;
     private int IdTipoCliente;
+    private String estadoCliente;
+    private int api;
 
     public Cliente() {
     }
 
-    public Cliente(int idCliente, String nombre, String apellido, String documento, String telefono, String tipoCliente) {
+    public Cliente(int idCliente, String nombre, String apellido, String documento, String telefono, String tipoCliente, int IdTipoCliente, String estadoCliente, int api) {
         this.idCliente = idCliente;
         this.nombre = nombre;
         this.apellido = apellido;
         this.documento = documento;
         this.telefono = telefono;
         this.tipoCliente = tipoCliente;
+        this.IdTipoCliente = IdTipoCliente;
+        this.estadoCliente = estadoCliente;
+        this.api = api;
     }
     
-
-    public String getTipoCliente() {
-        return tipoCliente;
-    }
-
-    public void setTipoCliente(String tipoCliente) {
-        this.tipoCliente = tipoCliente;
-    }
+    public Cliente(int idCliente, String nombre, String apellido, 
+               String documento, String telefono, String tipoCliente) {
+    this.idCliente = idCliente;
+    this.nombre = nombre;
+    this.apellido = apellido;
+    this.documento = documento;
+    this.telefono = telefono;
+    this.tipoCliente = tipoCliente;
+}
 
     public int getIdCliente() {
         return idCliente;
@@ -79,6 +85,14 @@ public class Cliente {
         this.telefono = telefono;
     }
 
+    public String getTipoCliente() {
+        return tipoCliente;
+    }
+
+    public void setTipoCliente(String tipoCliente) {
+        this.tipoCliente = tipoCliente;
+    }
+
     public int getIdTipoCliente() {
         return IdTipoCliente;
     }
@@ -87,6 +101,21 @@ public class Cliente {
         this.IdTipoCliente = IdTipoCliente;
     }
 
+    public String getEstadoCliente() {
+        return estadoCliente;
+    }
+
+    public void setEstadoCliente(String estadoCliente) {
+        this.estadoCliente = estadoCliente;
+    }
+
+    public int getApi() {
+        return api;
+    }
+
+    public void setApi(int api) {
+        this.api = api;
+    }
     
     
 

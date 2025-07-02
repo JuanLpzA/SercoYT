@@ -7,15 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteDao {
-    private static final String SQL_SELECT = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, c.idTipoCliente, tc.descripcion as tipoCliente FROM clientes c INNER JOIN tipocliente tc ON c.idTipoCliente = tc.idTipoCliente ORDER BY c.idCliente ASC";
-    private static final String SQL_INSERT = "INSERT INTO clientes(nombre, apellido, documento, telefono, idTipoCliente) VALUES(?, ?, ?, ?, ?)";
+    private static final String SQL_SELECT = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, c.idTipoCliente, tc.descripcion as tipoCliente, c.estadoCliente, c.api FROM clientes c INNER JOIN tipocliente tc ON c.idTipoCliente = tc.idTipoCliente ORDER BY c.idCliente ASC";
+    private static final String SQL_INSERT = "INSERT INTO clientes(nombre, apellido, documento, telefono, idTipoCliente, estadoCliente, api) VALUES(?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE = "UPDATE clientes SET nombre = ?, apellido = ?, documento = ?, telefono = ?, idTipoCliente = ? WHERE idCliente = ?";
     private static final String SQL_DELETE = "DELETE FROM clientes WHERE idCliente = ?";
-    private static final String SQL_GET_BY_ID = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, c.idTipoCliente, tc.descripcion as tipoCliente FROM clientes c INNER JOIN tipocliente tc ON c.idTipoCliente = tc.idTipoCliente WHERE c.idCliente = ?";
+    private static final String SQL_GET_BY_ID = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, c.idTipoCliente, tc.descripcion as tipoCliente, c.estadoCliente, c.api FROM clientes c INNER JOIN tipocliente tc ON c.idTipoCliente = tc.idTipoCliente WHERE c.idCliente = ?";
     private static final String SQL_CHECK_DNI = "SELECT COUNT(*) FROM clientes WHERE documento = ? AND idCliente != ?";
 
     public int registrarCliente(Cliente cliente) throws SQLException {
-        String sql = "INSERT INTO clientes (nombre, apellido, documento, telefono, idTipoCliente) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (nombre, apellido, documento, telefono, idTipoCliente, estadoCliente, api) VALUES (?, ?, ?, ?, ?, ?, ?)";
         int idCliente = 0;
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -25,6 +25,8 @@ public class ClienteDao {
             ps.setString(3, cliente.getDocumento());
             ps.setString(4, cliente.getTelefono());
             ps.setInt(5, 1);
+            ps.setString(6, "activo");
+            ps.setInt(7, 1);
 
             int affectedRows = ps.executeUpdate();
 
@@ -72,28 +74,33 @@ public class ClienteDao {
     }
     
     public List<Cliente> listarTodos() {
-        List<Cliente> clientes = new ArrayList<>();
-        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_SELECT); ResultSet rs = stmt.executeQuery()) {
+    List<Cliente> clientes = new ArrayList<>();
+    try (Connection conn = ConnectDB.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(SQL_SELECT); 
+         ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                Cliente cliente = new Cliente(
-                        rs.getInt("idCliente"),
-                        rs.getString("nombre"),
-                        rs.getString("apellido"),
-                        rs.getString("documento"),
-                        rs.getString("telefono"),
-                        rs.getString("tipoCliente")
-                );
-                cliente.setIdTipoCliente(rs.getInt("idTipoCliente")); // AGREGAR ESTA LÍNEA
-                clientes.add(cliente);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        while (rs.next()) {
+            Cliente cliente = new Cliente(
+                    rs.getInt("idCliente"),
+                    rs.getString("nombre"),
+                    rs.getString("apellido"),
+                    rs.getString("documento"),
+                    rs.getString("telefono"),
+                    rs.getString("tipoCliente")
+            );
+            cliente.setIdTipoCliente(rs.getInt("idTipoCliente"));
+            cliente.setEstadoCliente(rs.getString("estadoCliente"));
+            cliente.setApi(rs.getInt("api"));
+            clientes.add(cliente);
         }
-        return clientes;
+    } catch (SQLException ex) {
+        ex.printStackTrace();
     }
+    return clientes;
+}
 
-    public int insertar(Cliente cliente, int tipoCliente) {
+
+    public int insertar(Cliente cliente, int tipoCliente, int api) {
     try (Connection conn = ConnectDB.getConnection();
          PreparedStatement stmt = conn.prepareStatement(SQL_INSERT, PreparedStatement.RETURN_GENERATED_KEYS)) {
         
@@ -102,6 +109,9 @@ public class ClienteDao {
         stmt.setString(3, cliente.getDocumento());
         stmt.setString(4, cliente.getTelefono());
         stmt.setInt(5, tipoCliente);
+        stmt.setString(6, "activo"); // estado por defecto
+        stmt.setInt(7, api); // 1 si fue creado por API, 0 si fue manual
+        
         int affectedRows = stmt.executeUpdate();
         if (affectedRows > 0) {
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -125,11 +135,49 @@ public class ClienteDao {
         stmt.setString(2, cliente.getApellido());
         stmt.setString(3, cliente.getDocumento());
         stmt.setString(4, cliente.getTelefono());
-        stmt.setInt(5, tipoCliente); // CAMBIAR: ahora recibe tipoCliente como parámetro
-        stmt.setInt(6, cliente.getIdCliente()); // CAMBIAR: ahora es el parámetro 6
+        stmt.setInt(5, tipoCliente);
+        stmt.setInt(6, cliente.getIdCliente());
         
         return stmt.executeUpdate() > 0;
     } catch (SQLException ex) {
+        ex.printStackTrace();
+        return false;
+    }
+}
+    
+    public boolean cambiarEstado(int id, String estado) {
+    String sql = "UPDATE clientes SET estadoCliente = ? WHERE idCliente = ?";
+    
+    System.out.println("DAO - Ejecutando cambio de estado:");
+    System.out.println("  SQL: " + sql);
+    System.out.println("  ID: " + id);
+    System.out.println("  Estado: " + estado);
+    
+    try (Connection conn = ConnectDB.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, estado);
+        stmt.setInt(2, id);
+        
+        int filasAfectadas = stmt.executeUpdate();
+        System.out.println("  Filas afectadas: " + filasAfectadas);
+        
+        if (filasAfectadas > 0) {
+            System.out.println("  Estado cambiado exitosamente");
+            return true;
+        } else {
+            System.out.println("  No se encontró el cliente con ID: " + id);
+            return false;
+        }
+        
+    } catch (SQLException ex) {
+        System.out.println("Error SQL al cambiar estado:");
+        System.out.println("  Mensaje: " + ex.getMessage());
+        System.out.println("  Código: " + ex.getErrorCode());
+        ex.printStackTrace();
+        return false;
+    } catch (Exception ex) {
+        System.out.println("Error general al cambiar estado: " + ex.getMessage());
         ex.printStackTrace();
         return false;
     }
@@ -162,8 +210,9 @@ public class ClienteDao {
                     rs.getString("telefono"),
                     rs.getString("tipoCliente")
                 );
-                // AGREGAR ESTA LÍNEA:
                 cliente.setIdTipoCliente(rs.getInt("idTipoCliente"));
+                cliente.setEstadoCliente(rs.getString("estadoCliente"));
+                cliente.setApi(rs.getInt("api"));
                 return cliente;
             }
         }

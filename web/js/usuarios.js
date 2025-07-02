@@ -139,45 +139,61 @@ $(document).ready(function() {
 
     // Form validation
     function validateUsuarioForm($form) {
-        let isValid = true;
-        
-        // Clear previous validations
-        $form.find('.is-invalid').removeClass('is-invalid');
-        $form.find('.invalid-feedback').remove();
+    let isValid = true;
+    
+    // Clear previous validations
+    $form.find('.is-invalid').removeClass('is-invalid');
+    $form.find('.invalid-feedback').remove();
 
-        // Validate required fields
-        $form.find('[required]').each(function() {
-            if (!$(this).val().trim()) {
-                markAsInvalid($(this), AppContext.messages.requiredField);
-                isValid = false;
-            }
-        });
-
-        // Special validations for new user form
-        if ($form.attr('id') === 'nuevoUsuarioForm' || $form.attr('id') === 'cambiarContrasenaForm') {
-            const contrasena = $('#contrasena').val();
-            const confirmarContrasena = $('#confirmarContrasena').val();
-            
-            if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
-                markAsInvalid($('#confirmarContrasena'), AppContext.messages.contrasenaNoCoincide);
-                isValid = false;
-            }
-            
-            if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
-                markAsInvalid($('#contrasena'), AppContext.messages.contrasenaInvalida);
-                isValid = false;
-            }
-        }
-
-        // Validate DNI
-        const dniInput = $form.find('[name="dni"]');
-        if (dniInput.length && dniInput.val().length !== 8 || !/^\d+$/.test(dniInput.val())) {
-            markAsInvalid(dniInput, AppContext.messages.dniInvalido);
+    // Validate required fields
+    $form.find('[required]').each(function() {
+        if (!$(this).val().trim()) {
+            markAsInvalid($(this), AppContext.messages.requiredField);
             isValid = false;
         }
+    });
 
-        return isValid;
+    // Validaciones para nuevo usuario
+    if ($form.attr('id') === 'nuevoUsuarioForm') {
+        const contrasena = $('#contrasena').val();
+        const confirmarContrasena = $('#confirmarContrasena').val();
+        
+        if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
+            markAsInvalid($('#confirmarContrasena'), AppContext.messages.contrasenaNoCoincide);
+            isValid = false;
+        }
+        
+        if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
+            markAsInvalid($('#contrasena'), AppContext.messages.contrasenaInvalida);
+            isValid = false;
+        }
     }
+
+    // Validaciones para cambiar contraseña
+    if ($form.attr('id') === 'cambiarContrasenaForm') {
+        const contrasena = $('#nueva_contrasena').val();
+        const confirmarContrasena = $('#confirmar_nueva_contrasena').val();
+        
+        if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
+            markAsInvalid($('#confirmar_nueva_contrasena'), AppContext.messages.contrasenaNoCoincide);
+            isValid = false;
+        }
+        
+        if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
+            markAsInvalid($('#nueva_contrasena'), AppContext.messages.contrasenaInvalida);
+            isValid = false;
+        }
+    }
+
+    // Validar DNI solo si existe en el formulario
+    const dniInput = $form.find('[name="dni"]');
+    if (dniInput.length && (dniInput.val().length !== 8 || !/^\d+$/.test(dniInput.val()))) {
+        markAsInvalid(dniInput, AppContext.messages.dniInvalido);
+        isValid = false;
+    }
+
+    return isValid;
+}
 
     function markAsInvalid($element, message) {
         $element.addClass('is-invalid');

@@ -33,7 +33,7 @@
             </a>
         </li>
         <li class="${pageContext.request.requestURI.contains('reportes') ? 'active' : ''}">
-            <a href="#">
+            <a href="${pageContext.request.contextPath}/ReporteControlador">
                 <i class="fas fa-chart-line"></i> Reportes
             </a>
         </li>
@@ -47,6 +47,9 @@
                 <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=listarAdmin">
                     <i class="fas fa-user-cog"></i> Cuentas
                 </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/TipoUsuarioControlador?accion=gestionar">Gestionar Roles</a>
             </li>
             <li class="${pageContext.request.requestURI.contains('estadisticas') ? 'active' : ''}">
                 <a href="#">

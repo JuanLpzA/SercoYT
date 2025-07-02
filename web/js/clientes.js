@@ -435,6 +435,47 @@ $(document).ready(function() {
             `);
         }
     }
+    
+    $(document).on('click', '.btn-cambiar-estado', function() {
+    const id = $(this).data('id');
+    const estado = $(this).data('estado');
+    
+    Swal.fire({
+        title: 'Confirmar cambio',
+        text: `¿Está seguro que desea ${estado === 'activo' ? 'activar' : 'desactivar'} este cliente?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, cambiar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading();
+            
+            // Primero hacer el cambio de estado
+            $.ajax({
+                url: AppContext.endpoints.cliente.cambiarEstado,
+                type: 'POST',
+                data: {
+                    id: id,
+                    estado: estado
+                },
+                success: function(response) {
+                    // Después del cambio exitoso, redirigir al list
+                    window.location.href = AppContext.endpoints.cliente.list;
+                },
+                error: function(xhr, status, error) {
+                    hideLoading();
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Error al cambiar el estado del cliente',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+});
+
 
     function hideLoading() {
         $('.loading-overlay').remove();

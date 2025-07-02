@@ -169,8 +169,9 @@
                                             <td>${usuario.apellido}</td>
                                             <td>${usuario.dni}</td>
                                             <td>*******</td>
-                                            <td>${usuario.correo}</td>
-                                            <td>${usuario.telefono}</td>
+                                            <td>${not empty usuario.correo ? usuario.correo : 'S/D'}</td>
+                                            <td>${not empty usuario.telefono ? usuario.telefono : 'S/D'}</td>
+                                            
                                             <td>${usuario.direccion}</td>
                                             <td>${usuario.tipoUsuario}</td>
                                             <td>
@@ -376,12 +377,8 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Contraseña</label>
-                                <input type="text" class="form-control" value="********" readonly>
-                            </div>
-                            <div class="form-group">
                                 <label for="edit_estado" class="required">Estado *</label>
-                                <select class="form-control" id="edit_estado" name="estado" required>
+                                <select class="form-control" id="edit_estado" name="estado" required disabled>
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
                                 </select>
