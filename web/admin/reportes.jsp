@@ -85,6 +85,60 @@
                         </div>
                     </div>
 
+                    <div class="filter-card">
+                        <div class="card-header">
+                            <h5>Filtrar Ventas</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="filtroForm" class="filter-form">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="filtroId">ID Venta</label>
+                                            <input type="text" class="form-control" id="filtroId" name="id" 
+                                                   placeholder="Buscar por ID...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="filtroCliente">Cliente</label>
+                                            <input type="text" class="form-control" id="filtroCliente" name="cliente" 
+                                                   placeholder="Buscar por cliente...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="filtroEstado">Estado</label>
+                                            <select class="form-control" id="filtroEstado" name="estado">
+                                                <option value="">Todos los estados</option>
+                                                <option value="1">En espera</option>
+                                                <option value="2">En reparto</option>
+                                                <option value="3">Entregado</option>
+                                                <option value="4">Cancelado</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="filtroFecha">Fecha</label>
+                                            <input type="date" class="form-control" id="filtroFecha" name="fecha">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="filter-actions">
+                                <button type="button" class="btn btn-secondary" id="btnResetFiltros">
+                                    <i class="fas fa-eraser"></i> Limpiar Filtros
+                                </button>
+                                <button type="submit" form="filtroForm" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+
                     <div class="section-content">
                         <div class="table-container">
                             <div class="table-header">
@@ -123,25 +177,36 @@
                                             <td>${venta.metodoPagoNombre}</td>
                                             <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
                                             <td>
-                                                <div class="action-buttons">
-                                                    <a href="${pageContext.request.contextPath}/VentaControlador?accion=generarBoleta&id=${venta.idVenta}" 
-                                                       class="btn-action download" title="Descargar Boleta" target="_blank">
-                                                        <i class="fas fa-file-pdf"></i>
-                                                    </a>
-                                                    <a href="${pageContext.request.contextPath}/VentaControlador?accion=verDetalle&id=${venta.idVenta}" 
-                                                       class="btn-action view" title="Ver Detalle">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <c:if test="${venta.idEstado != 3 && venta.idEstado != 4}">
-                                                        <button class="btn-action change-status" 
-                                                                data-id="${venta.idVenta}" 
-                                                                data-current="${venta.idEstado}"
-                                                                title="Cambiar Estado">
-                                                            <i class="fas fa-truck"></i>
-                                                        </button>
-                                                    </c:if>
-                                                </div>
-                                            </td>
+    <div class="action-buttons">
+        <!-- Botón Descargar Boleta -->
+        <a href="${pageContext.request.contextPath}/VentaControlador?accion=generarBoleta&id=${venta.idVenta}" 
+           class="btn-action download" 
+           title="Descargar Boleta PDF" 
+           target="_blank"
+           data-toggle="tooltip">
+            <i class="fas fa-file-pdf"></i>
+        </a>
+        
+        <!-- Botón Ver Detalles -->
+        <button class="btn-action view" 
+                data-id="${venta.idVenta}"
+                title="Ver detalles completos"
+                data-toggle="tooltip">
+            <i class="fas fa-eye"></i>
+        </button>
+        
+        <!-- Botón Cambiar Estado (solo si no está entregado o cancelado) -->
+        <c:if test="${venta.idEstado != 3 && venta.idEstado != 4}">
+            <button class="btn-action change-status" 
+                    data-id="${venta.idVenta}" 
+                    data-current="${venta.idEstado}"
+                    title="Cambiar estado de envío"
+                    data-toggle="tooltip">
+                <i class="fas fa-truck"></i>
+            </button>
+        </c:if>
+    </div>
+</td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
@@ -189,6 +254,64 @@
             </div>
         </div>
 
+        <!-- Modal Detalles Venta -->
+        <div class="modal fade" id="detallesVentaModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-file-invoice"></i> Detalles de Venta #<span id="detalleIdVenta"></span>
+                        </h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-info-circle"></i> Información de la Venta</h6>
+                                <div id="infoVenta"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-truck"></i> Dirección de Entrega</h6>
+                                <div id="infoDireccion"></div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h6><i class="fas fa-boxes"></i> Productos</h6>
+                        <table class="table table-bordered table-sm">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProductos">
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-right">Subtotal:</th>
+                                    <th id="subtotalDetalle"></th>
+                                </tr>
+                                <tr>
+                                    <th colspan="3" class="text-right">IGV (18%):</th>
+                                    <th id="igvDetalle"></th>
+                                </tr>
+                                <tr class="table-active">
+                                    <th colspan="3" class="text-right">Total:</th>
+                                    <th id="totalDetalle"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
@@ -204,8 +327,8 @@
                 },
                 endpoints: {
                     reporte: {
-                        cambiarEstado: '${pageContext.request.contextPath}/ReporteControlador?accion=cambiarEstado'
-                    }
+                    cambiarEstado: '${pageContext.request.contextPath}/ReporteControlador?accion=cambiarEstado',
+                    obtenerDetalles: '${pageContext.request.contextPath}/ReporteControlador?accion=obtenerDetalles&idVenta=' }
                 }
             };
         </script>
