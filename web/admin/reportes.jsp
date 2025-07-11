@@ -69,14 +69,7 @@
                         <h4>Reportes de Ventas</h4>
                         <div class="header-actions">
                             <div class="btn-group" role="group">
-                                <a href="${pageContext.request.contextPath}/ReporteControlador?accion=listarOnline" 
-                                   class="btn ${filtroActivo eq 'online' ? 'btn-primary' : 'btn-outline-primary'}">
-                                    <i class="fas fa-globe"></i> Ventas Online
-                                </a>
-                                <a href="${pageContext.request.contextPath}/ReporteControlador?accion=listarPresencial" 
-                                   class="btn ${filtroActivo eq 'presencial' ? 'btn-primary' : 'btn-outline-primary'}">
-                                    <i class="fas fa-store"></i> Ventas Presenciales
-                                </a>
+                              
                                 <a href="${pageContext.request.contextPath}/ReporteControlador" 
                                    class="btn ${filtroActivo eq 'todas' ? 'btn-primary' : 'btn-outline-primary'}">
                                     <i class="fas fa-list"></i> Todas las Ventas
@@ -111,6 +104,7 @@
                                             <label for="filtroEstado">Estado</label>
                                             <select class="form-control" id="filtroEstado" name="estado">
                                                 <option value="">Todos los estados</option>
+                                                <option value="5">Por recoger</option>
                                                 <option value="1">En espera</option>
                                                 <option value="2">En reparto</option>
                                                 <option value="3">Entregado</option>
@@ -177,36 +171,37 @@
                                             <td>${venta.metodoPagoNombre}</td>
                                             <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
                                             <td>
-    <div class="action-buttons">
-        <!-- Botón Descargar Boleta -->
-        <a href="${pageContext.request.contextPath}/VentaControlador?accion=generarBoleta&id=${venta.idVenta}" 
-           class="btn-action download" 
-           title="Descargar Boleta PDF" 
-           target="_blank"
-           data-toggle="tooltip">
-            <i class="fas fa-file-pdf"></i>
-        </a>
-        
-        <!-- Botón Ver Detalles -->
-        <button class="btn-action view" 
-                data-id="${venta.idVenta}"
-                title="Ver detalles completos"
-                data-toggle="tooltip">
-            <i class="fas fa-eye"></i>
-        </button>
-        
-        <!-- Botón Cambiar Estado (solo si no está entregado o cancelado) -->
-        <c:if test="${venta.idEstado != 3 && venta.idEstado != 4}">
-            <button class="btn-action change-status" 
-                    data-id="${venta.idVenta}" 
-                    data-current="${venta.idEstado}"
-                    title="Cambiar estado de envío"
-                    data-toggle="tooltip">
-                <i class="fas fa-truck"></i>
-            </button>
-        </c:if>
-    </div>
-</td>
+                                                <div class="action-buttons">
+                                                    <!-- Botón Descargar Boleta -->
+                                                    <a href="${pageContext.request.contextPath}/VentaControlador?accion=generarBoleta&id=${venta.idVenta}" 
+                                                       class="btn-action download" 
+                                                       title="Descargar Boleta PDF" 
+                                                       target="_blank"
+                                                       data-toggle="tooltip">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                    </a>
+
+                                                    <!-- Botón Ver Detalles -->
+                                                    <button class="btn-action view" 
+                                                            data-id="${venta.idVenta}"
+                                                            title="Ver detalles completos"
+                                                            data-toggle="tooltip">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+
+                                                    <!-- Botón Cambiar Estado (solo si no está entregado o cancelado) 
+                                                    <c:if test="${venta.idEstado != 3 && venta.idEstado != 4}">
+                                                        <button class="btn-action change-status" 
+                                                                data-id="${venta.idVenta}" 
+                                                                data-current="${venta.idEstado}"
+                                                                title="Cambiar estado de envío"
+                                                                data-toggle="tooltip">
+                                                            <i class="fas fa-truck"></i>
+                                                        </button>
+                                                    </c:if>
+                                                    -->
+                                                </div>
+                                            </td>
                                         </tr>
                                     </c:forEach>
                                 </tbody>
@@ -217,7 +212,7 @@
             </div>
         </div>
 
-        <!-- Modal Cambiar Estado -->
+        <!-- Modal Cambiar Estado 
         <div class="modal fade" id="cambiarEstadoModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -253,7 +248,7 @@
                 </div>
             </div>
         </div>
-
+        -->
         <!-- Modal Detalles Venta -->
         <div class="modal fade" id="detallesVentaModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
@@ -327,8 +322,8 @@
                 },
                 endpoints: {
                     reporte: {
-                    cambiarEstado: '${pageContext.request.contextPath}/ReporteControlador?accion=cambiarEstado',
-                    obtenerDetalles: '${pageContext.request.contextPath}/ReporteControlador?accion=obtenerDetalles&idVenta=' }
+                        cambiarEstado: '${pageContext.request.contextPath}/ReporteControlador?accion=cambiarEstado',
+                        obtenerDetalles: '${pageContext.request.contextPath}/ReporteControlador?accion=obtenerDetalles&idVenta='}
                 }
             };
         </script>

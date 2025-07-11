@@ -152,7 +152,7 @@
                                         <th>Nombre</th>
                                         <th>Apellido</th>
                                         <th>DNI</th>
-                                        <th>Contraseña</th>
+                                        
                                         <th>Correo</th>
                                         <th>Teléfono</th>
                                         <th>Dirección</th>
@@ -168,7 +168,7 @@
                                             <td>${usuario.nombre}</td>
                                             <td>${usuario.apellido}</td>
                                             <td>${usuario.dni}</td>
-                                            <td>*******</td>
+                                           
                                             <td>${not empty usuario.correo ? usuario.correo : 'S/D'}</td>
                                             <td>${not empty usuario.telefono ? usuario.telefono : 'S/D'}</td>
                                             

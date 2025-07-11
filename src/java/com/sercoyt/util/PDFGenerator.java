@@ -18,11 +18,16 @@ public class PDFGenerator {
     private static final Font BOLD_FONT = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 
     public static void generarBoleta(Venta venta, List<DetalleVenta> detalles, OutputStream out)
-            throws DocumentException, IOException {
+        throws DocumentException, IOException {
 
-        Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, out);
-
+    System.out.println("=== Iniciando generación de documento PDF ===");
+    
+    Document document = new Document();
+    PdfWriter writer = null;
+    
+    try {
+        writer = PdfWriter.getInstance(document, out);
+        
         // Metadatos del PDF
         document.addTitle("Boleta de Venta #" + venta.getIdVenta());
         document.addSubject("Comprobante de compra");
@@ -30,17 +35,24 @@ public class PDFGenerator {
         document.addCreator("SercoYT System");
 
         document.open();
+        System.out.println("Documento PDF abierto");
 
-        // Logo de la empresa
+        // Logo de la empresa (comentar temporalmente para debugging)
         try {
-
             String logoPath = ServletContextProvider.getContextServlet().getRealPath("/img/logo.png");
-            Image logo = Image.getInstance(logoPath);
-            logo.scaleToFit(100, 100);
-            logo.setAlignment(Element.ALIGN_CENTER);
-            document.add(logo);
+            System.out.println("Ruta del logo: " + logoPath);
+            
+            if (logoPath != null && new File(logoPath).exists()) {
+                Image logo = Image.getInstance(logoPath);
+                logo.scaleToFit(100, 100);
+                logo.setAlignment(Element.ALIGN_CENTER);
+                document.add(logo);
+                System.out.println("Logo agregado exitosamente");
+            } else {
+                System.out.println("Logo no encontrado, continuando sin logo");
+            }
         } catch (Exception e) {
-            System.err.println("No se pudo cargar el logo: " + e.getMessage());
+            System.err.println("Error con logo (continuando sin logo): " + e.getMessage());
         }
 
         // Encabezado
@@ -48,11 +60,13 @@ public class PDFGenerator {
         title.setAlignment(Element.ALIGN_CENTER);
         title.setSpacingAfter(10);
         document.add(title);
+        System.out.println("Título agregado");
 
         Paragraph subTitle = new Paragraph("SercoYT - Tecnología a tu alcance", NORMAL_FONT);
         subTitle.setAlignment(Element.ALIGN_CENTER);
         subTitle.setSpacingAfter(20);
         document.add(subTitle);
+        System.out.println("Subtítulo agregado");
 
         // Información de la venta
         PdfPTable infoTable = new PdfPTable(2);
@@ -72,19 +86,15 @@ public class PDFGenerator {
         addCell(infoTable, "Método de Pago:", BOLD_FONT);
         String metodoPago = "";
         switch (venta.getIdPago()) {
-            case 1:
-                metodoPago = "Efectivo";
-                break;
-            case 2:
-                metodoPago = "Tarjeta";
-                break;
-            case 3:
-                metodoPago = "Yape";
-                break;
+            case 1: metodoPago = "Efectivo"; break;
+            case 2: metodoPago = "Tarjeta"; break;
+            case 3: metodoPago = "Yape"; break;
+            default: metodoPago = "No especificado"; break;
         }
         addCell(infoTable, metodoPago, NORMAL_FONT);
 
         document.add(infoTable);
+        System.out.println("Tabla de información agregada");
 
         // Línea separadora
         document.add(new Chunk(new LineSeparator()));
@@ -113,6 +123,7 @@ public class PDFGenerator {
         }
 
         document.add(detallesTable);
+        System.out.println("Tabla de detalles agregada");
 
         // Totales
         PdfPTable totalesTable = new PdfPTable(2);
@@ -130,6 +141,7 @@ public class PDFGenerator {
         addCell(totalesTable, formatMoney(venta.getTotal()), NORMAL_FONT);
 
         document.add(totalesTable);
+        System.out.println("Tabla de totales agregada");
 
         // Pie de página
         Paragraph footer = new Paragraph("\n\nGracias por su compra!\n\n"
@@ -137,14 +149,20 @@ public class PDFGenerator {
                 + "Teléfono: (+51) 918-060-852 - Email: sercoyt.eirl@gmail.com", NORMAL_FONT);
         footer.setAlignment(Element.ALIGN_CENTER);
         document.add(footer);
+        System.out.println("Footer agregado");
 
-        document.close();
-
-        // Cerrar writer solo si es FileOutputStream
-        if (out instanceof FileOutputStream) {
-            writer.close();
+        System.out.println("=== PDF generado exitosamente ===");
+        
+    } catch (Exception e) {
+        System.err.println("Error durante la generación del PDF: " + e.getMessage());
+        e.printStackTrace();
+        throw e;
+    } finally {
+        if (document != null && document.isOpen()) {
+            document.close();
         }
     }
+}
 
     private static void addCell(PdfPTable table, String text, Font font) {
         PdfPCell cell = new PdfPCell(new Phrase(text, font));

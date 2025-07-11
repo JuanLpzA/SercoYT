@@ -367,6 +367,16 @@
     content: "❌";
 }
 
+.status-badge.status-por-recoger {
+    background: #e2e3f3;
+    color: #383d61;
+    border-color: #bfbfe3;
+}
+
+.status-badge.status-por-recoger::before {
+    content: "🛍️";
+}
+
 /* Información de ventas */
 .venta-id {
     font-weight: 700;

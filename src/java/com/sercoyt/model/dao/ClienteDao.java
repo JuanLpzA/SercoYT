@@ -256,6 +256,35 @@ public class ClienteDao {
     }
     return false;
 }
+    
+    public Cliente obtenerPorDocumento(String documento) throws SQLException {
+    String sql = "SELECT c.idCliente, c.nombre, c.apellido, c.documento, c.telefono, " +
+                 "c.idTipoCliente, tc.descripcion as tipoCliente, c.estadoCliente, c.api " +
+                 "FROM clientes c INNER JOIN tipocliente tc ON c.idTipoCliente = tc.idTipoCliente " +
+                 "WHERE c.documento = ?";
+    
+    try (Connection conn = ConnectDB.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, documento);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                Cliente cliente = new Cliente();
+                cliente.setIdCliente(rs.getInt("idCliente"));
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setApellido(rs.getString("apellido"));
+                cliente.setDocumento(rs.getString("documento"));
+                cliente.setTelefono(rs.getString("telefono"));
+                cliente.setTipoCliente(rs.getString("tipoCliente"));
+                cliente.setIdTipoCliente(rs.getInt("idTipoCliente"));
+                cliente.setEstadoCliente(rs.getString("estadoCliente"));
+                cliente.setApi(rs.getInt("api"));
+                return cliente;
+            }
+        }
+    }
+    return null;
+}
 
 
 }

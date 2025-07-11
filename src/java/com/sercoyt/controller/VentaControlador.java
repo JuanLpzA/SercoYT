@@ -260,18 +260,43 @@ public class VentaControlador extends HttpServlet {
     }
 
     private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException, DocumentException {
-
+        throws ServletException, IOException {
+    try {
         int idVenta = Integer.parseInt(request.getParameter("id"));
-
+        
         Venta venta = ventaDao.obtenerVentaPorId(idVenta);
+        if (venta == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Venta no encontrada");
+            return;
+        }
+        
         List<DetalleVenta> detalles = ventaDao.listarDetallesVenta(idVenta);
-
+        if (detalles == null || detalles.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No se encontraron detalles de la venta");
+            return;
+        }
+        
+        // Configurar respuesta para PDF
         response.setContentType("application/pdf");
-        response.setHeader("Content-disposition", "inline; filename=boleta_" + idVenta + ".pdf");
-
+        response.setHeader("Content-Disposition", "inline; filename=boleta_" + idVenta + ".pdf");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
+        
+        // Generar PDF
         PDFGenerator.generarBoleta(venta, detalles, response.getOutputStream());
+        response.getOutputStream().flush();
+        
+    } catch (NumberFormatException e) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de venta inválido");
+    } catch (SQLException e) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error de base de datos");
+    } catch (DocumentException e) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al generar PDF");
+    } catch (Exception e) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error interno del servidor");
     }
+}
 
     private double redondearDecimales(double valor, int decimales) {
         BigDecimal bd = new BigDecimal(Double.toString(valor));

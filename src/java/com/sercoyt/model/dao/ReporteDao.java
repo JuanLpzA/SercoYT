@@ -1,4 +1,4 @@
-/*
+                                                                                                                                                                                                                                                                                                                                                                                                                                          /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -105,6 +105,51 @@ public class ReporteDao {
         }
         return ventas;
     }
+
+    public List<VentaExtra> listarPrimeras5Ventas() throws SQLException {
+        List<VentaExtra> ventas = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT v.*, "
+                + "tv.nombre AS tipoVentaNombre, "
+                + "CONCAT(c.nombre, ' ', c.apellido) AS clienteNombre, "
+                + "c.documento AS clienteDni, "
+                + "ed.descripcion AS estadoNombre, "
+                + "fp.metodo AS metodoPagoNombre "
+                + "FROM ventas v "
+                + "JOIN tipoventa tv ON v.idTipoVenta = tv.idTipoVenta "
+                + "LEFT JOIN clientes c ON v.idCliente = c.idCliente "
+                + "JOIN estadodespacho ed ON v.idEstado = ed.idEstado "
+                + "JOIN formapago fp ON v.idPago = fp.idPago "
+                + "WHERE 1=1 "
+                + "ORDER BY v.fecha DESC "
+                + "LIMIT 5"); 
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    VentaExtra ve = new VentaExtra();
+                    ve.setIdVenta(rs.getInt("idVenta"));
+                    ve.setFecha(rs.getTimestamp("fecha"));
+                    ve.setIdTipoVenta(rs.getInt("idTipoVenta"));
+                    ve.setIdCliente(rs.getInt("idCliente"));
+                    ve.setIdUsuario(rs.getInt("idUsuario"));
+                    ve.setIdEstado(rs.getInt("idEstado"));
+                    ve.setIdPago(rs.getInt("idPago"));
+                    ve.setSubtotal(rs.getDouble("subtotal"));
+                    ve.setIgv(rs.getDouble("igv"));
+                    ve.setTotal(rs.getDouble("total"));
+                    ve.setTipoVentaNombre(rs.getString("tipoVentaNombre"));
+                    ve.setClienteNombre(rs.getString("clienteNombre"));
+                    ve.setClienteDni(rs.getString("clienteDni"));
+                    ve.setEstadoNombre(rs.getString("estadoNombre"));
+                    ve.setMetodoPagoNombre(rs.getString("metodoPagoNombre"));
+                    ventas.add(ve);
+                }
+            }
+        }
+        return ventas;
+    }
+
+
 
     public boolean cambiarEstadoVenta(int idVenta, int nuevoEstado) throws SQLException {
         String sql = "UPDATE ventas SET idEstado = ? WHERE idVenta = ?";
