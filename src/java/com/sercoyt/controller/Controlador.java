@@ -61,48 +61,58 @@ public class Controlador extends HttpServlet {
                     break;
 
                 case "AgregarCarrito":
-                    int idp = Integer.parseInt(request.getParameter("id"));
-                    String categoriaActual = request.getParameter("categoria");
-                    Producto p = pdao.listarId(idp);
+    int idp = Integer.parseInt(request.getParameter("id"));
+    String categoriaActual = request.getParameter("categoria");
+    int cantidad = 1;
+    try {
+        cantidad = Integer.parseInt(request.getParameter("cantidad"));
+        cantidad = Math.max(1, Math.min(cantidad, 100)); // Limitar entre 1 y 100
+    } catch (NumberFormatException e) {
+        cantidad = 1;
+    }
+    
+    Producto p = pdao.listarId(idp);
 
-                    if (p != null && p.getStock() > 0) {
-                        boolean encontrado = false;
-                        for (Carrito item : listaCarrito) {
-                            if (item.getIdProducto() == idp) {
-                                if (item.getCantidad() < p.getStock()) {
-                                    item.setCantidad(item.getCantidad() + 1);
-                                    // MANTENER: El precio ya incluye IGV, subTotal = precioConIGV * cantidad
-                                    item.setSubTotal(item.getPrecioCompra() * item.getCantidad());
-                                }
-                                encontrado = true;
-                                break;
-                            }
-                        }
+    if (p != null && p.getStock() > 0) {
+        boolean encontrado = false;
+        for (Carrito item : listaCarrito) {
+            if (item.getIdProducto() == idp) {
+                int nuevaCantidad = item.getCantidad() + cantidad;
+                if (nuevaCantidad <= p.getStock()) {
+                    item.setCantidad(nuevaCantidad);
+                    item.setSubTotal(item.getPrecioCompra() * nuevaCantidad);
+                } else {
+                    item.setCantidad(p.getStock());
+                    item.setSubTotal(item.getPrecioCompra() * p.getStock());
+                }
+                encontrado = true;
+                break;
+            }
+        }
 
-                        if (!encontrado) {
-                            Carrito car = new Carrito();
-                            car.setItem(listaCarrito.size() + 1);
-                            car.setIdProducto(p.getId());
-                            car.setNombres(p.getNombres());
-                            car.setDescripcion(p.getDescripcion());
-                            car.setPrecioCompra(p.getPrecio()); // Este precio YA incluye IGV
-                            car.setCantidad(1);
-                            car.setSubTotal(p.getPrecio()); // SubTotal con IGV incluido
-                            car.setStock(p.getStock());
-                            listaCarrito.add(car);
-                        }
+        if (!encontrado) {
+            Carrito car = new Carrito();
+            car.setItem(listaCarrito.size() + 1);
+            car.setIdProducto(p.getId());
+            car.setNombres(p.getNombres());
+            car.setDescripcion(p.getDescripcion());
+            car.setPrecioCompra(p.getPrecio());
+            car.setCantidad(Math.min(cantidad, p.getStock()));
+            car.setSubTotal(p.getPrecio() * Math.min(cantidad, p.getStock()));
+            car.setStock(p.getStock());
+            listaCarrito.add(car);
+        }
 
-                        session.setAttribute("contador", listaCarrito.size());
+        session.setAttribute("contador", listaCarrito.size());
 
-                        // Si es una petición AJAX, no redireccionar
-                        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-                            response.setContentType("text/plain");
-                            response.getWriter().write("OK");
-                            return;
-                        }
-                        response.sendRedirect(categoriaActual != null ? "Controlador?accion=" + categoriaActual : "Controlador");
-                    }
-                    break;
+        if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+            response.setContentType("text/plain");
+            response.getWriter().write("OK");
+            return;
+        }
+        response.sendRedirect(categoriaActual != null ? "Controlador?accion=" + categoriaActual : "Controlador");
+    }
+    break;
                 case "Delete":
                     int idproducto = Integer.parseInt(request.getParameter("idp"));
                     listaCarrito.removeIf(item -> item.getIdProducto() == idproducto);
@@ -146,41 +156,52 @@ public class Controlador extends HttpServlet {
                     break;
 
                 case "Comprar":
-                    int idProductoComprar = Integer.parseInt(request.getParameter("id"));
-                    Producto productoComprar = pdao.listarId(idProductoComprar);
+    int idProductoComprar = Integer.parseInt(request.getParameter("id"));
+    int cantidadComprar = 1;
+    try {
+        cantidadComprar = Integer.parseInt(request.getParameter("cantidad"));
+        cantidadComprar = Math.max(1, Math.min(cantidadComprar, 100));
+    } catch (NumberFormatException e) {
+        cantidadComprar = 1;
+    }
+    
+    Producto productoComprar = pdao.listarId(idProductoComprar);
 
-                    if (productoComprar != null && productoComprar.getStock() > 0) {
-                        boolean encontrado = false;
-                        for (Carrito item : listaCarrito) {
-                            if (item.getIdProducto() == idProductoComprar) {
-                                if (item.getCantidad() < productoComprar.getStock()) {
-                                    item.setCantidad(item.getCantidad() + 1);
-                                    // MANTENER: El precio ya incluye IGV, subTotal = precioConIGV * cantidad
-                                    item.setSubTotal(item.getPrecioCompra() * item.getCantidad());
-                                }
-                                encontrado = true;
-                                break;
-                            }
-                        }
+    if (productoComprar != null && productoComprar.getStock() > 0) {
+        boolean encontrado = false;
+        for (Carrito item : listaCarrito) {
+            if (item.getIdProducto() == idProductoComprar) {
+                int nuevaCantidad = item.getCantidad() + cantidadComprar;
+                if (nuevaCantidad <= productoComprar.getStock()) {
+                    item.setCantidad(nuevaCantidad);
+                    item.setSubTotal(item.getPrecioCompra() * nuevaCantidad);
+                } else {
+                    item.setCantidad(productoComprar.getStock());
+                    item.setSubTotal(item.getPrecioCompra() * productoComprar.getStock());
+                }
+                encontrado = true;
+                break;
+            }
+        }
 
-                        if (!encontrado) {
-                            Carrito nuevoItem = new Carrito();
-                            nuevoItem.setItem(listaCarrito.size() + 1);
-                            nuevoItem.setIdProducto(productoComprar.getId());
-                            nuevoItem.setNombres(productoComprar.getNombres());
-                            nuevoItem.setDescripcion(productoComprar.getDescripcion());
-                            nuevoItem.setPrecioCompra(productoComprar.getPrecio()); // Este precio YA incluye IGV
-                            nuevoItem.setCantidad(1);
-                            nuevoItem.setSubTotal(productoComprar.getPrecio()); // SubTotal con IGV incluido
-                            nuevoItem.setStock(productoComprar.getStock());
-                            listaCarrito.add(nuevoItem);
-                        }
+        if (!encontrado) {
+            Carrito nuevoItem = new Carrito();
+            nuevoItem.setItem(listaCarrito.size() + 1);
+            nuevoItem.setIdProducto(productoComprar.getId());
+            nuevoItem.setNombres(productoComprar.getNombres());
+            nuevoItem.setDescripcion(productoComprar.getDescripcion());
+            nuevoItem.setPrecioCompra(productoComprar.getPrecio());
+            nuevoItem.setCantidad(Math.min(cantidadComprar, productoComprar.getStock()));
+            nuevoItem.setSubTotal(productoComprar.getPrecio() * Math.min(cantidadComprar, productoComprar.getStock()));
+            nuevoItem.setStock(productoComprar.getStock());
+            listaCarrito.add(nuevoItem);
+        }
 
-                        session.setAttribute("contador", listaCarrito.size());
-                    }
+        session.setAttribute("contador", listaCarrito.size());
+    }
 
-                    response.sendRedirect("Controlador?accion=Carrito");
-                    break;
+    response.sendRedirect("Controlador?accion=Carrito");
+    break;
 
                 case "asesoria":
                     request.getRequestDispatcher("asesoria.jsp").forward(request, response);
@@ -192,6 +213,16 @@ public class Controlador extends HttpServlet {
                     response.setContentType("text/plain");
                     response.getWriter().write(String.valueOf(listaCarrito.size()));
                     return;
+                case "VerDetalle":
+                    int idDetalle = Integer.parseInt(request.getParameter("id"));
+                    Producto productoDetalle = pdao.listarId(idDetalle);
+                    if (productoDetalle != null) {
+                        request.setAttribute("producto", productoDetalle);
+                        request.getRequestDispatcher("detalleProducto.jsp").forward(request, response);
+                    } else {
+                        response.sendRedirect("Controlador");
+                    }
+                    break;
 
                 default:
                     request.setAttribute("productos", pdao.listar());

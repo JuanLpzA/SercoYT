@@ -5,7 +5,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>SercoYT - Tecnología y Computación</title>
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styleonline.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styleonline.css?v4">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     </head>
     <body>
@@ -25,18 +25,23 @@
                         <div class="product-image-container">
                             <img src="ControladorIMG?id=${p.id}" alt="${p.nombres}" class="product-image">
                         </div>
-                        <div class="product-info">
-                            <h3 class="product-title">${p.nombres}</h3>
-                            <div class="product-price">S/${p.precio}0</div>
-                            <p class="product-description">${p.descripcion}</p>
-                            <div class="product-actions">
-                                <a href="#" class="btn-add-to-cart" onclick="agregarAlCarrito(${p.id}, '${param.accion}')">
-                                    <i class="fas fa-cart-plus"></i> Añadir
-                                </a>
-                                <button class="btn-buy-now" onclick="window.location.href = 'Controlador?accion=Comprar&id=${p.id}'">
-                                    <i class="fas fa-credit-card"></i> Comprar
-                                </button>
-                            </div>
+                            <div class="product-info">
+                                <h3 class="product-title">${p.nombres}</h3>
+                                <div class="product-price">S/${p.precio}0</div>
+                                <p class="product-description">${p.descripcion}</p>
+                                <div class="product-actions">
+                                    <div class="product-actions-top">
+                                        <a href="#" class="btn-add-to-cart" onclick="agregarAlCarrito(${p.id}, '${param.accion}')">
+                                            <i class="fas fa-cart-plus"></i> Añadir
+                                        </a>
+                                        <button class="btn-buy-now" onclick="window.location.href = 'Controlador?accion=Comprar&id=${p.id}'">
+                                            <i class="fas fa-credit-card"></i> Comprar
+                                        </button>
+                                    </div>
+                                    <a href="Controlador?accion=VerDetalle&id=${p.id}" class="btn-view-details">
+                                        <i class="fas fa-eye"></i> Ver detalles
+                                    </a>
+                                </div>
                         </div>
                     </div>
                 </c:forEach>

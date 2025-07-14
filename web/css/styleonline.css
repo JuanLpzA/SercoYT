@@ -188,6 +188,8 @@ img {
     animation: fadeInDropdown 0.3s ease-out;
 }
 
+
+
 @keyframes fadeInDropdown {
     from {
         opacity: 0;
@@ -287,6 +289,27 @@ img {
     max-width: 1300px; /* Un poco más ancho para productos */
     margin: 30px auto;
     padding: 0 15px;
+}
+.btn-view-details {
+    display: inline-block;
+    padding: 10px 15px; /* Aumentar padding para consistencia */
+    background: #999d9d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px; /* Cambiar de 4px a 5px para consistencia */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Mejorar transición */
+    font-size: 0.9em; /* Consistencia con otros botones */
+    font-family: 'Poppins', sans-serif; /* Consistencia con otros botones */
+    font-weight: 500; /* Consistencia con otros botones */
+    text-align: center;
+    width: 100%; /* Ocupar todo el ancho */
+    box-sizing: border-box; /* Incluir padding en el ancho */
+}
+
+.btn-view-details:hover {
+    background: #2980b9;
+    color: white;
+    transform: translateY(-2px); /* Añadir efecto hover consistente */
 }
 
 .section-title {
@@ -401,8 +424,15 @@ img {
 
 .product-actions {
     display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-top: auto; /* Asegura que los botones estén al final */
+}
+
+.product-actions-top {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
 .btn-add-to-cart,
@@ -902,5 +932,11 @@ img {
         padding: 8px 12px;
         margin: 0 3px;
         font-size: 0.9em;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-actions-top {
+        flex-direction: column; /* Botones uno debajo del otro en móviles */
     }
 }
