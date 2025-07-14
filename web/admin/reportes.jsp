@@ -69,7 +69,7 @@
                         <h4>Reportes de Ventas</h4>
                         <div class="header-actions">
                             <div class="btn-group" role="group">
-                              
+
                                 <a href="${pageContext.request.contextPath}/ReporteControlador" 
                                    class="btn ${filtroActivo eq 'todas' ? 'btn-primary' : 'btn-outline-primary'}">
                                     <i class="fas fa-list"></i> Todas las Ventas
@@ -147,7 +147,7 @@
                                         <th>ID</th>
                                         <th>Fecha</th>
                                         <th>Cliente</th>
-                                        <th>DNI</th>
+                                        <th>N° Documento</th>
                                         <th>Tipo</th>
                                         <th>Estado</th>
                                         <th>Método Pago</th>

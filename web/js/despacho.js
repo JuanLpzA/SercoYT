@@ -1,13 +1,13 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Botón para cambiar estado
-    $(document).on('click', '.change-status', function() {
+    $(document).on('click', '.change-status', function () {
         const idVenta = $(this).data('id');
         const currentEstado = $(this).data('current');
         const tipoVenta = $(this).data('tipo'); // 1=presencial, 2=online
-        
+
         $('#idVenta').val(idVenta);
         const $select = $('#nuevoEstado');
-        
+
         // Configurar opciones según tipo de venta
         if (tipoVenta == 1) { // Presencial
             // Mostrar solo opciones relevantes para presencial
@@ -22,15 +22,15 @@ $(document).ready(function() {
             // Seleccionar siguiente estado lógico
             $select.val(currentEstado < 3 ? currentEstado + 1 : currentEstado);
         }
-        
+
         updateWarningMessage($select.val());
         $('#cambiarEstadoModal').modal('show');
     });
-    
+
     function updateWarningMessage(estado) {
         const $warning = $('#warningMessage');
-        
-        switch(estado) {
+
+        switch (estado) {
             case '3': // Entregado
                 $warning.text('Cambiar el estado a "Entregado" es irreversible. ¿Está seguro?');
                 break;
@@ -41,14 +41,14 @@ $(document).ready(function() {
                 $warning.text('Cambiar el estado es una acción importante. ¿Está seguro?');
         }
     }
-    
+
     // Formulario para cambiar estado
-    $('#cambiarEstadoForm').submit(function(e) {
+    $('#cambiarEstadoForm').submit(function (e) {
         e.preventDefault();
-        
+
         const idVenta = $('#idVenta').val();
         const nuevoEstado = $('#nuevoEstado').val();
-        
+
         Swal.fire({
             title: 'Confirmar Cambio de Estado',
             text: '¿Está seguro que desea cambiar el estado de esta venta?',
@@ -64,7 +64,7 @@ $(document).ready(function() {
             }
         });
     });
-    
+
     function cambiarEstadoVenta(idVenta, nuevoEstado) {
         $.ajax({
             url: AppContext.endpoints.despacho.cambiarEstado,
@@ -74,7 +74,7 @@ $(document).ready(function() {
                 nuevoEstado: nuevoEstado
             },
             dataType: 'json',
-            beforeSend: function() {
+            beforeSend: function () {
                 $('#cambiarEstadoModal').modal('hide');
                 Swal.fire({
                     title: 'Procesando',
@@ -85,7 +85,7 @@ $(document).ready(function() {
                     }
                 });
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -105,7 +105,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al procesar la solicitud';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -113,7 +113,7 @@ $(document).ready(function() {
                 } catch (e) {
                     errorMessage = xhr.responseText || errorMessage;
                 }
-                
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -123,24 +123,24 @@ $(document).ready(function() {
             }
         });
     }
-    
+
     // Mostrar detalles de venta en modal
-    $(document).on('click', '.btn-action.view', function(e) {
+    $(document).on('click', '.btn-action.view', function (e) {
         e.preventDefault();
         const idVenta = $(this).data('id');
-        
+
         $.ajax({
             url: AppContext.endpoints.despacho.obtenerDetalles + idVenta,
             type: 'GET',
             dataType: 'json',
-            beforeSend: function() {
+            beforeSend: function () {
                 $('#detallesVentaModal').modal('show');
                 $('#detalleIdVenta').text(idVenta);
                 $('#infoVenta').html('<p class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando...</p>');
                 $('#infoDireccion').html('<p class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando...</p>');
                 $('#tablaProductos').html('<tr><td colspan="4" class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>');
             },
-            success: function(data) {
+            success: function (data) {
                 if (data.error) {
                     $('#infoVenta').html('<p class="text-danger">' + data.message + '</p>');
                     return;
@@ -149,12 +149,12 @@ $(document).ready(function() {
                 // Llenar información de la venta
                 const venta = data.venta || {};
                 let estadoBadge = '';
-                
+
                 if (venta.estadoNombre) {
                     const estadoClass = venta.estadoNombre.toLowerCase().replace(/\s+/g, '-');
                     estadoBadge = `<span class="status-badge status-${estadoClass}">${venta.estadoNombre}</span>`;
                 }
-                
+
                 let htmlVenta = `
                     <p><strong>Fecha:</strong> ${venta.fecha ? formatDate(venta.fecha) : 'S/D'}</p>
                     <p><strong>Cliente:</strong> ${venta.clienteNombre || 'S/D'}</p>
@@ -168,7 +168,7 @@ $(document).ready(function() {
                 // Llenar información de dirección
                 const direccion = data.direccion || {};
                 let htmlDireccion = '';
-                
+
                 if (Object.keys(direccion).length > 0) {
                     htmlDireccion = `
                         <p><strong>Receptor:</strong> ${direccion.nombreReceptor || 'S/D'}</p>
@@ -186,13 +186,13 @@ $(document).ready(function() {
                 // Llenar tabla de productos
                 let htmlProductos = '';
                 const productos = data.productos || [];
-                
+
                 if (productos.length > 0) {
                     productos.forEach(producto => {
                         const precioUnitario = parseFloat(producto.precioUnitario || 0).toFixed(2);
                         const cantidad = producto.cantidad || 0;
                         const subtotal = parseFloat(producto.subtotal || 0).toFixed(2);
-                        
+
                         htmlProductos += `
                             <tr>
                                 <td>${producto.nombre || 'Producto sin nombre'}</td>
@@ -211,22 +211,22 @@ $(document).ready(function() {
                 const subtotal = parseFloat(venta.subtotal || 0).toFixed(2);
                 const igv = parseFloat(venta.igv || 0).toFixed(2);
                 const total = parseFloat(venta.total || 0).toFixed(2);
-                
+
                 $('#subtotalDetalle').text('S/' + subtotal);
                 $('#igvDetalle').text('S/' + igv);
                 $('#totalDetalle').text('S/' + total);
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al cargar los detalles de la venta';
                 try {
                     const response = JSON.parse(xhr.responseText);
                     errorMessage = response.message || errorMessage;
                 } catch (e) {
-                    errorMessage = xhr.responseText.length > 100 ? 
-                                  'Error de servidor' : 
-                                  xhr.responseText;
+                    errorMessage = xhr.responseText.length > 100 ?
+                            'Error de servidor' :
+                            xhr.responseText;
                 }
-                
+
                 $('#infoVenta').html('<p class="text-danger">' + errorMessage + '</p>');
                 $('#infoDireccion').html('');
                 $('#tablaProductos').html('<tr><td colspan="4" class="text-center text-danger">Error al cargar productos</td></tr>');
@@ -235,8 +235,9 @@ $(document).ready(function() {
     });
 
     function formatDate(dateString) {
-        if (!dateString) return 'S/D';
-        
+        if (!dateString)
+            return 'S/D';
+
         try {
             const date = new Date(dateString);
             return date.toLocaleDateString('es-PE', {
@@ -252,7 +253,7 @@ $(document).ready(function() {
     }
 
     // Filtros
-    $('#filtroForm').submit(function(e) {
+    $('#filtroForm').submit(function (e) {
         e.preventDefault();
         const params = $(this).serialize();
         const currentUrl = window.location.href.split('?')[0];
@@ -262,23 +263,23 @@ $(document).ready(function() {
         window.location.href = currentUrl + '?accion=' + accion + '&' + params;
     });
 
-    $('#btnResetFiltros').click(function() {
+    $('#btnResetFiltros').click(function () {
         $('#filtroForm')[0].reset();
         const currentUrl = window.location.href.split('?')[0];
         const urlParams = new URLSearchParams(window.location.search);
         const accion = urlParams.get('accion') || 'listarOnline';
-        
+
         window.location.href = currentUrl + '?accion=' + accion;
     });
-    
+
     // Tooltips
     $('[title]').tooltip({
         placement: 'top',
         trigger: 'hover'
     });
-    
+
     // Auto-dismiss alerts
-    setTimeout(function() {
+    setTimeout(function () {
         $('.alert').fadeOut();
     }, 5000);
 });

@@ -51,7 +51,8 @@
                                                min="1" max="${car.getStock()}" class="quantity-input form-control text-center"
                                                title="La cantidad mínima permitida es 1">
                                     </td>
-                                    <td>S/<fmt:formatNumber value="${car.getSubTotal()}" maxFractionDigits="2" minFractionDigits="2"/></td>
+                                    <td>S/<fmt:formatNumber value="${car.getSubTotal() / 1.18}" maxFractionDigits="2" minFractionDigits="2"/></td>
+
                                     <td>
                                         <input type="hidden" id="idp" value="${car.getIdProducto()}">
                                         <a class="btn-remove-item" href="#" id="btnDelete">Eliminar</a>
@@ -70,16 +71,17 @@
                         <div class="summary-body">
                             <div class="summary-row">
                                 <label>Subtotal:</label>
-                                <input type="text" value="S/<fmt:formatNumber value='${totalPagar}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
+                                <input type="text" value="S/<fmt:formatNumber value='${subtotalSinIGV}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
                             </div>
                             <div class="summary-row">
                                 <label>IGV (18%):</label>
-                                <input type="text" value="S/<fmt:formatNumber value='${totalPagar * 0.18}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
+                                <input type="text" value="S/<fmt:formatNumber value='${igvCalculado}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
                             </div>
                             <div class="summary-row total">
                                 <label>Total a Pagar:</label>
-                                <input type="text" value="S/<fmt:formatNumber value='${totalPagar * 1.18}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
+                                <input type="text" value="S/<fmt:formatNumber value='${totalPagar}' maxFractionDigits='2' minFractionDigits='2'/>" readonly>
                             </div>
+                        </div>
                         </div>
                         <div class="summary-footer">
                             <c:choose>
@@ -99,6 +101,61 @@
                             </c:choose>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal de Selección de Entrega (nuevo) -->
+        <div id="deliveryTypeModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal" id="closeDeliveryTypeModal">&times;</span>
+                <h3>Seleccione Método de Entrega</h3>
+                <div class="delivery-options">
+                    <div class="delivery-option" data-type="pickup">
+                        <h4><i class="fas fa-store"></i> Recoger en Tienda</h4>
+                        <p>Retira tu pedido en nuestro local</p>
+                        <ul>
+                            <li>Horario de atención: Lunes a Viernes de 3:00 pm a 7:00 pm</li>
+                            <li>Dirección: Calle Bolívar 438 Lambayeque, Lambayeque, Peru 14013</li>
+                            <li>Debes presentar tu DNI</li>
+                        </ul>
+                    </div>
+                    <div class="delivery-option" data-type="delivery">
+                        <h4><i class="fas fa-truck"></i> Delivery a Domicilio</h4>
+                        <p>Recibe tus productos en la comodidad de tu hogar</p>
+                        <ul>
+                            <li>Envíos a toda la región de Lambayeque</li>
+                            <li>Tiempo de entrega: 1-3 días hábiles</li>
+                            <li>Costo de envío incluido</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelDeliveryType">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmDeliveryType">Continuar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmación Recoger en Tienda (nuevo) -->
+        <div id="pickupInfoModal" class="modal-overlay" style="display:none;">
+            <div class="modal-content">
+                <span class="close-modal" id="closePickupInfoModal">&times;</span>
+                <h3>Información para Recoger en Tienda</h3>
+                <div class="pickup-info">
+                    <p><strong>Por favor tenga en cuenta lo siguiente:</strong></p>
+                    <ul>
+                        <li>Debe presentar su DNI al recoger</li>
+                        <li>Horario de atención: Lunes a Viernes de 3:00 pm a 7:00 pm</li>
+                        <li>Dirección: Calle Bolívar 438 Lambayeque, Lambayeque, Peru 14013</li>
+                        <li>Tiene 5 días hábiles para recoger su pedido</li>
+                    </ul>
+                    <p>Al continuar, estará reservando los productos seleccionados y deberá acercarse a nuestro local para completar la compra.</p>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelPickupInfo">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmPickupInfo">Continuar con Pago</button>
                 </div>
             </div>
         </div>
@@ -232,7 +289,7 @@
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>    
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="js/funciones.js" type="text/javascript"></script>
-        <script src="js/carrito.js"></script>
+        <script src="js/carrito.js?v2"></script>
        
     </body>
 </html>

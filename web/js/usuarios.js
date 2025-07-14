@@ -1,23 +1,16 @@
-
-$(document).ready(function() {
-    // New user button
-    $('#btnNuevoUsuario').click(function() {
-        $('#seleccionarTipoModal').modal('show');
-    });
-
-    // Select user type
-    $('.tipo-option').click(function() {
-        const tipoUsuario = $(this).data('tipo');
-        $('#tipoUsuario').val(tipoUsuario);
-        $('#seleccionarTipoModal').modal('hide');
+$(document).ready(function () {
+    // New user button - Directamente abrir el modal principal
+    $('#btnNuevoUsuario').click(function () {
         $('#nuevoUsuarioForm')[0].reset();
+        // Habilitar campos de nombre y apellido al inicio
+        $('#nombre, #apellido').prop('readonly', false).removeClass('readonly-field');
         $('#nuevoUsuarioModal').modal('show');
     });
 
     // Consult DNI API
-    $('#btnConsultarDni').click(function() {
+    $('#btnConsultarDni').click(function () {
         const dni = $('#dni').val().trim();
-        
+
         if (dni.length !== 8 || !/^\d+$/.test(dni)) {
             Swal.fire({
                 icon: 'error',
@@ -27,12 +20,86 @@ $(document).ready(function() {
             });
             return;
         }
-        
+
+        // Mostrar loading en el botón
+        const $btn = $(this);
+        const originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Consultando...');
+
         $.ajax({
             url: AppContext.endpoints.usuario.consultarDni + dni,
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
+                if (data.error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error,
+                        timer: 3000
+                    });
+                    // Mantener campos editables si hay error
+                    $('#nombre, #apellido').prop('readonly', false).removeClass('readonly-field');
+                } else {
+                    // Llenar los campos con los datos de la API
+                    $('#nombre').val(data.nombres || '');
+                    $('#apellido').val(data.apellidoPaterno + ' ' + (data.apellidoMaterno || ''));
+
+                    // Hacer los campos de solo lectura después de consultar
+                    $('#nombre, #apellido').prop('readonly', true).addClass('readonly-field');
+
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Datos encontrados',
+                        text: 'Nombres y apellidos completados automáticamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            },
+            error: function (xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo consultar el DNI. Verifique su conexión.',
+                    timer: 3000
+                });
+                // Mantener campos editables si hay error
+                $('#nombre, #apellido').prop('readonly', false).removeClass('readonly-field');
+            },
+            complete: function () {
+                // Restaurar botón
+                $btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+
+
+    // Consult DNI API for Edit Modal
+    $('#btnConsultarDniEdit').click(function () {
+        const dni = $('#edit_dni').val().trim();
+
+        if (dni.length !== 8 || !/^\d+$/.test(dni)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'DNI Inválido',
+                text: 'El DNI debe tener exactamente 8 dígitos numéricos',
+                timer: 3000
+            });
+            return;
+        }
+
+        // Mostrar loading en el botón
+        const $btn = $(this);
+        const originalText = $btn.html();
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Consultando...');
+
+        $.ajax({
+            url: AppContext.endpoints.usuario.consultarDni + dni,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
                 if (data.error) {
                     Swal.fire({
                         icon: 'error',
@@ -41,32 +108,65 @@ $(document).ready(function() {
                         timer: 3000
                     });
                 } else {
-                    $('#nombre').val(data.nombres || '');
-                    $('#apellido').val(data.apellidoPaterno + ' ' + (data.apellidoMaterno || ''));
+                    // Llenar los campos con los datos de la API
+                    $('#edit_nombre').val(data.nombres || '');
+                    $('#edit_apellido').val(data.apellidoPaterno + ' ' + (data.apellidoMaterno || ''));
+
+                    // Mostrar mensaje de éxito
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Datos actualizados',
+                        text: 'Nombres y apellidos actualizados desde la API',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'No se pudo consultar el DNI',
+                    text: 'No se pudo consultar el DNI. Verifique su conexión.',
                     timer: 3000
                 });
+            },
+            complete: function () {
+                // Restaurar botón
+                $btn.prop('disabled', false).html(originalText);
             }
         });
     });
 
+
+    // Función para habilitar edición manual si es necesario
+    $('#nombre, #apellido').on('focus', function () {
+        if ($(this).prop('readonly')) {
+            Swal.fire({
+                title: '¿Editar manualmente?',
+                text: 'Los datos se completaron automáticamente. ¿Desea editarlos manualmente?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, editar',
+                cancelButtonText: 'No, mantener'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#nombre, #apellido').prop('readonly', false).removeClass('readonly-field');
+                    $(this).focus();
+                }
+            });
+        }
+    });
+
     // Edit user button
-    $(document).on('click', '.btn-editar', function() {
+    $(document).on('click', '.btn-editar', function () {
         const id = $(this).data('id');
         const $btn = $(this);
         $btn.prop('disabled', true);
-
         $.ajax({
             url: AppContext.endpoints.usuario.edit + id,
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#edit_id').val(data.idUsuario);
                 $('#edit_nombre').val(data.nombre);
                 $('#edit_apellido').val(data.apellido);
@@ -77,7 +177,7 @@ $(document).ready(function() {
                 $('#edit_estado').val(data.estado);
                 $('#editarUsuarioModal').modal('show');
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -85,37 +185,36 @@ $(document).ready(function() {
                     timer: 3000
                 });
             },
-            complete: function() {
+            complete: function () {
                 $btn.prop('disabled', false);
             }
         });
     });
 
     // Promote user button
-    $(document).on('click', '.btn-ascender', function() {
+    $(document).on('click', '.btn-ascender', function () {
         const id = $(this).data('id');
         const $btn = $(this);
         $btn.prop('disabled', true);
-
         $.ajax({
             url: AppContext.endpoints.usuario.edit + id,
             type: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 $('#rol_id').val(data.idUsuario);
                 $('#rol_actual').val(data.tipoUsuario);
-                
+
                 // Set the current role as selected in the dropdown
                 const tipoUsuarioMap = {
                     'administrador': 1,
                     'vendedor': 2,
                     'cliente': 3
                 };
-                
+
                 $('#nuevo_rol').val(tipoUsuarioMap[data.tipoUsuario.toLowerCase()]);
                 $('#cambiarRolModal').modal('show');
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -123,14 +222,14 @@ $(document).ready(function() {
                     timer: 3000
                 });
             },
-            complete: function() {
+            complete: function () {
                 $btn.prop('disabled', false);
             }
         });
     });
 
     // Change password button
-    $(document).on('click', '.btn-contrasena', function() {
+    $(document).on('click', '.btn-contrasena', function () {
         const id = $(this).data('id');
         $('#contrasena_id').val(id);
         $('#cambiarContrasenaForm')[0].reset();
@@ -139,61 +238,61 @@ $(document).ready(function() {
 
     // Form validation
     function validateUsuarioForm($form) {
-    let isValid = true;
-    
-    // Clear previous validations
-    $form.find('.is-invalid').removeClass('is-invalid');
-    $form.find('.invalid-feedback').remove();
+        let isValid = true;
 
-    // Validate required fields
-    $form.find('[required]').each(function() {
-        if (!$(this).val().trim()) {
-            markAsInvalid($(this), AppContext.messages.requiredField);
-            isValid = false;
-        }
-    });
+        // Clear previous validations
+        $form.find('.is-invalid').removeClass('is-invalid');
+        $form.find('.invalid-feedback').remove();
 
-    // Validaciones para nuevo usuario
-    if ($form.attr('id') === 'nuevoUsuarioForm') {
-        const contrasena = $('#contrasena').val();
-        const confirmarContrasena = $('#confirmarContrasena').val();
-        
-        if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
-            markAsInvalid($('#confirmarContrasena'), AppContext.messages.contrasenaNoCoincide);
+        // Validate required fields
+        $form.find('[required]').each(function () {
+            if (!$(this).val().trim()) {
+                markAsInvalid($(this), AppContext.messages.requiredField);
+                isValid = false;
+            }
+        });
+
+        // Validaciones para nuevo usuario
+        if ($form.attr('id') === 'nuevoUsuarioForm') {
+            const contrasena = $('#contrasena').val();
+            const confirmarContrasena = $('#confirmarContrasena').val();
+
+            if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
+                markAsInvalid($('#confirmarContrasena'), AppContext.messages.contrasenaNoCoincide);
+                isValid = false;
+            }
+
+            if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
+                markAsInvalid($('#contrasena'), AppContext.messages.contrasenaInvalida);
+                isValid = false;
+            }
+        }
+
+        // Validaciones para cambiar contraseña
+        if ($form.attr('id') === 'cambiarContrasenaForm') {
+            const contrasena = $('#nueva_contrasena').val();
+            const confirmarContrasena = $('#confirmar_nueva_contrasena').val();
+
+            if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
+                markAsInvalid($('#confirmar_nueva_contrasena'), AppContext.messages.contrasenaNoCoincide);
+                isValid = false;
+            }
+
+            if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
+                markAsInvalid($('#nueva_contrasena'), AppContext.messages.contrasenaInvalida);
+                isValid = false;
+            }
+        }
+
+        // Validar DNI solo si existe en el formulario
+        const dniInput = $form.find('[name="dni"]');
+        if (dniInput.length && (dniInput.val().length !== 8 || !/^\d+$/.test(dniInput.val()))) {
+            markAsInvalid(dniInput, AppContext.messages.dniInvalido);
             isValid = false;
         }
-        
-        if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
-            markAsInvalid($('#contrasena'), AppContext.messages.contrasenaInvalida);
-            isValid = false;
-        }
+
+        return isValid;
     }
-
-    // Validaciones para cambiar contraseña
-    if ($form.attr('id') === 'cambiarContrasenaForm') {
-        const contrasena = $('#nueva_contrasena').val();
-        const confirmarContrasena = $('#confirmar_nueva_contrasena').val();
-        
-        if (contrasena && confirmarContrasena && contrasena !== confirmarContrasena) {
-            markAsInvalid($('#confirmar_nueva_contrasena'), AppContext.messages.contrasenaNoCoincide);
-            isValid = false;
-        }
-        
-        if (contrasena && !/(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/.test(contrasena)) {
-            markAsInvalid($('#nueva_contrasena'), AppContext.messages.contrasenaInvalida);
-            isValid = false;
-        }
-    }
-
-    // Validar DNI solo si existe en el formulario
-    const dniInput = $form.find('[name="dni"]');
-    if (dniInput.length && (dniInput.val().length !== 8 || !/^\d+$/.test(dniInput.val()))) {
-        markAsInvalid(dniInput, AppContext.messages.dniInvalido);
-        isValid = false;
-    }
-
-    return isValid;
-}
 
     function markAsInvalid($element, message) {
         $element.addClass('is-invalid');
@@ -201,9 +300,9 @@ $(document).ready(function() {
     }
 
     // New user form submission
-    $('#nuevoUsuarioForm').submit(function(e) {
+    $('#nuevoUsuarioForm').submit(function (e) {
         e.preventDefault();
-        
+
         if (!validateUsuarioForm($(this))) {
             scrollToFirstError();
             return false;
@@ -212,7 +311,7 @@ $(document).ready(function() {
         const $form = $(this);
         const $submitBtn = $form.find('[type="submit"]');
         const originalBtnText = $submitBtn.html();
-        
+
         // Mostrar loading en el botón
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
 
@@ -221,11 +320,11 @@ $(document).ready(function() {
             type: 'POST',
             data: $form.serialize(),
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Cerrar modal
                     $('#nuevoUsuarioModal').modal('hide');
-                    
+
                     // Mostrar mensaje de éxito
                     Swal.fire({
                         icon: 'success',
@@ -247,7 +346,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al procesar la solicitud';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -255,7 +354,7 @@ $(document).ready(function() {
                 } catch (e) {
                     errorMessage = xhr.responseText || errorMessage;
                 }
-                
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -263,7 +362,7 @@ $(document).ready(function() {
                     confirmButtonText: 'Entendido'
                 });
             },
-            complete: function() {
+            complete: function () {
                 // Restaurar botón
                 $submitBtn.prop('disabled', false).html(originalBtnText);
             }
@@ -271,9 +370,9 @@ $(document).ready(function() {
     });
 
     // Edit user form submission
-    $('#editarUsuarioForm').submit(function(e) {
+    $('#editarUsuarioForm').submit(function (e) {
         e.preventDefault();
-        
+
         if (!validateUsuarioForm($(this))) {
             scrollToFirstError();
             return false;
@@ -282,7 +381,7 @@ $(document).ready(function() {
         const $form = $(this);
         const $submitBtn = $form.find('[type="submit"]');
         const originalBtnText = $submitBtn.html();
-        
+
         // Mostrar loading en el botón
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Actualizando...');
 
@@ -291,11 +390,11 @@ $(document).ready(function() {
             type: 'POST',
             data: $form.serialize(),
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Cerrar modal
                     $('#editarUsuarioModal').modal('hide');
-                    
+
                     // Mostrar mensaje de éxito
                     Swal.fire({
                         icon: 'success',
@@ -317,7 +416,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al procesar la solicitud';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -325,7 +424,7 @@ $(document).ready(function() {
                 } catch (e) {
                     errorMessage = xhr.responseText || errorMessage;
                 }
-                
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -333,7 +432,7 @@ $(document).ready(function() {
                     confirmButtonText: 'Entendido'
                 });
             },
-            complete: function() {
+            complete: function () {
                 // Restaurar botón
                 $submitBtn.prop('disabled', false).html(originalBtnText);
             }
@@ -341,13 +440,13 @@ $(document).ready(function() {
     });
 
     // Change role form submission
-    $('#cambiarRolForm').submit(function(e) {
+    $('#cambiarRolForm').submit(function (e) {
         e.preventDefault();
-        
+
         const $form = $(this);
         const $submitBtn = $form.find('[type="submit"]');
         const originalBtnText = $submitBtn.html();
-        
+
         // Mostrar loading en el botón
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Actualizando...');
 
@@ -356,11 +455,11 @@ $(document).ready(function() {
             type: 'POST',
             data: $form.serialize(),
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Cerrar modal
                     $('#cambiarRolModal').modal('hide');
-                    
+
                     // Mostrar mensaje de éxito
                     Swal.fire({
                         icon: 'success',
@@ -382,7 +481,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al procesar la solicitud';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -390,7 +489,7 @@ $(document).ready(function() {
                 } catch (e) {
                     errorMessage = xhr.responseText || errorMessage;
                 }
-                
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -398,7 +497,7 @@ $(document).ready(function() {
                     confirmButtonText: 'Entendido'
                 });
             },
-            complete: function() {
+            complete: function () {
                 // Restaurar botón
                 $submitBtn.prop('disabled', false).html(originalBtnText);
             }
@@ -406,9 +505,9 @@ $(document).ready(function() {
     });
 
     // Change password form submission
-    $('#cambiarContrasenaForm').submit(function(e) {
+    $('#cambiarContrasenaForm').submit(function (e) {
         e.preventDefault();
-        
+
         if (!validateUsuarioForm($(this))) {
             scrollToFirstError();
             return false;
@@ -417,7 +516,7 @@ $(document).ready(function() {
         const $form = $(this);
         const $submitBtn = $form.find('[type="submit"]');
         const originalBtnText = $submitBtn.html();
-        
+
         // Mostrar loading en el botón
         $submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Actualizando...');
 
@@ -426,11 +525,11 @@ $(document).ready(function() {
             type: 'POST',
             data: $form.serialize(),
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     // Cerrar modal
                     $('#cambiarContrasenaModal').modal('hide');
-                    
+
                     // Mostrar mensaje de éxito
                     Swal.fire({
                         icon: 'success',
@@ -452,7 +551,7 @@ $(document).ready(function() {
                     });
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errorMessage = 'Error al procesar la solicitud';
                 try {
                     const response = JSON.parse(xhr.responseText);
@@ -460,7 +559,7 @@ $(document).ready(function() {
                 } catch (e) {
                     errorMessage = xhr.responseText || errorMessage;
                 }
-                
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -468,7 +567,7 @@ $(document).ready(function() {
                     confirmButtonText: 'Entendido'
                 });
             },
-            complete: function() {
+            complete: function () {
                 // Restaurar botón
                 $submitBtn.prop('disabled', false).html(originalBtnText);
             }
@@ -486,32 +585,32 @@ $(document).ready(function() {
     }
 
     // Filter form
-    $('#filtroForm').submit(function(e) {
+    $('#filtroForm').submit(function (e) {
         e.preventDefault();
         showLoading();
-        
+
         const $form = $(this);
         const params = $form.serialize();
         window.location.href = AppContext.endpoints.usuario.filter + '&' + params;
     });
 
     // Reset filters
-    $('#btnResetFiltros').click(function() {
+    $('#btnResetFiltros').click(function () {
         $('#filtroForm')[0].reset();
         showLoading();
         window.location.href = AppContext.endpoints.usuario.list;
     });
 
     // Activate/deactivate user
-    $(document).on('click', '.btn-desactivar, .btn-activar', function() {
+    $(document).on('click', '.btn-desactivar, .btn-activar', function () {
         const isActivate = $(this).hasClass('btn-activar');
         const id = $(this).data('id');
-        
+
         Swal.fire({
             title: isActivate ? 'Confirmar Activación' : 'Confirmar Desactivación',
-            text: isActivate ? 
-                '¿Está seguro que desea activar este usuario?' : 
-                '¿Está seguro que desea desactivar este usuario?',
+            text: isActivate ?
+                    '¿Está seguro que desea activar este usuario?' :
+                    '¿Está seguro que desea desactivar este usuario?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: isActivate ? '#28a745' : '#dc3545',
@@ -519,9 +618,9 @@ $(document).ready(function() {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                const url = isActivate ? 
-                    AppContext.endpoints.usuario.activate + id : 
-                    AppContext.endpoints.usuario.deactivate + id;
+                const url = isActivate ?
+                        AppContext.endpoints.usuario.activate + id :
+                        AppContext.endpoints.usuario.deactivate + id;
                 window.location.href = url;
             }
         });
@@ -543,18 +642,20 @@ $(document).ready(function() {
     }
 
     // Modal events
-    $('#nuevoUsuarioModal').on('shown.bs.modal', function() {
-        $('#dni').focus();
+    $('#nuevoUsuarioModal').on('shown.bs.modal', function () {
+        $('#tipoUsuario').focus();
     });
 
-    $('.modal').on('hidden.bs.modal', function() {
+    $('.modal').on('hidden.bs.modal', function () {
         $(this).find('form').trigger('reset');
         $(this).find('.is-invalid').removeClass('is-invalid');
         $(this).find('.invalid-feedback').remove();
+        // Restaurar campos de nombre y apellido como editables
+        $('#nombre, #apellido').prop('readonly', false).removeClass('readonly-field');
     });
 
     // Auto-dismiss alerts
-    setTimeout(function() {
+    setTimeout(function () {
         $('.alert').fadeOut();
     }, 5000);
 
@@ -565,7 +666,7 @@ $(document).ready(function() {
     });
 
     // Hide loading when page fully loads
-    $(window).on('load', function() {
+    $(window).on('load', function () {
         hideLoading();
     });
 });

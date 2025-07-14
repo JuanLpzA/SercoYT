@@ -58,88 +58,107 @@ public class VentaControlador extends HttpServlet {
         }
     }
 
-    private void generarCompraCompleta(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
-            throws ServletException, IOException, SQLException, DocumentException {
-
-        HttpSession session = request.getSession();
-        List<Carrito> carrito = (List<Carrito>) session.getAttribute("carrito");
-
-        if (carrito == null || carrito.isEmpty()) {
-            sendJsonError(response, "El carrito está vacío");
-            return;
+   private void generarCompraCompleta(HttpServletRequest request, HttpServletResponse response, Usuario usuario)
+    throws ServletException, IOException, SQLException, DocumentException {
+    HttpSession session = request.getSession();
+    List<Carrito> carrito = (List<Carrito>) session.getAttribute("carrito");
+    
+    // Validar estado del cliente antes de continuar
+    ClienteDao clienteDao = new ClienteDao();
+    Cliente cliente = clienteDao.obtenerPorDocumento(usuario.getDni());
+    
+    if (cliente != null && "inactivo".equalsIgnoreCase(cliente.getEstadoCliente())) {
+        sendJsonError(response, "Actualmente no se puede realizar compras. Su cuenta está inactiva.");
+        return;
+    }
+    
+    if (carrito == null || carrito.isEmpty()) {
+        sendJsonError(response, "El carrito está vacío");
+        return;
+    }
+    
+    try {
+        // Obtener tipo de entrega (nuevo)
+        String tipoEntrega = request.getParameter("tipoEntrega"); // "pickup" o "delivery"
+        
+        // Parsear datos de dirección solo si es delivery
+        JSONObject direccionJson = null;
+        if ("delivery".equals(tipoEntrega)) {
+            direccionJson = new JSONObject(request.getParameter("direccion"));
         }
-
-        try {
-            // 1. Parsear datos de dirección
-            JSONObject direccionJson = new JSONObject(request.getParameter("direccion"));
-
-            // 2. Calcular totales
-            double subtotal = carrito.stream().mapToDouble(Carrito::getSubTotal).sum();
-            double igv = redondearDecimales(subtotal * 0.18, 2);
-            double total = redondearDecimales(subtotal + igv, 2);
-
-            // 3. Crear o obtener cliente
-            int idCliente = obtenerOcrearCliente(usuario);
-
-            // 4. Crear venta
-            Venta venta = new Venta();
-            venta.setFecha(new Date());
-            venta.setIdTipoVenta(2); // Virtual
-            venta.setIdCliente(idCliente);
-            venta.setIdUsuario(usuario.getIdUsuario());
-            venta.setIdEstado(1); // En espera
-            venta.setIdPago(Integer.parseInt(request.getParameter("metodoPago")));
-            venta.setSubtotal(subtotal);
-            venta.setIgv(igv);
-            venta.setTotal(total);
-
-            // 5. Crear detalles
-            List<DetalleVenta> detalles = new ArrayList<>();
-            for (Carrito item : carrito) {
-                DetalleVenta detalle = new DetalleVenta();
-                detalle.setIdProducto(item.getIdProducto());
-                detalle.setCantidad(item.getCantidad());
-                detalle.setPrecioUnitario(item.getPrecioCompra());
-                detalle.setSubtotal(item.getSubTotal());
-                detalles.add(detalle);
-            }
-
-            // 6. Registrar venta y detalles
-            int idVenta = ventaDao.registrarVenta(venta, detalles);
-
-            // 7. Registrar dirección de entrega (MODIFICADO)
+        
+        // Calcular totales (igual que antes)
+        double totalConIGV = carrito.stream().mapToDouble(Carrito::getSubTotal).sum();
+        double subtotal = redondearDecimales(totalConIGV / 1.18, 2);
+        double igv = redondearDecimales(totalConIGV - subtotal, 2);
+        double total = redondearDecimales(subtotal + igv, 2);
+        
+        // Crear o obtener cliente (igual que antes)
+        int idCliente = obtenerOcrearCliente(usuario);
+        
+        // Obtener tipoVenta y estado (nuevo)
+        int idTipoVenta = Integer.parseInt(request.getParameter("idTipoVenta")); // 1 o 2
+        int idEstado = Integer.parseInt(request.getParameter("idEstado")); // 5 o 1
+        
+        // Crear venta (modificado)
+        Venta venta = new Venta();
+        venta.setFecha(new Date());
+        venta.setIdTipoVenta(idTipoVenta);
+        venta.setIdCliente(idCliente);
+        venta.setIdUsuario(usuario.getIdUsuario());
+        venta.setIdEstado(idEstado);
+        venta.setIdPago(Integer.parseInt(request.getParameter("metodoPago")));
+        venta.setSubtotal(subtotal);
+        venta.setIgv(igv);
+        venta.setTotal(total);
+        
+        // Crear detalles (igual que antes)
+        List<DetalleVenta> detalles = new ArrayList<>();
+        for (Carrito item : carrito) {
+            DetalleVenta detalle = new DetalleVenta();
+            detalle.setIdProducto(item.getIdProducto());
+            detalle.setCantidad(item.getCantidad());
+            detalle.setPrecioUnitario(item.getPrecioCompra());
+            detalle.setSubtotal(item.getSubTotal());
+            detalles.add(detalle);
+        }
+        
+        // Registrar venta y detalles (igual que antes)
+        int idVenta = ventaDao.registrarVenta(venta, detalles);
+        
+        // Registrar dirección solo si es delivery (modificado)
+        if ("delivery".equals(tipoEntrega)) {
             DireccionEntrega direccion = new DireccionEntrega();
             direccion.setIdVenta(idVenta);
             direccion.setNombreReceptor(direccionJson.getString("nombreReceptor"));
             direccion.setTelefono(direccionJson.getString("telefono"));
             direccion.setProvincia(direccionJson.getString("provincia"));
             direccion.setDireccion(direccionJson.getString("direccion"));
-
-            // Campos opcionales
+            
             if (direccionJson.has("referencia") && !direccionJson.getString("referencia").isEmpty()) {
                 direccion.setReferencia(direccionJson.getString("referencia"));
             }
-
             if (direccionJson.has("codigoPostal") && !direccionJson.getString("codigoPostal").isEmpty()) {
                 direccion.setCodigoPostal(direccionJson.getString("codigoPostal"));
             }
-
+            
             ventaDao.registrarDireccionEntrega(direccion);
-
-            // 8. Generar y guardar PDF
-            String pdfPath = generarYGuardarBoleta(idVenta);
-
-            // 9. Limpiar carrito
-            session.removeAttribute("carrito");
-            session.removeAttribute("contador");
-
-            // 10. Responder con éxito
-            sendJsonSuccess(response, idVenta);
-
-        } catch (Exception e) {
-            sendJsonError(response, "Error al procesar la compra: " + e.getMessage());
         }
+        
+        // Generar y guardar PDF (igual que antes)
+        String pdfPath = generarYGuardarBoleta(idVenta);
+        
+        // Limpiar carrito (igual que antes)
+        session.removeAttribute("carrito");
+        session.removeAttribute("contador");
+        
+        // Responder con éxito (igual que antes)
+        sendJsonSuccess(response, idVenta);
+        
+    } catch (Exception e) {
+        sendJsonError(response, "Error al procesar la compra: " + e.getMessage());
     }
+}
 
 
     private String generarYGuardarBoleta(int idVenta)

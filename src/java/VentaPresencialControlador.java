@@ -19,6 +19,7 @@ public class VentaPresencialControlador extends HttpServlet {
     private final VentaDao ventaDao = new VentaDao();
     private final ClienteDao clienteDao = new ClienteDao();
     private final ProductoDao productoDao = new ProductoDao();
+    private final ReporteDao reporteDao = new ReporteDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -81,7 +82,10 @@ public class VentaPresencialControlador extends HttpServlet {
     private void mostrarVentaInicio(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         List<Producto> productos = productoDao.listarActivos();
+        List<VentaExtra> ventasPresenciales = reporteDao.listarVentasPresencialesEntregadas(8); // numero de cuantos 
+
         request.setAttribute("productos", productos);
+        request.setAttribute("ventas", ventasPresenciales);
         request.getRequestDispatcher("/admin/ventapresencialinicio.jsp").forward(request, response);
     }
 
@@ -89,9 +93,9 @@ public class VentaPresencialControlador extends HttpServlet {
             throws ServletException, IOException, SQLException {
         String tipoDocumento = request.getParameter("tipoDocumento");
         String documento = request.getParameter("documento");
-        
+
         JSONObject respuesta = new JSONObject();
-        
+
         // Validar documento según tipo
         if (tipoDocumento.equals("1") && documento.length() != 8) { // DNI
             respuesta.put("error", "El DNI debe tener 8 dígitos");
@@ -102,17 +106,22 @@ public class VentaPresencialControlador extends HttpServlet {
         } else {
             // Buscar cliente en la base de datos
             Cliente cliente = clienteDao.obtenerPorDocumento(documento);
-            
+
             if (cliente != null) {
-                respuesta.put("existe", true);
-                respuesta.put("cliente", new JSONObject(cliente));
+                // Validar estado del cliente
+                if ("inactivo".equalsIgnoreCase(cliente.getEstadoCliente())) {
+                    respuesta.put("error", "Actualmente no se puede realizar compras con este cliente");
+                } else {
+                    respuesta.put("existe", true);
+                    respuesta.put("cliente", new JSONObject(cliente));
+                }
             } else {
                 respuesta.put("existe", false);
                 respuesta.put("tipoDocumento", tipoDocumento);
                 respuesta.put("documento", documento);
             }
         }
-        
+
         response.setContentType("application/json");
         response.getWriter().write(respuesta.toString());
     }
@@ -164,69 +173,78 @@ public class VentaPresencialControlador extends HttpServlet {
         response.getWriter().write(respuesta.toString());
     }
 
-    private void finalizarVenta(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {
-        HttpSession session = request.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
-        
-        if (usuario == null) {
-            enviarErrorJson(response, "No hay usuario autenticado");
-            return;
-        }
-        
-        // Parsear datos del carrito desde JSON
-        JSONObject datos = new JSONObject(request.getParameter("datos"));
-        int idCliente = datos.getInt("idCliente");
-        int metodoPago = datos.getInt("metodoPago");
-        JSONArray carritoJson = datos.getJSONArray("carrito");
-        
-        // Convertir JSONArray a List<DetalleVenta>
-        List<DetalleVenta> detalles = new ArrayList<>();
-        double subtotal = 0;
-        
-        for (int i = 0; i < carritoJson.length(); i++) {
-            JSONObject item = carritoJson.getJSONObject(i);
-            DetalleVenta detalle = new DetalleVenta();
-            detalle.setIdProducto(item.getInt("idProducto"));
-            detalle.setCantidad(item.getInt("cantidad"));
-            detalle.setPrecioUnitario(item.getDouble("precio"));
-            detalle.setSubtotal(item.getDouble("subtotal"));
-            detalles.add(detalle);
-            
-            subtotal += detalle.getSubtotal();
-        }
-        
-        // Calcular totales
-        double igv = redondearDecimales(subtotal * 0.18, 2);
-        double total = redondearDecimales(subtotal + igv, 2);
-        
-        // Crear venta
-        Venta venta = new Venta();
-        venta.setFecha(new Date());
-        venta.setIdTipoVenta(1); // Presencial
-        venta.setIdCliente(idCliente);
-        venta.setIdUsuario(usuario.getIdUsuario());
-        venta.setIdEstado(3); // Entregado (venta presencial)
-        venta.setIdPago(metodoPago);
-        venta.setSubtotal(subtotal);
-        venta.setIgv(igv);
-        venta.setTotal(total);
-        
-        // Registrar venta
-        int idVenta = ventaDao.registrarVenta(venta, detalles);
-        
-        // Generar respuesta
-        JSONObject respuesta = new JSONObject();
-        if (idVenta > 0) {
-            respuesta.put("success", true);
-            respuesta.put("idVenta", idVenta);
-        } else {
-            respuesta.put("error", "No se pudo registrar la venta");
-        }
-        
-        response.setContentType("application/json");
-        response.getWriter().write(respuesta.toString());
+   private void finalizarVenta(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException, SQLException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
+    
+    if (usuario == null) {
+        enviarErrorJson(response, "No hay usuario autenticado");
+        return;
     }
+    
+    // Parsear datos del carrito desde JSON
+    JSONObject datos = new JSONObject(request.getParameter("datos"));
+    int idCliente = datos.getInt("idCliente");
+    int metodoPago = datos.getInt("metodoPago");
+    JSONArray carritoJson = datos.getJSONArray("carrito");
+    
+    // Convertir JSONArray a List<DetalleVenta>
+    List<DetalleVenta> detalles = new ArrayList<>();
+    double totalConIgv = 0;
+    
+    for (int i = 0; i < carritoJson.length(); i++) {
+        JSONObject item = carritoJson.getJSONObject(i);
+        DetalleVenta detalle = new DetalleVenta();
+        detalle.setIdProducto(item.getInt("idProducto"));
+        detalle.setCantidad(item.getInt("cantidad"));
+        
+        // El precio que viene del frontend ya incluye IGV
+        double precioConIgv = item.getDouble("precioConIgv");
+        double subtotalConIgv = item.getDouble("subtotal");
+        
+        // Calcular precio sin IGV para almacenarlo en la base de datos
+        double precioSinIgv = precioConIgv / 1.18;
+        
+        detalle.setPrecioUnitario(precioSinIgv); // Guardamos el precio sin IGV
+        detalle.setSubtotal(subtotalConIgv / 1.18); // Subtotal sin IGV
+        detalles.add(detalle);
+        
+        totalConIgv += subtotalConIgv;
+    }
+    
+    // Calcular totales correctamente
+    double subtotalSinIgv = redondearDecimales(totalConIgv / 1.18, 2);
+    double igv = redondearDecimales(totalConIgv - subtotalSinIgv, 2);
+    double total = redondearDecimales(totalConIgv, 2);
+    
+    // Crear venta
+    Venta venta = new Venta();
+    venta.setFecha(new Date());
+    venta.setIdTipoVenta(1); // Presencial
+    venta.setIdCliente(idCliente);
+    venta.setIdUsuario(usuario.getIdUsuario());
+    venta.setIdEstado(3); // Entregado (venta presencial)
+    venta.setIdPago(metodoPago);
+    venta.setSubtotal(subtotalSinIgv); // Subtotal sin IGV
+    venta.setIgv(igv); // IGV calculado
+    venta.setTotal(total); // Total con IGV
+    
+    // Registrar venta
+    int idVenta = ventaDao.registrarVenta(venta, detalles);
+    
+    // Generar respuesta
+    JSONObject respuesta = new JSONObject();
+    if (idVenta > 0) {
+        respuesta.put("success", true);
+        respuesta.put("idVenta", idVenta);
+    } else {
+        respuesta.put("error", "No se pudo registrar la venta");
+    }
+    
+    response.setContentType("application/json");
+    response.getWriter().write(respuesta.toString());
+}
 
     private void generarBoletaPDF(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {

@@ -619,6 +619,246 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     animation: spin 1s linear infinite;
 }
 
+/* ===== MODAL NUEVO USUARIO - CSS COMPLETO ===== */
+
+/* Configuración general del modal */
+#nuevoUsuarioModal .modal-dialog {
+    max-width: 900px;
+}
+
+#nuevoUsuarioModal .modal-content {
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+/* Header del modal */
+#nuevoUsuarioModal .modal-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-radius: 8px 8px 0 0;
+    padding: 1rem 1.5rem;
+    border-bottom: none;
+}
+
+#nuevoUsuarioModal .modal-header .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#nuevoUsuarioModal .modal-header .modal-title i {
+    font-size: 1.2rem;
+}
+
+/* Body del modal */
+#nuevoUsuarioModal .modal-body {
+    padding: 2rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+/* Espaciado y organización de formularios */
+#nuevoUsuarioModal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#nuevoUsuarioModal .form-row .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos para labels */
+#nuevoUsuarioModal .form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Indicador visual para campos obligatorios */
+#nuevoUsuarioModal .required:after {
+    content: " *";
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Estilos para inputs */
+#nuevoUsuarioModal .form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+#nuevoUsuarioModal .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    background-color: white;
+}
+
+#nuevoUsuarioModal .form-control:valid {
+    border-color: #28a745;
+}
+
+#nuevoUsuarioModal .form-control:invalid:not(:placeholder-shown) {
+    border-color: #dc3545;
+}
+
+/* Estilos específicos para el select de tipo de usuario */
+#nuevoUsuarioModal #tipoUsuario {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#nuevoUsuarioModal #tipoUsuario option {
+    padding: 8px;
+    font-weight: normal;
+}
+
+/* Estilos para campos readonly después de consultar DNI */
+#nuevoUsuarioModal .readonly-field {
+    background-color: #e9ecef !important;
+    border-color: #28a745 !important;
+    cursor: not-allowed;
+    color: #495057;
+}
+
+#nuevoUsuarioModal .readonly-field:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+/* Grupo de input para DNI con botón */
+#nuevoUsuarioModal .input-group {
+    position: relative;
+}
+
+#nuevoUsuarioModal .input-group-append .btn {
+    border-left: 0;
+    border: 2px solid #e9ecef;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+#nuevoUsuarioModal .input-group-append .btn:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-1px);
+}
+
+#nuevoUsuarioModal .input-group-append .btn:active {
+    transform: translateY(0);
+}
+
+/* Estilos para los mensajes de ayuda */
+#nuevoUsuarioModal .form-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* Estilos para inputs de contraseña */
+#nuevoUsuarioModal input[type="password"] {
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+}
+
+#nuevoUsuarioModal input[type="password"]:focus {
+    letter-spacing: 1px;
+}
+
+/* Footer del modal */
+#nuevoUsuarioModal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Botones del footer */
+#nuevoUsuarioModal .modal-footer .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#nuevoUsuarioModal .modal-footer .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+#nuevoUsuarioModal .modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    transform: translateY(-1px);
+}
+
+#nuevoUsuarioModal .modal-footer .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+#nuevoUsuarioModal .modal-footer .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+    transform: translateY(-1px);
+}
+
+/* Animaciones para los botones */
+#nuevoUsuarioModal .btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Estilos para validación visual */
+#nuevoUsuarioModal .form-control.is-valid {
+    border-color: #28a745;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.96.96 4.76-4.76L6.99 1.96 3.26 5.69l-1.92-1.92L.4 4.71z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+#nuevoUsuarioModal .form-control.is-invalid {
+    border-color: #dc3545;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 1.4 1.4M7.2 7.4l-1.4-1.4'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.readonly-field {
+    background-color: #e9ecef !important;
+    opacity: 1 !important;
+}
+
+input[readonly], select[readonly] {
+    background-color: #f8f9fa !important;
+    cursor: not-allowed !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .section-header {
@@ -626,43 +866,43 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
         align-items: flex-start;
         gap: 15px;
     }
-    
+
     .filter-form {
         grid-template-columns: 1fr;
     }
-    
+
     .filter-actions {
         justify-content: stretch;
     }
-    
+
     .btn-filter {
         flex: 1;
         justify-content: center;
     }
-    
+
     .table-container {
         overflow-x: auto;
     }
-    
+
     .products-table {
         min-width: 1000px;
     }
-    
+
     .action-buttons {
         flex-wrap: wrap;
         gap: 3px;
     }
-    
+
     .btn-action {
         width: 28px;
         height: 28px;
         font-size: 0.7rem;
     }
-    
+
     .tipo-usuario-options {
         grid-template-columns: 1fr;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -672,40 +912,40 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     .dashboard-main {
         padding: 15px;
     }
-    
+
     .filter-card .card-body {
         padding: 20px;
     }
-    
+
     .products-table th,
     .products-table td {
         padding: 8px 6px;
         font-size: 0.8rem;
     }
-    
+
     .modal-body {
         padding: 20px;
     }
-    
+
     .modal-footer {
         padding: 15px 20px;
         flex-direction: column;
     }
-    
+
     .modal-footer .btn {
         width: 100%;
     }
-    
+
     .input-group {
         flex-direction: column;
     }
-    
+
     .input-group .form-control {
         border-radius: 6px;
         border-right: 1px solid #ddd;
         margin-bottom: 10px;
     }
-    
+
     .input-group-append .btn {
         border-radius: 6px;
         border-left: 1px solid #ddd;
@@ -714,18 +954,34 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 
 /* Animaciones */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .table-container,

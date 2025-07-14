@@ -34,7 +34,7 @@
                                 <i class="fas fa-caret-down"></i>
                             </button>
                             <div class="dropdown-content">
-                                <a href="${pageContext.request.contextPath}/index.jsp">
+                                <a href="${pageContext.request.contextPath}/Controlador">
                                     <i class="fas fa-store"></i> Ir a la tienda
                                 </a>
                                 <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=logout">
@@ -98,7 +98,7 @@
                                             <option value="">Todas las categorías</option>
                                             <option value="1" ${filtroCategoria == '1' ? 'selected' : ''}>Persona Natural (DNI)</option>
                                             <option value="2" ${filtroCategoria == '2' ? 'selected' : ''}>Persona Jurídica (RUC)</option>
-                                            <option value="2" ${filtroCategoria == '3' ? 'selected' : ''}>Persona Extranjera (Carnet de Extranjeria)</option>
+                                            <option value="3" ${filtroCategoria == '3' ? 'selected' : ''}>Persona Extranjera (Carnet de Extranjería)</option>
                                         </select>
                                     </div>
                                     <div class="filter-group">
@@ -217,14 +217,14 @@
                                             <i class="fas fa-building"></i> Persona Jurídica (RUC)
                                         </label>
                                     </div>
-                                    
+
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoCarnet" value="3" checked>
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoCarnet" value="3">
                                         <label class="form-check-label" for="tipoCarnet">
-                                            <i class="fas fa-user"></i> Extranjero (Carnet de Extranjeria)
+                                            <i class="fas fa-passport"></i> Extranjero (Carnet de Extranjería)
                                         </label>
                                     </div>
-                                    
+
                                 </div>
                             </div>
 
@@ -285,25 +285,34 @@
                     <form id="editarClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
                         <input type="hidden" id="edit_tipoClienteOriginal" name="tipoClienteOriginal">
+
+                        <!-- ESTA ES LA SOLUCIÓN: Campo hidden que guarda el tipoCliente -->
+                        <input type="hidden" id="edit_tipoClienteHidden" name="tipoCliente">
+
                         <div class="modal-body">
                             <div class="form-group">
                                 <label class="required">Tipo de Cliente </label>
                                 <div class="radio-group">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoDni" value="1" disabled>
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoDni" value="1" disabled>
                                         <label class="form-check-label" for="editTipoDni">
                                             <i class="fas fa-user"></i> Persona Natural (DNI)
                                         </label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="tipoCliente" id="editTipoRuc" value="2" disabled>
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoRuc" value="2" disabled>
                                         <label class="form-check-label" for="editTipoRuc">
                                             <i class="fas fa-building"></i> Persona Jurídica (RUC)
                                         </label>
                                     </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoCarnet" value="3" disabled>
+                                        <label class="form-check-label" for="editTipoCarnet">
+                                            <i class="fas fa-passport"></i> Extranjero (Carnet de Extranjería)
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="edit_dni" class="required" id="editLabelDocumento">DNI </label>
                                 <div class="input-group">
@@ -317,21 +326,18 @@
                                 </div>
                                 <small class="form-text text-muted" id="editHelpDocumento">Ingrese el DNI para buscar automáticamente</small>
                             </div>
-
                             <div class="form-group">
                                 <label for="edit_nombre" class="required" id="editLabelNombre">Nombre </label>
                                 <input type="text" class="form-control" id="edit_nombre" name="nombre" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
-
                             <div class="form-group" id="editGrupoApellido">
                                 <label for="edit_apellido" class="required">Apellido </label>
                                 <input type="text" class="form-control" id="edit_apellido" name="apellido" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
-
                             <div class="form-group">
                                 <label for="edit_telefono">Teléfono</label>
                                 <input type="text" class="form-control" id="edit_telefono" name="telefono"
@@ -397,6 +403,6 @@
                 }
             };
         </script>
-        <script src="${pageContext.request.contextPath}/js/clientes.js"></script>
+        <script src="${pageContext.request.contextPath}/js/clientes.js?v3"></script>
     </body>
 </html>

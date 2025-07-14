@@ -8,7 +8,6 @@ package com.sercoyt.model.dao;
  *
  * @author Arrunategui
  */
-
 import com.sercoyt.config.ConnectDB;
 import com.sercoyt.model.VentaExtra;
 import java.sql.*;
@@ -60,8 +59,7 @@ public class DespachoDao {
 
         sql.append(" ORDER BY ").append(orden);
 
-        try (Connection con = ConnectDB.getConnection(); 
-             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
             int paramIndex = 1;
             if (idTipoVenta != null) {
@@ -103,8 +101,7 @@ public class DespachoDao {
     public boolean cambiarEstadoVenta(int idVenta, int nuevoEstado) throws SQLException {
         String sql = "UPDATE ventas SET idEstado = ? WHERE idVenta = ?";
 
-        try (Connection con = ConnectDB.getConnection(); 
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, nuevoEstado);
             ps.setInt(2, idVenta);
@@ -115,7 +112,7 @@ public class DespachoDao {
 
     public Map<String, Object> obtenerDetallesVenta(int idVenta) throws SQLException {
         Map<String, Object> detalles = new HashMap<>();
-        
+
         String sqlVenta = "SELECT v.*, tv.nombre AS tipoVentaNombre, ed.descripcion AS estadoNombre, "
                 + "fp.metodo AS metodoPagoNombre, CONCAT(COALESCE(c.nombre, ''), ' ', COALESCE(c.apellido, '')) AS clienteNombre, "
                 + "c.documento AS clienteDni FROM ventas v "
@@ -124,13 +121,13 @@ public class DespachoDao {
                 + "JOIN estadodespacho ed ON v.idEstado = ed.idEstado "
                 + "JOIN formapago fp ON v.idPago = fp.idPago "
                 + "WHERE v.idVenta = ?";
-        
+
         String sqlProductos = "SELECT dv.*, p.nombre AS nombreProducto FROM detalleventa dv "
                 + "JOIN productos p ON dv.idProducto = p.idProducto "
                 + "WHERE dv.idVenta = ?";
-        
+
         String sqlDireccion = "SELECT * FROM direccionentrega WHERE idVenta = ?";
-        
+
         try (Connection con = ConnectDB.getConnection()) {
             // Obtener datos de la venta
             try (PreparedStatement ps = con.prepareStatement(sqlVenta)) {
@@ -148,7 +145,7 @@ public class DespachoDao {
                     }
                 }
             }
-            
+
             // Obtener productos
             List<Map<String, Object>> productos = new ArrayList<>();
             try (PreparedStatement ps = con.prepareStatement(sqlProductos)) {
@@ -167,7 +164,7 @@ public class DespachoDao {
                 }
             }
             detalles.put("productos", productos);
-            
+
             // Obtener dirección
             try (PreparedStatement ps = con.prepareStatement(sqlDireccion)) {
                 ps.setInt(1, idVenta);

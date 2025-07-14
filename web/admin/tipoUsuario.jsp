@@ -26,7 +26,7 @@
                         <button class="sidebar-toggle">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h4>Productos</h4>
+                        <h4>Configuracion de Roles</h4>
                     </div>
                     <div class="topbar-right">
                         <div class="user-dropdown">

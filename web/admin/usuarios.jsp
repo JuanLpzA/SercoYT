@@ -16,7 +16,7 @@
         <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/logo.png">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/usuarios.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/usuarios.css?v3">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -149,10 +149,10 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
+                                        <th>Nombre Completo</th>
+
                                         <th>DNI</th>
-                                        
+
                                         <th>Correo</th>
                                         <th>Teléfono</th>
                                         <th>Dirección</th>
@@ -165,13 +165,17 @@
                                     <c:forEach var="usuario" items="${usuarios}">
                                         <tr>
                                             <td><strong>#${usuario.idUsuario}</strong></td>
-                                            <td>${usuario.nombre}</td>
-                                            <td>${usuario.apellido}</td>
+                                            <td>
+                                                ${usuario.nombre} 
+                                                <c:if test="${not empty usuario.apellido}">
+                                                    ${usuario.apellido}
+                                                </c:if>
+                                            </td>
                                             <td>${usuario.dni}</td>
-                                           
+
                                             <td>${not empty usuario.correo ? usuario.correo : 'S/D'}</td>
                                             <td>${not empty usuario.telefono ? usuario.telefono : 'S/D'}</td>
-                                            
+
                                             <td>${usuario.direccion}</td>
                                             <td>${usuario.tipoUsuario}</td>
                                             <td>
@@ -256,70 +260,102 @@
 
         <!-- Modal Nuevo Usuario -->
         <div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Nuevo Usuario
                         </h5>
+
                     </div>
                     <form id="nuevoUsuarioForm" action="${pageContext.request.contextPath}/UsuarioControlador?accion=guardarAdmin" method="POST">
-                        <input type="hidden" id="tipoUsuario" name="tipoUsuario">
                         <div class="modal-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="dni" class="required">DNI *</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="dni" name="dni" required
-                                               maxlength="8" pattern="[0-9]{8}" title="Debe tener 8 dígitos numéricos">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button" id="btnConsultarDni">
-                                                <i class="fas fa-search"></i> Consultar
-                                            </button>
-                                        </div>
+                            <!-- Tipo de Usuario -->
+                            <div class="form-group">
+                                <label for="tipoUsuario" class="required">Tipo de Usuario *</label>
+                                <select class="form-control" id="tipoUsuario" name="tipoUsuario" required>
+                                    <option value="">Seleccione un tipo de usuario</option>
+                                    <c:forEach var="tipo" items="${tiposUsuario}">
+                                        <option value="${tipo.idTipoUsuario}">${tipo.nombre}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+
+                            <!-- DNI con consulta -->
+                            <div class="form-group">
+                                <label for="dni" class="required">DNI *</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="dni" name="dni" required
+                                           maxlength="8" pattern="[0-9]{8}" title="Debe tener 8 dígitos numéricos"
+                                           placeholder="Ingrese el DNI">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDni">
+                                            <i class="fas fa-search"></i> Consultar
+                                        </button>
                                     </div>
                                 </div>
+                                <small class="form-text text-muted">Consulte el DNI para autocompletar nombres y apellidos</small>
                             </div>
+
+                            <!-- Nombres y Apellidos (readonly después de consultar) -->
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="nombre" class="required">Nombre *</label>
                                     <input type="text" class="form-control" id="nombre" name="nombre" required
-                                           maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
+                                           maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios"
+                                           placeholder="Nombre del usuario">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="apellido" class="required">Apellido *</label>
                                     <input type="text" class="form-control" id="apellido" name="apellido" required
-                                           maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
+                                           maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios"
+                                           placeholder="Apellido del usuario">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="correo">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="correo" name="correo"
-                                       maxlength="100" title="Ingrese un correo válido">
-                            </div>
+
+                            <!-- Información de contacto -->
                             <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="correo">Correo Electrónico</label>
+                                    <input type="email" class="form-control" id="correo" name="correo"
+                                           maxlength="100" title="Ingrese un correo válido"
+                                           placeholder="ejemplo@correo.com">
+                                </div>
                                 <div class="form-group col-md-6">
                                     <label for="telefono">Teléfono</label>
                                     <input type="text" class="form-control" id="telefono" name="telefono"
-                                           maxlength="9" pattern="[0-9]{7,9}" title="Debe tener entre 7 y 9 dígitos">
+                                           maxlength="9" pattern="[0-9]{7,9}" title="Debe tener entre 7 y 9 dígitos"
+                                           placeholder="987654321">
+                                </div>
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="form-group">
+                                <label for="direccion">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion" maxlength="50"
+                                       placeholder="Dirección del usuario">
+                            </div>
+
+                            <!-- Contraseñas -->
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="contrasena" class="required">Contraseña *</label>
+                                    <input type="password" class="form-control" id="contrasena" name="contrasena" required
+                                           minlength="8" title="Mínimo 8 caracteres con números y letras"
+                                           placeholder="Contraseña del usuario">
+                                    <small class="form-text text-muted">Mínimo 8 caracteres con números y letras</small>
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="direccion">Dirección</label>
-                                    <input type="text" class="form-control" id="direccion" name="direccion" maxlength="30">
+                                    <label for="confirmarContrasena" class="required">Confirmar Contraseña *</label>
+                                    <input type="password" class="form-control" id="confirmarContrasena" name="confirmarContrasena" required
+                                           placeholder="Confirme la contraseña">
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="contrasena" class="required">Contraseña *</label>
-                                <input type="password" class="form-control" id="contrasena" name="contrasena" required
-                                       minlength="8" title="Mínimo 8 caracteres con números y letras">
-                                <small class="form-text text-muted">La contraseña debe tener al menos 8 caracteres, incluyendo números y letras</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmarContrasena" class="required">Confirmar Contraseña *</label>
-                                <input type="password" class="form-control" id="confirmarContrasena" name="confirmarContrasena" required>
                             </div>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Usuario
                             </button>
@@ -344,19 +380,26 @@
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="edit_dni" class="required">DNI *</label>
-                                    <input type="text" class="form-control" id="edit_dni" name="dni" required
-                                           maxlength="8" pattern="[0-9]{8}" title="Debe tener 8 dígitos numéricos">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="edit_dni" name="dni" required readonly
+                                               maxlength="8" pattern="[0-9]{8}" title="Debe tener 8 dígitos numéricos">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="btnConsultarDniEdit">
+                                                <i class="fas fa-search"></i> Consultar
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="edit_nombre" class="required">Nombre *</label>
-                                    <input type="text" class="form-control" id="edit_nombre" name="nombre" required
+                                    <input type="text" class="form-control" id="edit_nombre" name="nombre" required readonly
                                            maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="edit_apellido" class="required">Apellido *</label>
-                                    <input type="text" class="form-control" id="edit_apellido" name="apellido" required
+                                    <input type="text" class="form-control" id="edit_apellido" name="apellido" required readonly
                                            maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
                                 </div>
                             </div>
@@ -378,10 +421,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="edit_estado" class="required">Estado *</label>
-                                <select class="form-control" id="edit_estado" name="estado" required disabled>
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                </select>
+                                <input type="text" class="form-control" id="edit_estado" name="estado" required readonly 
+                                       style="background-color: #f8f9fa; cursor: not-allowed;">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -515,6 +556,6 @@
                 }
             };
         </script>
-        <script src="${pageContext.request.contextPath}/js/usuarios.js"></script>
+        <script src="${pageContext.request.contextPath}/js/usuarios.js?v2"></script>
     </body>
 </html>

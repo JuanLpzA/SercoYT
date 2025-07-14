@@ -119,7 +119,8 @@ public class PDFGenerator {
             addCell(detallesTable, String.valueOf(detalle.getCantidad()), NORMAL_FONT);
             addCell(detallesTable, formatMoney(detalle.getPrecioUnitario()), NORMAL_FONT);
             addCell(detallesTable, formatMoney(detalle.getPrecioUnitario() * 0.18), NORMAL_FONT);
-            addCell(detallesTable, formatMoney(detalle.getSubtotal()), NORMAL_FONT);
+            addCell(detallesTable, formatMoney(detalle.getSubtotal() / 1.18), NORMAL_FONT);
+
         }
 
         document.add(detallesTable);

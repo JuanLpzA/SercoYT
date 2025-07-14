@@ -178,8 +178,8 @@ public class ClienteControlador extends HttpServlet {
         request.getSession().setAttribute("error", "Error al actualizar el cliente: " + e.getMessage());
         response.sendRedirect(request.getContextPath() + "/ClienteControlador?accion=listar");
     }
-}   
-
+}  
+ 
     private void eliminarCliente(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));

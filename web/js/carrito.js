@@ -1,6 +1,7 @@
 $(document).ready(function () {
     var metodoPagoSeleccionado = '';
     var googleMapsLoaded = false;
+    var deliveryType = '';
 
 
 
@@ -199,57 +200,53 @@ $(document).ready(function () {
 
     // 7. Generar orden de compra completa
     function generateCompleteOrder() {
-        const shippingData = buildShippingData();
+    const shippingData = deliveryType === 'delivery' ? buildShippingData() : null;
 
-        swal({
-            title: "Procesando compra",
-            text: "Estamos registrando su pedido",
-            icon: "info",
-            buttons: false,
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        });
+    swal({
+        title: "Procesando compra",
+        text: "Estamos registrando su pedido",
+        icon: "info",
+        buttons: false,
+        closeOnClickOutside: false,
+        closeOnEsc: false
+    });
 
-        // Determinar idPago (2 para tarjeta, 3 para yape)
-        const idPago = metodoPagoSeleccionado === 'tarjeta' ? 2 : 3;
-
-        $.ajax({
-            url: 'VentaControlador',
-            type: 'POST',
-            data: {
-                accion: 'generarCompraCompleta',
-                metodoPago: idPago,
-                direccion: JSON.stringify(shippingData)
-            },
-            dataType: 'json',
-            success: function (response) {
-                swal.close();
-
-                if (response.success) {
-                    // Mostrar boleta y redirigir
-                    window.open('VentaControlador?accion=generarBoleta&id=' + response.idVenta, '_blank');
-
-                    swal({
-                        title: "¡Compra exitosa!",
-                        text: "Su pedido sera entregado de 1 a 3 dias habiles",
-                        icon: "success"
-                    }).then(() => {
-                        window.location.href = 'Controlador?accion=ninguno';
-                    });
-                } else {
-                    swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
-                }
-            },
-            error: function (xhr) {
-                swal.close();
-                swal("Error", "Ocurrió un error al comunicarse con el servidor", "error");
-                console.error("Error en la solicitud AJAX:", xhr.responseText);
+    $.ajax({
+        url: 'VentaControlador',
+        type: 'POST',
+        data: {
+            accion: 'generarCompraCompleta',
+            metodoPago: metodoPagoSeleccionado === 'tarjeta' ? 2 : 3,
+            tipoEntrega: deliveryType,
+            direccion: deliveryType === 'delivery' ? JSON.stringify(shippingData) : null,
+            idTipoVenta: deliveryType === 'pickup' ? 1 : 2,
+            idEstado: deliveryType === 'pickup' ? 5 : 1
+        },
+        dataType: 'json',
+        success: function (response) {
+            swal.close();
+            
+            if (response.error && response.error.includes("inactiva")) {
+                swal("Cuenta inactiva", response.error, "error");
+                return;
             }
-        });
-    }
+            
+            if (response.success) {
+                // ... resto del código existente ...
+            } else {
+                swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
+            }
+        },
+        error: function (xhr) {
+            swal.close();
+            swal("Error", "Ocurrió un error al comunicarse con el servidor", "error");
+            console.error("Error en la solicitud AJAX:", xhr.responseText);
+        }
+    });
+}
 
     // 8. Inicialización principal
-    function initialize() {
+    function initialize() { 
         setupModalBehavior();
 
 
@@ -257,8 +254,36 @@ $(document).ready(function () {
 
         // Mostrar modal de dirección al hacer clic en Generar Compra
         $('#btnGenerarCompra').click(function () {
-            $('#addressModal').css('display', 'flex');
+            $('#deliveryTypeModal').css('display', 'flex');
         });
+
+        // Selección de tipo de entrega
+        $('.delivery-option').click(function () {
+            $('.delivery-option').removeClass('selected');
+            $(this).addClass('selected');
+            deliveryType = $(this).data('type');
+        });
+
+        $('#confirmDeliveryType').click(function () {
+            if (!deliveryType) {
+                swal("Error", "Por favor seleccione un método de entrega", "error");
+                return;
+            }
+
+            $('#deliveryTypeModal').fadeOut();
+
+            if (deliveryType === 'pickup') {
+                $('#pickupInfoModal').css('display', 'flex');
+            } else {
+                $('#addressModal').css('display', 'flex');
+            }
+        });
+
+        $('#confirmPickupInfo').click(function () {
+            $('#pickupInfoModal').fadeOut();
+            $('#paymentModal').css('display', 'flex');
+        });
+
 
         // Selección de método de pago
         $('.payment-method').click(function () {

@@ -71,6 +71,7 @@ public class Controlador extends HttpServlet {
                             if (item.getIdProducto() == idp) {
                                 if (item.getCantidad() < p.getStock()) {
                                     item.setCantidad(item.getCantidad() + 1);
+                                    // MANTENER: El precio ya incluye IGV, subTotal = precioConIGV * cantidad
                                     item.setSubTotal(item.getPrecioCompra() * item.getCantidad());
                                 }
                                 encontrado = true;
@@ -84,9 +85,9 @@ public class Controlador extends HttpServlet {
                             car.setIdProducto(p.getId());
                             car.setNombres(p.getNombres());
                             car.setDescripcion(p.getDescripcion());
-                            car.setPrecioCompra(p.getPrecio());
+                            car.setPrecioCompra(p.getPrecio()); // Este precio YA incluye IGV
                             car.setCantidad(1);
-                            car.setSubTotal(p.getPrecio());
+                            car.setSubTotal(p.getPrecio()); // SubTotal con IGV incluido
                             car.setStock(p.getStock());
                             listaCarrito.add(car);
                         }
@@ -118,6 +119,7 @@ public class Controlador extends HttpServlet {
                         if (item.getIdProducto() == idpro) {
                             cant = Math.min(cant, item.getStock());
                             item.setCantidad(cant);
+                            // MANTENER: El precio ya incluye IGV, subTotal = precioConIGV * cantidad
                             item.setSubTotal(item.getPrecioCompra() * cant);
                             break;
                         }
@@ -126,10 +128,19 @@ public class Controlador extends HttpServlet {
                     break;
 
                 case "Carrito":
-                    double totalPagar = listaCarrito.stream()
+                    // Calcular el total con IGV (que es lo que ya está en subTotal)
+                    double totalConIGV = listaCarrito.stream()
                             .mapToDouble(Carrito::getSubTotal)
                             .sum();
-                    request.setAttribute("totalPagar", totalPagar);
+
+                    // Calcular subtotal sin IGV e IGV por separado para mostrar en JSP
+                    double subtotalSinIGV = totalConIGV / 1.18;
+                    double igvCalculado = totalConIGV - subtotalSinIGV;
+
+                    // Pasar todos los valores al JSP
+                    request.setAttribute("totalPagar", totalConIGV); // Total con IGV
+                    request.setAttribute("subtotalSinIGV", subtotalSinIGV); // Subtotal sin IGV
+                    request.setAttribute("igvCalculado", igvCalculado); // IGV calculado
                     request.setAttribute("carrito", listaCarrito);
                     request.getRequestDispatcher("carrito.jsp").forward(request, response);
                     break;
@@ -144,6 +155,7 @@ public class Controlador extends HttpServlet {
                             if (item.getIdProducto() == idProductoComprar) {
                                 if (item.getCantidad() < productoComprar.getStock()) {
                                     item.setCantidad(item.getCantidad() + 1);
+                                    // MANTENER: El precio ya incluye IGV, subTotal = precioConIGV * cantidad
                                     item.setSubTotal(item.getPrecioCompra() * item.getCantidad());
                                 }
                                 encontrado = true;
@@ -157,9 +169,9 @@ public class Controlador extends HttpServlet {
                             nuevoItem.setIdProducto(productoComprar.getId());
                             nuevoItem.setNombres(productoComprar.getNombres());
                             nuevoItem.setDescripcion(productoComprar.getDescripcion());
-                            nuevoItem.setPrecioCompra(productoComprar.getPrecio());
+                            nuevoItem.setPrecioCompra(productoComprar.getPrecio()); // Este precio YA incluye IGV
                             nuevoItem.setCantidad(1);
-                            nuevoItem.setSubTotal(productoComprar.getPrecio());
+                            nuevoItem.setSubTotal(productoComprar.getPrecio()); // SubTotal con IGV incluido
                             nuevoItem.setStock(productoComprar.getStock());
                             listaCarrito.add(nuevoItem);
                         }
@@ -169,7 +181,7 @@ public class Controlador extends HttpServlet {
 
                     response.sendRedirect("Controlador?accion=Carrito");
                     break;
-                    
+
                 case "asesoria":
                     request.getRequestDispatcher("asesoria.jsp").forward(request, response);
                     break;

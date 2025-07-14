@@ -34,7 +34,7 @@
                                 <i class="fas fa-caret-down"></i>
                             </button>
                             <div class="dropdown-content">
-                                <a href="${pageContext.request.contextPath}/index.jsp">
+                                <a href="${pageContext.request.contextPath}/Controlador">
                                     <i class="fas fa-store"></i> Ir a la tienda
                                 </a>
                                 <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=logout">

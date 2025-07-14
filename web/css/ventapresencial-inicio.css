@@ -1,0 +1,757 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 11 jul. 2025, 12:22:39
+    Author     : Arrunategui
+*/
+
+/*
+ * CSS para Venta Presencial - Inicio
+ * Mantiene consistencia con productos.css
+ * Author: Arrunategui
+ */
+
+/* Variables CSS heredadas del sistema */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    --border-color: #e9ecef;
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-hover: 0 8px 15px rgba(0,0,0,0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* Contenedor principal */
+.dashboard-main {
+    padding: 20px;
+    background-color: #f5f6fa;
+    min-height: calc(100vh - 80px);
+}
+
+/* Header de sección */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px 0;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.section-header h4 {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 600;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-header h4::before {
+    content: "💰";
+    font-size: 1.2em;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-nueva-venta {
+    background: linear-gradient(135deg, var(--success-color), #1e7e34);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.btn-nueva-venta:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Contenido principal con layout de 2 columnas */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 25px;
+    align-items: start;
+}
+
+/* Columna izquierda - Tabla de ventas */
+.left-column {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.ventas-section {
+    height: 100%;
+}
+
+.section-title {
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    padding: 15px 20px;
+    margin: 0;
+    border-bottom: none;
+}
+
+.section-title h5 {
+    margin: 0;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Contenedor de tabla */
+.table-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.ventas-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.ventas-table thead {
+    background: var(--light-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.ventas-table th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark-color);
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.ventas-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+    font-size: 0.85rem;
+}
+
+.ventas-table tbody tr {
+    transition: var(--transition);
+}
+
+.ventas-table tbody tr:hover {
+    background-color: #f8f9ff;
+}
+
+/* Badges de estado */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.status-badge.status-completado {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.status-pendiente {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-badge.status-cancelado {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--secondary-color);
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #dee2e6;
+}
+
+.empty-state h6 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: var(--dark-color);
+}
+
+.empty-state p {
+    color: var(--secondary-color);
+    margin: 0;
+}
+
+/* Columna derecha - Guía de uso */
+.right-column {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+.guide-section {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.guide-content {
+    padding: 20px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.guide-intro {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9ff;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+}
+
+.guide-intro p {
+    margin: 0;
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+/* Pasos de la guía */
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.step-item {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    background: #fafbfc;
+    border-radius: var(--border-radius);
+    border: 1px solid #e9ecef;
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.step-item:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, var(--primary-color), #0056b3);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h6 {
+    margin: 0 0 10px 0;
+    color: var(--dark-color);
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.step-content p {
+    margin: 0 0 10px 0;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.step-content ul {
+    margin: 10px 0;
+    padding-left: 20px;
+    color: var(--secondary-color);
+}
+
+.step-content li {
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.step-content li strong {
+    color: var(--dark-color);
+}
+
+/* Tips y warnings */
+.tip, .warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.tip {
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.tip i, .warning i {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Métodos de pago */
+.payment-methods {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--dark-color);
+}
+
+.payment-option i {
+    color: var(--primary-color);
+}
+
+/* Footer de la guía */
+.guide-footer {
+    padding: 20px;
+    background: var(--light-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.success-message {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+}
+
+.success-message i {
+    color: var(--success-color);
+    font-size: 1.5rem;
+}
+
+.success-message h6 {
+    margin: 0 0 5px 0;
+    color: #155724;
+    font-weight: 600;
+}
+
+.success-message p {
+    margin: 0;
+    color: #155724;
+    font-size: 0.9rem;
+}
+
+.btn-start-sale {
+    width: 100%;
+    background: linear-gradient(135deg, var(--success-color), #1e7e34);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-start-sale:hover {
+    background: linear-gradient(135deg, #1e7e34, #155724);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+/* Badges de estado específicos para ventas */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 2px solid transparent;
+}
+
+.status-badge.status-en-espera {
+    background: #fff3cd;
+    color: #856404;
+    border-color: #ffeaa7;
+}
+
+.status-badge.status-en-espera::before {
+    content: "⏳";
+}
+
+.status-badge.status-en-reparto {
+    background: #cce5ff;
+    color: #004085;
+    border-color: #99d6ff;
+}
+
+.status-badge.status-en-reparto::before {
+    content: "🚚";
+}
+
+.status-badge.status-entregado {
+    background: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.status-badge.status-entregado::before {
+    content: "✅";
+}
+
+.status-badge.status-cancelado {
+    background: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.status-badge.status-cancelado::before {
+    content: "❌";
+}
+
+.status-badge.status-por-recoger {
+    background: #e2e3f3;
+    color: #383d61;
+    border-color: #bfbfe3;
+}
+
+.status-badge.status-por-recoger::before {
+    content: "🛍️";
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+    .main-content {
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+    }
+    
+    .guide-content {
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .right-column {
+        order: -1;
+    }
+    
+    .guide-content {
+        max-height: none;
+        padding: 15px;
+    }
+    
+    .guide-steps {
+        gap: 15px;
+    }
+    
+    .step-item {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-main {
+        padding: 15px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 0;
+    }
+    
+    .section-header h4 {
+        font-size: 1.3rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+    }
+    
+    .btn-nueva-venta {
+        width: 100%;
+        justify-content: center;
+        padding: 15px;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .ventas-table {
+        min-width: 700px;
+    }
+    
+    .ventas-table th,
+    .ventas-table td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+    
+    .step-item {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .step-number {
+        align-self: flex-start;
+    }
+    
+    .payment-methods {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .payment-option {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-main {
+        padding: 10px;
+    }
+    
+    .section-header {
+        padding: 10px 0;
+    }
+    
+    .section-header h4 {
+        font-size: 1.2rem;
+    }
+    
+    .guide-content {
+        padding: 10px;
+    }
+    
+    .step-item {
+        padding: 12px;
+    }
+    
+    .step-content h6 {
+        font-size: 0.9rem;
+    }
+    
+    .step-content p,
+    .step-content li {
+        font-size: 0.8rem;
+    }
+    
+    .guide-footer {
+        padding: 15px;
+    }
+    
+    .success-message {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .btn-start-sale {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.left-column,
+.right-column {
+    animation: fadeIn 0.4s ease;
+}
+
+/* Efectos de hover para filas de tabla */
+.ventas-table tbody tr:hover {
+    background-color: #f8f9ff;
+    transform: translateX(2px);
+}
+
+/* Scrollbar personalizado */
+.table-container::-webkit-scrollbar,
+.guide-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-track,
+.guide-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb,
+.guide-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover,
+.guide-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Estados de loading */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mejoras de accesibilidad */
+.btn-nueva-venta:focus,
+.btn-start-sale:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.step-item:focus-within {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Estados de la tabla */
+.text-success {
+    color: var(--success-color) !important;
+}
+
+.font-weight-bold {
+    font-weight: 600 !important;
+}
+
+/* Personalización adicional para el sistema */
+.ventas-table td:last-child {
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+.ventas-table td:first-child {
+    font-weight: 600;
+    color: var(--primary-color);
+}

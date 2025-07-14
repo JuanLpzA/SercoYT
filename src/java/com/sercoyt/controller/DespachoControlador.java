@@ -66,21 +66,21 @@ public class DespachoControlador extends HttpServlet {
             throws ServletException, IOException, SQLException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
             int idVenta = Integer.parseInt(request.getParameter("idVenta"));
             int nuevoEstado = Integer.parseInt(request.getParameter("nuevoEstado"));
-            
+
             boolean exito = despachoDao.cambiarEstadoVenta(idVenta, nuevoEstado);
-            
+
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("success", exito);
-            jsonResponse.put("message", exito 
-                ? "Estado de venta actualizado correctamente" 
-                : "No se pudo actualizar el estado de la venta");
-            
+            jsonResponse.put("message", exito
+                    ? "Estado de venta actualizado correctamente"
+                    : "No se pudo actualizar el estado de la venta");
+
             response.getWriter().write(jsonResponse.toString());
-            
+
         } catch (NumberFormatException e) {
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("success", false);
@@ -93,11 +93,11 @@ public class DespachoControlador extends HttpServlet {
             throws ServletException, IOException, SQLException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        
+
         try {
             int idVenta = Integer.parseInt(request.getParameter("idVenta"));
             Map<String, Object> detalles = despachoDao.obtenerDetallesVenta(idVenta);
-            
+
             if (detalles.isEmpty() || !detalles.containsKey("venta")) {
                 JSONObject errorResponse = new JSONObject();
                 errorResponse.put("error", true);
@@ -105,10 +105,10 @@ public class DespachoControlador extends HttpServlet {
                 response.getWriter().write(errorResponse.toString());
                 return;
             }
-            
+
             JSONObject jsonResponse = new JSONObject(detalles);
             response.getWriter().write(jsonResponse.toString());
-            
+
         } catch (NumberFormatException e) {
             JSONObject errorResponse = new JSONObject();
             errorResponse.put("error", true);

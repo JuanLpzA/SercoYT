@@ -36,7 +36,7 @@
                             <i class="fas fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="${pageContext.request.contextPath}/Controlador?accion=laptops">
+                            <a href="${pageContext.request.contextPath}/Controlador">
                                 <i class="fas fa-store"></i> Ir a la tienda
                             </a>
                             <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=logout">
@@ -112,15 +112,15 @@
                                     <tr>
                                         <td><strong>#${venta.idVenta}</strong></td>
                                         <td><fmt:formatDate value="${venta.fecha}" pattern="dd/MM/yyyy HH:mm"/></td>
-                                <td>${venta.clienteNombre}</td>
-                                <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
-                                <td>
-                                    <span class="status-badge status-${fn:toLowerCase(fn:replace(venta.estadoNombre, ' ', '-'))}">
-                                        ${venta.estadoNombre}
-                                    </span>
-                                </td>
+                                        <td>${venta.clienteNombre}</td>
+                                        <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
+                                        <td>
+                                            <span class="status-badge status-${venta.estadoNombre != null ? fn:toLowerCase(fn:replace(venta.estadoNombre, ' ', '-')) : 'sin-estado'}">
+                                                ${venta.estadoNombre != null ? venta.estadoNombre : 'Sin estado'}
+                                            </span>
+                                        </td>
 
-                                </tr>
+                                    </tr>
                             </c:forEach>
                                 <td colspan="5" class="text-center">5 ultimas ventas</td>
                             </tbody>

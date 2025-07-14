@@ -360,6 +360,55 @@ body {
     font-size: 14px;
 }
 
+.delivery-options {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.delivery-option {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.delivery-option:hover {
+    border-color: #4CAF50;
+    background-color: #f9f9f9;
+}
+
+.delivery-option.selected {
+    border: 2px solid #4CAF50;
+    background-color: #f0fff0;
+}
+
+.delivery-option h4 {
+    color: #4CAF50;
+    margin-top: 0;
+}
+
+.delivery-option i {
+    margin-right: 10px;
+}
+
+.pickup-info {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.pickup-info ul {
+    padding-left: 20px;
+}
+
+.pickup-info li {
+    margin-bottom: 8px;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .cart-content {
