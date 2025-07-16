@@ -171,7 +171,12 @@ public class VentaDao {
                     DireccionEntrega de = new DireccionEntrega();
                     de.setIdEntrega(rs.getInt("idEntrega"));
                     de.setIdVenta(rs.getInt("idVenta"));
+                    de.setNombreReceptor(rs.getString("nombreReceptor"));
+                    de.setTelefono(rs.getString("telefono"));
+                    de.setProvincia(rs.getString("provincia"));
                     de.setDireccion(rs.getString("direccion"));
+                    de.setReferencia(rs.getString("referencia"));
+                    de.setCodigoPostal(rs.getString("codigoPostal"));
                     return de;
                 }
             }
@@ -180,12 +185,19 @@ public class VentaDao {
     }
 
     public void registrarDireccionEntrega(DireccionEntrega direccion) throws SQLException {
-        String sql = "INSERT INTO direccionentrega (idVenta, direccion) VALUES (?, ?)";
+        String sql = "INSERT INTO direccionentrega (idVenta, nombreReceptor, telefono, provincia, direccion, referencia, codigoPostal) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, direccion.getIdVenta());
-            ps.setString(2, direccion.getDireccion());
+            ps.setString(2, direccion.getNombreReceptor());
+            ps.setString(3, direccion.getTelefono());
+            ps.setString(4, direccion.getProvincia());
+            ps.setString(5, direccion.getDireccion());
+            ps.setString(6, direccion.getReferencia());
+            ps.setString(7, direccion.getCodigoPostal());
+
             ps.executeUpdate();
         }
     }
@@ -223,7 +235,7 @@ public class VentaDao {
         String sql = "SELECT v.*, "
                 + "tv.nombre AS tipoVentaNombre, "
                 + "CONCAT(c.nombre, ' ', c.apellido) AS clienteNombre, "
-                + "c.dni AS clienteDni, "
+                + "c.documento AS clienteDni, "
                 + "ed.descripcion AS estadoNombre, "
                 + "fp.metodo AS metodoPagoNombre "
                 + "FROM ventas v "
@@ -231,7 +243,7 @@ public class VentaDao {
                 + "JOIN clientes c ON v.idCliente = c.idCliente "
                 + "JOIN estadodespacho ed ON v.idEstado = ed.idEstado "
                 + "JOIN formapago fp ON v.idPago = fp.idPago "
-                + "WHERE c.dni = ? "
+                + "WHERE c.documento = ? "
                 + "ORDER BY v.fecha DESC";
 
         try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
@@ -269,7 +281,7 @@ public class VentaDao {
         String sql = "SELECT "
                 + "tv.nombre AS tipoVentaNombre, "
                 + "CONCAT(c.nombre, ' ', c.apellido) AS clienteNombre, "
-                + "c.dni AS clienteDni, "
+                + "c.documento AS clienteDni, "
                 + "ed.descripcion AS estadoNombre, "
                 + "fp.metodo AS metodoPagoNombre "
                 + "FROM ventas v "

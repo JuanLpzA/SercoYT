@@ -1,5 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
@@ -35,7 +36,7 @@
                             <i class="fas fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="${pageContext.request.contextPath}/Controlador?accion=laptops">
+                            <a href="${pageContext.request.contextPath}/Controlador">
                                 <i class="fas fa-store"></i> Ir a la tienda
                             </a>
                             <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=logout">
@@ -90,7 +91,7 @@
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h4>Últimas ventas</h4>
-                        <a href="#" class="btn-view-all">Ver todas</a>
+                        <a href="${pageContext.request.contextPath}/ReporteControlador" class="btn-view-all">Ver todas</a>
                     </div>
                     <div class="section-content">
                         <table class="table table-striped">
@@ -104,10 +105,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Aquí irían las últimas ventas -->
-                                <tr>
+                                <c:forEach var="venta" items="${ventas}">
+                                    <!-- Aquí irían las últimas ventas
                                     <td colspan="5" class="text-center">No hay ventas recientes</td>
-                                </tr>
+                                    -->
+                                    <tr>
+                                        <td><strong>#${venta.idVenta}</strong></td>
+                                        <td><fmt:formatDate value="${venta.fecha}" pattern="dd/MM/yyyy HH:mm"/></td>
+                                        <td>${venta.clienteNombre}</td>
+                                        <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
+                                        <td>
+                                            <span class="status-badge status-${venta.estadoNombre != null ? fn:toLowerCase(fn:replace(venta.estadoNombre, ' ', '-')) : 'sin-estado'}">
+                                                ${venta.estadoNombre != null ? venta.estadoNombre : 'Sin estado'}
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                            </c:forEach>
+                                <td colspan="5" class="text-center">5 ultimas ventas</td>
                             </tbody>
                         </table>
                     </div>

@@ -50,6 +50,146 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
     gap: 10px;
 }
 
+/* Badges de estado */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-badge.inactive {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Estilos para el grupo de radio buttons - Tipo de Cliente */
+.radio-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 10px 14px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    flex: 1;
+}
+
+.form-check:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.form-check-input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    margin-top: 0;
+    border: 2px solid #6c757d;
+    background-color: #ffffff;
+    border-radius: 50%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.form-check-input[type="radio"]:checked {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+.form-check-input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #ffffff;
+}
+
+.form-check-input[type="radio"]:focus {
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+.form-check-label {
+    font-weight: 400;
+    color: #495057;
+    cursor: pointer;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.form-check-label i {
+    margin-right: 5px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.form-check:hover .form-check-label {
+    color: #007bff;
+}
+
+.form-check:hover .form-check-label i {
+    color: #007bff;
+}
+
+.form-check-input[type="radio"]:checked + .form-check-label {
+    color: #007bff;
+    font-weight: 500;
+}
+
+.form-check-input[type="radio"]:checked + .form-check-label i {
+    color: #007bff;
+}
+
+/* Estado seleccionado para todo el contenedor */
+.form-check:has(.form-check-input[type="radio"]:checked) {
+    border-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.03);
+}
+
+/* Label requerido para el grupo */
+.form-group label.required {
+    font-weight: 500;
+    color: #343a40;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px;
+}
+
+.form-group label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+
 .section-header h4::before {
     content: "👥";
     font-size: 1.2em;

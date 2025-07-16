@@ -1,6 +1,7 @@
 $(document).ready(function () {
     var metodoPagoSeleccionado = '';
     var googleMapsLoaded = false;
+    var deliveryType = '';
 
 
 
@@ -148,19 +149,11 @@ $(document).ready(function () {
         // Validar código postal si se ingresó
         const codigoPostal = $('#codigoPostal').val().trim();
         if (codigoPostal !== '') {
-            // Códigos postales válidos para Lambayeque (rangos aproximados)
-            const codigosValidos = {
-                'Chiclayo': /^13[7-8]\d{2}$/,
-                'Ferreñafe': /^141\d{2}$/,
-                'Lambayeque': /^14[0-1]\d{2}$/
-            };
-
-            const provincia = $('#provincia').val();
-            const regex = codigosValidos[provincia];
-
-            if (!regex || !regex.test(codigoPostal)) {
+            // Código postal válido para todo Lambayeque (rango 14000-14099)
+            // Los códigos se comparten entre todas las provincias del departamento
+            if (!/^140\d{2}$/.test(codigoPostal)) {
                 $('#codigoPostal').addClass('input-error');
-                $('#codigoPostalError').text('Código postal no válido para ' + provincia).show();
+                $('#codigoPostalError').text('Código postal no válido para Lambayeque (debe estar entre 14000-14099)').show();
                 isValid = false;
             } else {
                 $('#codigoPostal').removeClass('input-error');
@@ -207,57 +200,53 @@ $(document).ready(function () {
 
     // 7. Generar orden de compra completa
     function generateCompleteOrder() {
-        const shippingData = buildShippingData();
+    const shippingData = deliveryType === 'delivery' ? buildShippingData() : null;
 
-        swal({
-            title: "Procesando compra",
-            text: "Estamos registrando su pedido",
-            icon: "info",
-            buttons: false,
-            closeOnClickOutside: false,
-            closeOnEsc: false
-        });
+    swal({
+        title: "Procesando compra",
+        text: "Estamos registrando su pedido",
+        icon: "info",
+        buttons: false,
+        closeOnClickOutside: false,
+        closeOnEsc: false
+    });
 
-        // Determinar idPago (2 para tarjeta, 3 para yape)
-        const idPago = metodoPagoSeleccionado === 'tarjeta' ? 2 : 3;
-
-        $.ajax({
-            url: 'VentaControlador',
-            type: 'POST',
-            data: {
-                accion: 'generarCompraCompleta',
-                metodoPago: idPago,
-                direccion: JSON.stringify(shippingData)
-            },
-            dataType: 'json',
-            success: function (response) {
-                swal.close();
-
-                if (response.success) {
-                    // Mostrar boleta y redirigir
-                    window.open('VentaControlador?accion=generarBoleta&id=' + response.idVenta, '_blank');
-
-                    swal({
-                        title: "¡Compra exitosa!",
-                        text: "Su pedido sera entregado de 1 a 3 dias habiles",
-                        icon: "success"
-                    }).then(() => {
-                        window.location.href = 'index.jsp';
-                    });
-                } else {
-                    swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
-                }
-            },
-            error: function (xhr) {
-                swal.close();
-                swal("Error", "Ocurrió un error al comunicarse con el servidor", "error");
-                console.error("Error en la solicitud AJAX:", xhr.responseText);
+    $.ajax({
+        url: 'VentaControlador',
+        type: 'POST',
+        data: {
+            accion: 'generarCompraCompleta',
+            metodoPago: metodoPagoSeleccionado === 'tarjeta' ? 2 : 3,
+            tipoEntrega: deliveryType,
+            direccion: deliveryType === 'delivery' ? JSON.stringify(shippingData) : null,
+            idTipoVenta: deliveryType === 'pickup' ? 1 : 2,
+            idEstado: deliveryType === 'pickup' ? 5 : 1
+        },
+        dataType: 'json',
+        success: function (response) {
+            swal.close();
+            
+            if (response.error && response.error.includes("inactiva")) {
+                swal("Cuenta inactiva", response.error, "error");
+                return;
             }
-        });
-    }
+            
+            if (response.success) {
+                // ... resto del código existente ...
+            } else {
+                swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
+            }
+        },
+        error: function (xhr) {
+            swal.close();
+            swal("Error", "Ocurrió un error al comunicarse con el servidor", "error");
+            console.error("Error en la solicitud AJAX:", xhr.responseText);
+        }
+    });
+}
 
     // 8. Inicialización principal
-    function initialize() {
+    function initialize() { 
         setupModalBehavior();
 
 
@@ -265,8 +254,36 @@ $(document).ready(function () {
 
         // Mostrar modal de dirección al hacer clic en Generar Compra
         $('#btnGenerarCompra').click(function () {
-            $('#addressModal').css('display', 'flex');
+            $('#deliveryTypeModal').css('display', 'flex');
         });
+
+        // Selección de tipo de entrega
+        $('.delivery-option').click(function () {
+            $('.delivery-option').removeClass('selected');
+            $(this).addClass('selected');
+            deliveryType = $(this).data('type');
+        });
+
+        $('#confirmDeliveryType').click(function () {
+            if (!deliveryType) {
+                swal("Error", "Por favor seleccione un método de entrega", "error");
+                return;
+            }
+
+            $('#deliveryTypeModal').fadeOut();
+
+            if (deliveryType === 'pickup') {
+                $('#pickupInfoModal').css('display', 'flex');
+            } else {
+                $('#addressModal').css('display', 'flex');
+            }
+        });
+
+        $('#confirmPickupInfo').click(function () {
+            $('#pickupInfoModal').fadeOut();
+            $('#paymentModal').css('display', 'flex');
+        });
+
 
         // Selección de método de pago
         $('.payment-method').click(function () {
@@ -379,10 +396,27 @@ $(document).ready(function () {
                 isValid = false;
             }
 
-            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test($('#expiryDate').val())) {
+            // Validación de formato de fecha de expiración
+            var expiryValue = $('#expiryDate').val();
+            if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(expiryValue)) {
                 $('#expiryDate').addClass('input-error');
-                $('#expiryDateError').show();
+                $('#expiryDateError').text('Formato MM/AA (ej. 12/25)').show();
                 isValid = false;
+            } else {
+                // Validación adicional: verificar si la fecha ya expiró
+                var parts = expiryValue.split('/');
+                var inputMonth = parseInt(parts[0], 10);
+                var inputYear = parseInt('20' + parts[1], 10); // convierte '25' en 2025
+                var today = new Date();
+                var currentMonth = today.getMonth() + 1; // enero = 0
+                var currentYear = today.getFullYear();
+
+                // Verifica que la fecha no haya expirado
+                if (inputYear < currentYear || (inputYear === currentYear && inputMonth < currentMonth)) {
+                    $('#expiryDate').addClass('input-error');
+                    $('#expiryDateError').text('La tarjeta ya expiró').show();
+                    isValid = false;
+                }
             }
 
             if ($('#cvv').val().length !== 3) {

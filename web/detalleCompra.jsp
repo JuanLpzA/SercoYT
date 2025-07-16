@@ -75,7 +75,10 @@
                     <div class="shipping-section">
                         <h3>Dirección de Envío</h3>
                         <div class="shipping-address">
-                            <p>${direccion.direccion}</p>
+                            <p><strong>Receptor:</strong> ${direccion.nombreReceptor}</p>
+                            <p><strong>Teléfono:</strong> ${direccion.telefono}</p>
+                            <p><strong>Provincia:</strong> ${direccion.provincia}</p>
+                            <p><strong>Dirección:</strong> ${direccion.direccion}</p>
                         </div>
                     </div>
                 </c:if>

@@ -13,41 +13,56 @@
             </a>
         </li>
         <li class="${pageContext.request.requestURI.contains('ventapresencial') ? 'active' : ''}">
-            <a href="${pageContext.request.contextPath}/VentaPresencialControlador">
+            <a href="${pageContext.request.contextPath}/VentaPresencialControlador?accion=inicio">
                 <i class="fas fa-credit-card"></i> Venta Presencial
             </a>
         </li>
-        <li class="${pageContext.request.requestURI.contains('Producto') ? 'active' : ''}">
+        <li class="${pageContext.request.requestURI.contains('productos') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/ProductoControlador">
                 <i class="fas fa-box"></i> Productos
             </a>
         </li>
-        <li class="${pageContext.request.requestURI.contains('Marca') ? 'active' : ''}">
+        <li class="${pageContext.request.requestURI.contains('marcas') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/MarcaControlador">
                 <i class="fas fa-tags"></i> Marcas
             </a>
         </li>
-        <li class="${pageContext.request.requestURI.contains('Categoria') ? 'active' : ''}">
+        <li class="${pageContext.request.requestURI.contains('categorias') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/CategoriaControlador">
                 <i class="fas fa-list"></i> Categorías
             </a>
         </li>
-        <li class="${pageContext.request.requestURI.contains('reportes') ? 'active' : ''}">
-            <a href="#">
-                <i class="fas fa-chart-line"></i> Reportes
-            </a>
-        </li>
+        
         <li class="${pageContext.request.requestURI.contains('clientes') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/ClienteControlador">
                 <i class="fas fa-users"></i> Clientes
             </a>
         </li>
+
+        <li class="${pageContext.request.requestURI.contains('despacho') ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/DespachoControlador">
+                <i class="fas fa-building"></i> Despachar
+            </a>
+        </li>
+
         <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
-            <li class="${pageContext.request.requestURI.contains('cuentas') ? 'active' : ''}">
-                <a href="#">
+            <li class="${pageContext.request.requestURI.contains('reportes') ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/ReporteControlador">
+                    <i class="fas fa-history"></i> Reportes
+                </a>
+            </li>
+
+            <li class="${pageContext.request.requestURI.contains('usuarios') ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=listarAdmin">
                     <i class="fas fa-user-cog"></i> Cuentas
                 </a>
             </li>
+            <li class="${pageContext.request.requestURI.contains('tipoUsuario') ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/TipoUsuarioControlador?accion=gestionar">
+                    <i class="fas fa-globe"></i>Gestionar Roles
+                </a>
+            </li>
+            <!--
             <li class="${pageContext.request.requestURI.contains('estadisticas') ? 'active' : ''}">
                 <a href="#">
                     <i class="fas fa-chart-pie"></i> Estadísticas
@@ -58,6 +73,7 @@
                     <i class="fas fa-bell"></i> Notificaciones
                 </a>
             </li>
+            -->
         </c:if>
     </ul>
 </div>

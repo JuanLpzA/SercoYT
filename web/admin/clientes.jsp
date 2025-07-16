@@ -34,7 +34,7 @@
                                 <i class="fas fa-caret-down"></i>
                             </button>
                             <div class="dropdown-content">
-                                <a href="${pageContext.request.contextPath}/index.jsp">
+                                <a href="${pageContext.request.contextPath}/Controlador">
                                     <i class="fas fa-store"></i> Ir a la tienda
                                 </a>
                                 <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=logout">
@@ -87,11 +87,29 @@
                                                placeholder="Buscar por nombre o apellido...">
                                     </div>
                                     <div class="filter-group">
-                                        <label for="filtroDni">DNI</label>
+                                        <label for="filtroDni">DNI/RUC</label>
                                         <input type="text" class="form-control" id="filtroDni" name="dni" 
                                                value="${filtroDni != null ? filtroDni : ''}"
-                                               placeholder="Buscar por DNI..." maxlength="8">
+                                               placeholder="Buscar por Documento..." maxlength="11">
                                     </div>
+                                    <div class="filter-group">
+                                        <label for="filtroCategoria">Categoría</label>
+                                        <select class="form-control" id="filtroCategoria" name="categoria">
+                                            <option value="">Todas las categorías</option>
+                                            <option value="1" ${filtroCategoria == '1' ? 'selected' : ''}>Persona Natural (DNI)</option>
+                                            <option value="2" ${filtroCategoria == '2' ? 'selected' : ''}>Persona Jurídica (RUC)</option>
+                                            <option value="3" ${filtroCategoria == '3' ? 'selected' : ''}>Persona Extranjera (Carnet de Extranjería)</option>
+                                        </select>
+                                    </div>
+                                    <div class="filter-group">
+                                        <label for="filtroEstado">Estado</label>
+                                        <select class="form-control" id="filtroEstado" name="estado">
+                                            <option value="todos">Todos los estados</option>
+                                            <option value="activo" ${filtroEstado == 'activo' ? 'selected' : ''}>Activo</option>
+                                            <option value="inactivo" ${filtroEstado == 'inactivo' ? 'selected' : ''}>Inactivo</option>
+                                        </select>
+                                    </div>    
+
                                 </form>
                                 <div class="filter-actions">
                                     <button type="button" class="btn-filter secondary" id="btnResetFiltros">
@@ -115,10 +133,11 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>DNI</th>
+                                        <th>Nombre Completo</th>
+                                        <th>DNI/RUC</th>
                                         <th>Teléfono</th>
+                                        <th>Categoria</th>
+                                        <th>Estado</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -126,16 +145,40 @@
                                     <c:forEach var="cliente" items="${clientes}">
                                         <tr>
                                             <td><strong>#${cliente.idCliente}</strong></td>
-                                            <td>${cliente.nombre}</td>
-                                            <td>${cliente.apellido}</td>
-                                            <td>${cliente.dni}</td>
-                                            <td>${cliente.telefono}</td>
+                                            <td>
+                                                ${cliente.nombre} 
+                                                <c:if test="${not empty cliente.apellido}">
+                                                    ${cliente.apellido}
+                                                </c:if>
+                                            </td>
+                                            <td>${cliente.documento}</td>
+                                            <td>${not empty cliente.telefono ? cliente.telefono : 'S/D'}</td>
+                                            <td>${cliente.tipoCliente}</td>
+                                            <td>
+                                                <span class="status-badge ${cliente.estadoCliente eq 'activo' ? 'active' : 'inactive'}">
+                                                    ${cliente.estadoCliente eq 'activo' ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <button class="btn-action edit btn-editar" 
                                                             data-id="${cliente.idCliente}" title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+                                                    <c:choose>
+                                                        <c:when test="${cliente.estadoCliente == 'activo'}">
+                                                            <button class="btn-action deactivate btn-cambiar-estado" 
+                                                                    data-id="${cliente.idCliente}" data-estado="inactivo" title="Desactivar">
+                                                                <i class="fas fa-toggle-on"></i>
+                                                            </button>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <button class="btn-action activate btn-cambiar-estado" 
+                                                                    data-id="${cliente.idCliente}" data-estado="activo" title="Activar">
+                                                                <i class="fas fa-toggle-off"></i>
+                                                            </button>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                 </div>
                                             </td>
                                         </tr>
@@ -156,35 +199,62 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus"></i> Nuevo Cliente
                         </h5>
-
                     </div>
                     <form id="nuevoClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=guardar" method="POST">
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="dni" class="required">DNI *</label>
+                                <label class="required">Tipo de Cliente </label>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoDni" value="1" checked>
+                                        <label class="form-check-label" for="tipoDni">
+                                            <i class="fas fa-user"></i> Persona Natural (DNI)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoRuc" value="2">
+                                        <label class="form-check-label" for="tipoRuc">
+                                            <i class="fas fa-building"></i> Persona Jurídica (RUC)
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoCliente" id="tipoCarnet" value="3">
+                                        <label class="form-check-label" for="tipoCarnet">
+                                            <i class="fas fa-passport"></i> Extranjero (Carnet de Extranjería)
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="dni" class="required" id="labelDocumento">DNI </label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="dni" name="dni" required
                                            maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
                                     <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDni">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDocumento">
                                             <i class="fas fa-search"></i> Buscar
                                         </button>
                                     </div>
                                 </div>
-                                <small class="form-text text-muted">Ingrese el DNI para buscar automáticamente</small>
+                                <small class="form-text text-muted" id="helpDocumento">Ingrese el DNI para buscar automáticamente</small>
                             </div>
+
                             <div class="form-group">
-                                <label for="nombre" class="required">Nombre *</label>
+                                <label for="nombre" class="required" id="labelNombre">Nombre </label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" required
-                                       maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
-                                       title="Solo letras y espacios">
+                                       maxlength="100" title="Ingrese el nombre o razón social">
                             </div>
-                            <div class="form-group">
-                                <label for="apellido" class="required">Apellido *</label>
+
+                            <div class="form-group" id="grupoApellido">
+                                <label for="apellido" class="required">Apellido </label>
                                 <input type="text" class="form-control" id="apellido" name="apellido" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
+
                             <div class="form-group">
                                 <label for="telefono">Teléfono</label>
                                 <input type="text" class="form-control" id="telefono" name="telefono"
@@ -202,6 +272,8 @@
         </div>
 
         <!-- Modal Editar Cliente -->
+
+        <!-- Modal Editar Cliente -->
         <div class="modal fade" id="editarClienteModal" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -209,24 +281,59 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-edit"></i> Editar Cliente
                         </h5>
-
                     </div>
                     <form id="editarClienteForm" action="${pageContext.request.contextPath}/ClienteControlador?accion=actualizar" method="POST">
                         <input type="hidden" id="edit_id" name="id">
+                        <input type="hidden" id="edit_tipoClienteOriginal" name="tipoClienteOriginal">
+
+                        <!-- ESTA ES LA SOLUCIÓN: Campo hidden que guarda el tipoCliente -->
+                        <input type="hidden" id="edit_tipoClienteHidden" name="tipoCliente">
+
                         <div class="modal-body">
                             <div class="form-group">
-                                <label for="edit_dni" class="required">DNI *</label>
-                                <input type="text" class="form-control" id="edit_dni" name="dni" required
-                                       maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
+                                <label class="required">Tipo de Cliente </label>
+                                <div class="radio-group">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoDni" value="1" disabled>
+                                        <label class="form-check-label" for="editTipoDni">
+                                            <i class="fas fa-user"></i> Persona Natural (DNI)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoRuc" value="2" disabled>
+                                        <label class="form-check-label" for="editTipoRuc">
+                                            <i class="fas fa-building"></i> Persona Jurídica (RUC)
+                                        </label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tipoClienteDisplay" id="editTipoCarnet" value="3" disabled>
+                                        <label class="form-check-label" for="editTipoCarnet">
+                                            <i class="fas fa-passport"></i> Extranjero (Carnet de Extranjería)
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="edit_nombre" class="required">Nombre *</label>
+                                <label for="edit_dni" class="required" id="editLabelDocumento">DNI </label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="edit_dni" name="dni" required
+                                           maxlength="8" pattern="[0-9]{8}" title="Ingrese 8 dígitos numéricos">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnConsultarDocumentoEdit">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted" id="editHelpDocumento">Ingrese el DNI para buscar automáticamente</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit_nombre" class="required" id="editLabelNombre">Nombre </label>
                                 <input type="text" class="form-control" id="edit_nombre" name="nombre" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
                             </div>
-                            <div class="form-group">
-                                <label for="edit_apellido" class="required">Apellido *</label>
+                            <div class="form-group" id="editGrupoApellido">
+                                <label for="edit_apellido" class="required">Apellido </label>
                                 <input type="text" class="form-control" id="edit_apellido" name="apellido" required
                                        maxlength="50" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" 
                                        title="Solo letras y espacios">
@@ -238,7 +345,6 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Actualizar Cliente
                             </button>
@@ -289,11 +395,14 @@
                         save: '${pageContext.request.contextPath}/ClienteControlador?accion=guardar',
                         update: '${pageContext.request.contextPath}/ClienteControlador?accion=actualizar',
                         delete: '${pageContext.request.contextPath}/ClienteControlador?accion=eliminar&id=',
-                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni='
+                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni=',
+                        consultarRuc: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarRuc&ruc=',
+                        cambiarEstado: '${pageContext.request.contextPath}/ClienteControlador?accion=cambiarEstado',
+                        validarDocumento: '${pageContext.request.contextPath}/ClienteControlador?accion=validarDocumento'
                     }
                 }
             };
         </script>
-        <script src="${pageContext.request.contextPath}/js/clientes.js"></script>
+        <script src="${pageContext.request.contextPath}/js/clientes.js?v3"></script>
     </body>
 </html>

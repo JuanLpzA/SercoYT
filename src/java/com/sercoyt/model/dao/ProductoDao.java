@@ -15,7 +15,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 public class ProductoDao {
-    
+
     private static final String SQL_INSERT = "INSERT INTO productos(nombre, descripcion, precio, stock, imagenUrl, idMarca, idCategoria, estadoProducto) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SQL_UPDATE = "UPDATE productos SET nombre=?, descripcion=?, precio=?, idMarca=?, idCategoria=?, estadoProducto=?, imagenUrl=? WHERE idProducto=?";
     private static final String SQL_DELETE = "UPDATE productos SET estadoProducto='inactivo' WHERE idProducto=?";
@@ -175,7 +175,6 @@ public class ProductoDao {
 //            ps.executeUpdate();
 //        }
 //    }
-
     public String obtenerNombreProducto(int idProducto) throws SQLException {
         String sql = "SELECT nombre FROM productos WHERE idProducto = ?";
         String nombre = null;
@@ -192,11 +191,10 @@ public class ProductoDao {
         }
         return nombre != null ? nombre : "Producto desconocido";
     }
-    
+
     public boolean insertar(Producto producto) {
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
+
             stmt.setString(1, producto.getNombres());
             stmt.setString(2, producto.getDescripcion());
             stmt.setDouble(3, producto.getPrecio());
@@ -205,7 +203,7 @@ public class ProductoDao {
             stmt.setInt(6, obtenerIdMarca(producto.getNombreMarca()));
             stmt.setInt(7, obtenerIdCategoria(producto.getNombreCategoria()));
             stmt.setString(8, "activo");
-            
+
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -213,39 +211,37 @@ public class ProductoDao {
         }
     }
 
-  public boolean actualizar(Producto producto) {
-    try (Connection conn = ConnectDB.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
-        
-        stmt.setString(1, producto.getNombres());
-        stmt.setString(2, producto.getDescripcion());
-        stmt.setDouble(3, producto.getPrecio());
-        stmt.setInt(4, obtenerIdMarca(producto.getNombreMarca()));
-        stmt.setInt(5, obtenerIdCategoria(producto.getNombreCategoria()));
-        stmt.setString(6, "activo");
-        
-        // Manejo de la imagen
-        if (producto.getFoto() != null) {
-            stmt.setBlob(7, producto.getFoto());
-        } else {
-            // Si no hay nueva imagen, mantenemos la existente
-            Producto productoActual = listarId(producto.getId());
-            stmt.setBlob(7, productoActual.getFoto());
+    public boolean actualizar(Producto producto) {
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_UPDATE)) {
+
+            stmt.setString(1, producto.getNombres());
+            stmt.setString(2, producto.getDescripcion());
+            stmt.setDouble(3, producto.getPrecio());
+            stmt.setInt(4, obtenerIdMarca(producto.getNombreMarca()));
+            stmt.setInt(5, obtenerIdCategoria(producto.getNombreCategoria()));
+            stmt.setString(6, "activo");
+
+            // Manejo de la imagen
+            if (producto.getFoto() != null) {
+                stmt.setBlob(7, producto.getFoto());
+            } else {
+                // Si no hay nueva imagen, mantenemos la existente
+                Producto productoActual = listarId(producto.getId());
+                stmt.setBlob(7, productoActual.getFoto());
+            }
+
+            stmt.setInt(8, producto.getId());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
         }
-        
-        stmt.setInt(8, producto.getId());
-        
-        return stmt.executeUpdate() > 0;
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        return false;
     }
-}
 
     public boolean eliminar(int id) {
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_DELETE)) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_DELETE)) {
+
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException ex) {
@@ -255,9 +251,8 @@ public class ProductoDao {
     }
 
     public boolean actualizarStock(int idProducto, int cantidad) {
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_STOCK)) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR_STOCK)) {
+
             stmt.setInt(1, cantidad);
             stmt.setInt(2, idProducto);
             return stmt.executeUpdate() > 0;
@@ -269,10 +264,8 @@ public class ProductoDao {
 
     public List<Producto> listarTodos() {
         List<Producto> productos = new ArrayList<>();
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_TODOS);
-             ResultSet rs = stmt.executeQuery()) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_TODOS); ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Producto p = new Producto();
                 p.setId(rs.getInt("idProducto"));
@@ -294,10 +287,8 @@ public class ProductoDao {
 
     public List<Producto> listarActivos() {
         List<Producto> productos = new ArrayList<>();
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_ACTIVOS);
-             ResultSet rs = stmt.executeQuery()) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(SQL_LISTAR_ACTIVOS); ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Producto p = new Producto();
                 p.setId(rs.getInt("idProducto"));
@@ -318,9 +309,8 @@ public class ProductoDao {
 
     private int obtenerIdMarca(String nombreMarca) throws SQLException {
         String sql = "SELECT idMarca FROM marcas WHERE nombre = ?";
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, nombreMarca);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -333,9 +323,8 @@ public class ProductoDao {
 
     private int obtenerIdCategoria(String nombreCategoria) throws SQLException {
         String sql = "SELECT idCategoria FROM categorias WHERE nombre = ?";
-        try (Connection conn = ConnectDB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, nombreCategoria);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -345,121 +334,130 @@ public class ProductoDao {
         }
         return -1;
     }
-    
+
     //nuevo añadido
     public List<Producto> filtrarProductos(String nombre, String marca, String categoria, Integer stockMin, Integer stockMax) {
-    List<Producto> productos = new ArrayList<>();
-    StringBuilder sql = new StringBuilder(SQL_LISTAR_ACTIVOS);
-    List<Object> parametros = new ArrayList<>();
+        List<Producto> productos = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(SQL_LISTAR_ACTIVOS);
+        List<Object> parametros = new ArrayList<>();
 
-    // Construir la consulta dinámica
-    if (nombre != null && !nombre.isEmpty()) {
-        sql.append(" AND p.nombre LIKE ?");
-        parametros.add("%" + nombre + "%");
-    }
-    if (marca != null && !marca.isEmpty()) {
-        sql.append(" AND m.nombre = ?");
-        parametros.add(marca);
-    }
-    if (categoria != null && !categoria.isEmpty()) {
-        sql.append(" AND c.nombre = ?");
-        parametros.add(categoria);
-    }
-    if (stockMin != null) {
-        sql.append(" AND p.stock >= ?");
-        parametros.add(stockMin);
-    }
-    if (stockMax != null) {
-        sql.append(" AND p.stock <= ?");
-        parametros.add(stockMax);
-    }
-
-    try (Connection conn = ConnectDB.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
-        
-        // Establecer parámetros
-        for (int i = 0; i < parametros.size(); i++) {
-            stmt.setObject(i + 1, parametros.get(i));
+        // Construir la consulta dinámica
+        if (nombre != null && !nombre.isEmpty()) {
+            sql.append(" AND p.nombre LIKE ?");
+            parametros.add("%" + nombre + "%");
+        }
+        if (marca != null && !marca.isEmpty()) {
+            sql.append(" AND m.nombre = ?");
+            parametros.add(marca);
+        }
+        if (categoria != null && !categoria.isEmpty()) {
+            sql.append(" AND c.nombre = ?");
+            parametros.add(categoria);
+        }
+        if (stockMin != null) {
+            sql.append(" AND p.stock >= ?");
+            parametros.add(stockMin);
+        }
+        if (stockMax != null) {
+            sql.append(" AND p.stock <= ?");
+            parametros.add(stockMax);
         }
 
-        try (ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                Producto p = new Producto();
-                p.setId(rs.getInt("idProducto"));
-                p.setNombres(rs.getString("nombre"));
-                p.setDescripcion(rs.getString("descripcion"));
-                p.setPrecio(rs.getDouble("precio"));
-                p.setStock(rs.getInt("stock"));
-                p.setFoto(rs.getBinaryStream("imagenUrl"));
-                p.setNombreMarca(rs.getString("nombreMarca"));
-                p.setNombreCategoria(rs.getString("nombreCategoria"));
-                p.setEstado(rs.getString("estadoProducto"));
-                productos.add(p);
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            // Establecer parámetros
+            for (int i = 0; i < parametros.size(); i++) {
+                stmt.setObject(i + 1, parametros.get(i));
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Producto p = new Producto();
+                    p.setId(rs.getInt("idProducto"));
+                    p.setNombres(rs.getString("nombre"));
+                    p.setDescripcion(rs.getString("descripcion"));
+                    p.setPrecio(rs.getDouble("precio"));
+                    p.setStock(rs.getInt("stock"));
+                    p.setFoto(rs.getBinaryStream("imagenUrl"));
+                    p.setNombreMarca(rs.getString("nombreMarca"));
+                    p.setNombreCategoria(rs.getString("nombreCategoria"));
+                    p.setEstado(rs.getString("estadoProducto"));
+                    productos.add(p);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return productos;
+    }
+
+    public boolean existeMarca(String nombreMarca) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM marcas WHERE nombre = ?";
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nombreMarca);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
             }
         }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    }
-    return productos;
-}
-
-public boolean existeMarca(String nombreMarca) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM marcas WHERE nombre = ?";
-    try (Connection conn = ConnectDB.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        
-        stmt.setString(1, nombreMarca);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        }
-    }
-    return false;
-}
-
-public boolean existeCategoria(String nombreCategoria) throws SQLException {
-    String sql = "SELECT COUNT(*) FROM categorias WHERE nombre = ?";
-    try (Connection conn = ConnectDB.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        
-        stmt.setString(1, nombreCategoria);
-        try (ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        }
-    }
-    return false;
-}
-
-public boolean activar(int id) {
-    String sql = "UPDATE productos SET estadoProducto='activo' WHERE idProducto=?";
-    try (Connection conn = ConnectDB.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
-        
-        stmt.setInt(1, id);
-        return stmt.executeUpdate() > 0;
-    } catch (SQLException ex) {
-        ex.printStackTrace();
         return false;
     }
-}
 
-    
-    
-    //dashboard
-    public int contarProductosActivos() throws SQLException {
-    String sql = "SELECT COUNT(*) FROM productos WHERE estadoProducto = 'activo'";
-    try (Connection con = ConnectDB.getConnection();
-         PreparedStatement ps = con.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) {
-            return rs.getInt(1);
+    public boolean existeCategoria(String nombreCategoria) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM categorias WHERE nombre = ?";
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nombreCategoria);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean activar(int id) {
+        String sql = "UPDATE productos SET estadoProducto='activo' WHERE idProducto=?";
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
-    return 0;
-}
 
+    public boolean existeProducto(String nombre, String marca, String categoria) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM productos p "
+                + "JOIN marcas m ON p.idMarca = m.idMarca "
+                + "JOIN categorias c ON p.idCategoria = c.idCategoria "
+                + "WHERE p.nombre = ? AND m.nombre = ? AND c.nombre = ? AND p.estadoProducto = 'activo'";
+
+        try (Connection conn = ConnectDB.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nombre);
+            stmt.setString(2, marca);
+            stmt.setString(3, categoria);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    //dashboard
+    public int contarProductosActivos() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM productos WHERE estadoProducto = 'activo'";
+        try (Connection con = ConnectDB.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 
 }
