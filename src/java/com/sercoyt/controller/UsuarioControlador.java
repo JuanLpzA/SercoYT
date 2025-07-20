@@ -215,14 +215,17 @@ public class UsuarioControlador extends HttpServlet {
         session.setAttribute("usuario", usuario);
 
         switch (usuario.getTipoUsuario()) {
+            case "cliente":
+                response.sendRedirect(request.getContextPath() + "/Controlador");
+                break;
             case "administrador":
                 response.sendRedirect(request.getContextPath() + "/DashboardControlador");
                 break;
             case "vendedor":
                 response.sendRedirect(request.getContextPath() + "/DashboardControlador");
                 break;
-            default: // cliente
-                response.sendRedirect(request.getContextPath() + "/Controlador");
+            default: // otros
+                response.sendRedirect(request.getContextPath() + "/DashboardControlador");
         }
     }
 

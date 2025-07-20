@@ -51,7 +51,7 @@ public class AuthFilter implements Filter {
         String tipo = usuario.getTipoUsuario(); // por ejemplo: "cliente", "vendedor", "administrador"
         String uri = httpRequest.getRequestURI();
        
-        // 1. Acceso a /admin/* => Solo administrador
+        // 1. Acceso a /admin/* => Solo administrador o vendedor
         if (uri.contains("/admin/") && !(tipo.equals("administrador") || tipo.equals("vendedor"))) {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Acceso denegado");
             return;

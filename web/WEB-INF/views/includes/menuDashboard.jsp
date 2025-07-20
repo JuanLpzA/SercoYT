@@ -27,11 +27,13 @@
                 <i class="fas fa-tags"></i> Marcas
             </a>
         </li>
+        <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
         <li class="${pageContext.request.requestURI.contains('categorias') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/CategoriaControlador">
                 <i class="fas fa-list"></i> Categorías
             </a>
         </li>
+        </c:if>
         
         <li class="${pageContext.request.requestURI.contains('clientes') ? 'active' : ''}">
             <a href="${pageContext.request.contextPath}/ClienteControlador">
@@ -57,6 +59,7 @@
                     <i class="fas fa-user-cog"></i> Cuentas
                 </a>
             </li>
+            <!--
             <li class="${pageContext.request.requestURI.contains('tipoUsuario') ? 'active' : ''}">
                 <a href="${pageContext.request.contextPath}/TipoUsuarioControlador?accion=gestionar">
                     <i class="fas fa-globe"></i>Gestionar Roles

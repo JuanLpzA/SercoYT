@@ -20,6 +20,7 @@ public class VentaPresencialControlador extends HttpServlet {
     private final ClienteDao clienteDao = new ClienteDao();
     private final ProductoDao productoDao = new ProductoDao();
     private final ReporteDao reporteDao = new ReporteDao();
+    private final CajaDao cajaDao = new CajaDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -43,6 +44,16 @@ public class VentaPresencialControlador extends HttpServlet {
                     break;
                 case "inicio":
                     mostrarVentaInicio(request, response);
+                    break;
+                case "verificarEstadoCaja":
+                    verificarEstadoCaja(request, response);
+                    break;
+                case "obtenerResumenCaja":
+                    obtenerResumenCaja(request, response);
+                    break;
+                case "obtenerVentasCaja":
+                    obtenerVentasCaja(request, response);
+                    break;
                 default:
                     mostrarVentaPresencial(request, response);
             }
@@ -55,7 +66,7 @@ public class VentaPresencialControlador extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String accion = request.getParameter("accion");
-        
+
         try {
             switch (accion) {
                 case "registrarCliente":
@@ -63,6 +74,12 @@ public class VentaPresencialControlador extends HttpServlet {
                     break;
                 case "finalizarVenta":
                     finalizarVenta(request, response);
+                    break;
+                case "abrirCaja":
+                    abrirCaja(request, response);
+                    break;
+                case "cerrarCaja":
+                    cerrarCaja(request, response);
                     break;
                 default:
                     enviarErrorJson(response, "Acción no válida");
@@ -80,14 +97,24 @@ public class VentaPresencialControlador extends HttpServlet {
     }
     
     private void mostrarVentaInicio(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {
-        List<Producto> productos = productoDao.listarActivos();
-        List<VentaExtra> ventasPresenciales = reporteDao.listarVentasPresencialesEntregadas(8); // numero de cuantos 
-
-        request.setAttribute("productos", productos);
-        request.setAttribute("ventas", ventasPresenciales);
-        request.getRequestDispatcher("/admin/ventapresencialinicio.jsp").forward(request, response);
+        throws ServletException, IOException, SQLException {
+    
+    // Verificar si viene el parámetro nuevaVenta
+    String nuevaVenta = request.getParameter("nuevaVenta");
+    if ("true".equals(nuevaVenta)) {
+        // Redirigir a la página de venta presencial
+        mostrarVentaPresencial(request, response);
+        return;
     }
+    
+    // Código original para mostrar la página de inicio
+    List<Producto> productos = productoDao.listarActivos();
+    List<VentaExtra> ventasPresenciales = reporteDao.listarVentasPresencialesEntregadas(8);
+
+    request.setAttribute("productos", productos);
+    request.setAttribute("ventas", ventasPresenciales);
+    request.getRequestDispatcher("/admin/ventapresencialinicio.jsp").forward(request, response);
+}
 
     private void buscarCliente(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -177,9 +204,15 @@ public class VentaPresencialControlador extends HttpServlet {
         throws ServletException, IOException, SQLException {
     HttpSession session = request.getSession();
     Usuario usuario = (Usuario) session.getAttribute("usuario");
+    Integer idCaja = (Integer) session.getAttribute("idCaja");
     
     if (usuario == null) {
         enviarErrorJson(response, "No hay usuario autenticado");
+        return;
+    }
+    
+    if (idCaja == null) {
+        enviarErrorJson(response, "No hay una caja abierta para registrar la venta");
         return;
     }
     
@@ -233,6 +266,10 @@ public class VentaPresencialControlador extends HttpServlet {
     // Registrar venta
     int idVenta = ventaDao.registrarVenta(venta, detalles);
     
+    if (idVenta > 0) {
+        CajaDao cajaDao = new CajaDao();
+        cajaDao.registrarVentaEnCaja(idCaja, idVenta);
+    }
     // Generar respuesta
     JSONObject respuesta = new JSONObject();
     if (idVenta > 0) {
@@ -328,4 +365,135 @@ public class VentaPresencialControlador extends HttpServlet {
         response.setContentType("application/json");
         response.getWriter().write(error.toString());
     }
+    
+    
+    
+    private void abrirCaja(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
+    
+    try {
+        double montoInicial = Double.parseDouble(request.getParameter("montoInicial"));
+        CajaDao cajaDao = new CajaDao();
+        int idCaja = cajaDao.abrirCaja(usuario.getIdUsuario(), montoInicial);
+        
+        JSONObject respuesta = new JSONObject();
+        if (idCaja > 0) {
+            respuesta.put("success", true);
+            respuesta.put("idCaja", idCaja);
+            session.setAttribute("idCaja", idCaja);
+        } else {
+            respuesta.put("error", "No se pudo abrir la caja");
+        }
+        
+        response.setContentType("application/json");
+        response.getWriter().write(respuesta.toString());
+    } catch (Exception e) {
+        enviarErrorJson(response, "Error al abrir caja: " + e.getMessage());
+    }
+}
+
+private void cerrarCaja(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Integer idCaja = (Integer) session.getAttribute("idCaja");
+    
+    try {
+        double montoRecaudado = Double.parseDouble(request.getParameter("montoRecaudado"));
+        String observaciones = request.getParameter("observaciones");
+        
+        CajaDao cajaDao = new CajaDao();
+        boolean success = cajaDao.cerrarCaja(idCaja, montoRecaudado, observaciones);
+        
+        JSONObject respuesta = new JSONObject();
+        if (success) {
+            respuesta.put("success", true);
+            session.removeAttribute("idCaja");
+        } else {
+            respuesta.put("error", "No se pudo cerrar la caja");
+        }
+        
+        response.setContentType("application/json");
+        response.getWriter().write(respuesta.toString());
+    } catch (Exception e) {
+        enviarErrorJson(response, "Error al cerrar caja: " + e.getMessage());
+    }
+}
+
+private void verificarEstadoCaja(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
+    
+    try {
+        CajaDao cajaDao = new CajaDao();
+        Caja caja = cajaDao.obtenerCajaAbierta(usuario.getIdUsuario());
+        
+        JSONObject respuesta = new JSONObject();
+        if (caja != null) {
+            respuesta.put("cajaAbierta", true);
+            respuesta.put("idCaja", caja.getIdCaja());
+            respuesta.put("montoInicial", caja.getMontoInicial());
+            session.setAttribute("idCaja", caja.getIdCaja());
+        } else {
+            respuesta.put("cajaAbierta", false);
+        }
+        
+        response.setContentType("application/json");
+        response.getWriter().write(respuesta.toString());
+    } catch (Exception e) {
+        enviarErrorJson(response, "Error al verificar estado de caja: " + e.getMessage());
+    }
+}
+
+private void obtenerResumenCaja(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+    HttpSession session = request.getSession();
+    Integer idCaja = (Integer) session.getAttribute("idCaja");
+    
+    try {
+        CajaDao cajaDao = new CajaDao();
+        double totalVentas = cajaDao.calcularTotalVentas(idCaja);
+        List<VentaExtra> ventas = cajaDao.obtenerVentasDeCaja(idCaja);
+        
+        JSONObject respuesta = new JSONObject();
+        respuesta.put("totalVentas", totalVentas);
+        respuesta.put("ventas", ventas);
+        
+        response.setContentType("application/json");
+        response.getWriter().write(respuesta.toString());
+    } catch (Exception e) {
+        enviarErrorJson(response, "Error al obtener resumen de caja: " + e.getMessage());
+    }
+}
+
+private void obtenerVentasCaja(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException {
+    try {
+        int idCaja = Integer.parseInt(request.getParameter("idCaja"));
+        CajaDao cajaDao = new CajaDao();
+        List<VentaExtra> ventas = cajaDao.obtenerVentasDeCaja(idCaja);
+        
+        JSONArray ventasJson = new JSONArray();
+        for (VentaExtra venta : ventas) {
+            JSONObject ventaObj = new JSONObject();
+            ventaObj.put("idVenta", venta.getIdVenta());
+            ventaObj.put("fecha", venta.getFecha().getTime());
+            ventaObj.put("clienteNombre", venta.getClienteNombre());
+            ventaObj.put("clienteDni", venta.getClienteDni());
+            ventaObj.put("tipoVentaNombre", venta.getTipoVentaNombre());
+            ventaObj.put("estadoNombre", venta.getEstadoNombre());
+            ventaObj.put("metodoPagoNombre", venta.getMetodoPagoNombre());
+            ventaObj.put("total", venta.getTotal());
+            ventasJson.put(ventaObj);
+        }
+        
+        response.setContentType("application/json");
+        response.getWriter().write(ventasJson.toString());
+        
+    } catch (Exception e) {
+        enviarErrorJson(response, "Error al obtener ventas de caja: " + e.getMessage());
+    }
+}
 }

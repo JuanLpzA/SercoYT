@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    
+    verificarEstadoCaja();
     // Variables globales
     let carrito = [];
     let clienteSeleccionado = null;
@@ -529,6 +531,29 @@ $('#btnGuardarClienteModal').click(function() {
         $('#total').text('S/. ' + totalConIgv.toFixed(2));
     }
 
+    function verificarEstadoCaja() {
+        // Solo si estamos en la página de venta presencial (no en el inicio)
+        if (window.location.pathname.includes('ventapresencial.jsp')) {
+            $.ajax({
+                url: AppContext.endpoints.ventaPresencial.verificarEstadoCaja,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (!response.cajaAbierta) {
+                        mostrarError('No hay una caja abierta. Debe aperturar caja primero.');
+                        setTimeout(function() {
+                            window.location.href = AppContext.endpoints.ventaPresencial.ventaInicio;
+                        }, 2000);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error al verificar estado de caja:', xhr.responseText);
+                }
+            });
+        }
+    }
+    
+    // Modificar la función finalizarVenta para verificar caja abierta
     function finalizarVenta() {
         if (!clienteSeleccionado) {
             mostrarError('Seleccione un cliente antes de finalizar la venta');
@@ -539,6 +564,27 @@ $('#btnGuardarClienteModal').click(function() {
             return;
         }
 
+        // Verificar estado de caja antes de continuar
+        $.ajax({
+            url: AppContext.endpoints.ventaPresencial.verificarEstadoCaja,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (!response.cajaAbierta) {
+                    mostrarError('No hay una caja abierta. No se puede registrar la venta.');
+                    return;
+                }
+                
+                // Resto del código de finalizarVenta...
+                procesarVenta();
+            },
+            error: function(xhr) {
+                mostrarError('Error al verificar estado de caja: ' + xhr.responseText);
+            }
+        });
+    }
+    
+    function procesarVenta() {
         const metodoPago = $('#metodoPago').val();
         mostrarCargando('#btnFinalizarVenta');
 
@@ -603,8 +649,8 @@ $('#btnGuardarClienteModal').click(function() {
                     carrito = [];
                     clienteSeleccionado = null;
                     $('#documento').val('');
-                    $('#clienteInfo').hide();
-                    $('#nuevoClienteForm').hide();
+                    $('#nombreCompleto').val('');
+                    $('#idCliente').val('');
                     $('#btnFinalizarVenta').prop('disabled', true);
                     actualizarCarrito();
                 }

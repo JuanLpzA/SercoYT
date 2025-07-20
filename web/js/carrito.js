@@ -231,10 +231,21 @@ $(document).ready(function () {
                 return;
             }
             
-            if (response.success) {
-                // ... resto del código existente ...
-            } else {
-                swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
+                if (response.success) {
+                    window.open('VentaControlador?accion=generarBoleta&id=' + response.idVenta, '_blank');
+                    const mensajeExito = deliveryType === 'delivery' ?
+                            "Su pedido sera entregado de 1 a 3 dias habiles" :
+                            "Su pedido debera ser recogido en tienda";
+
+                    swal({
+                        title: "¡Compra exitosa!",
+                        text: mensajeExito,
+                        icon: "success"
+                    }).then(() => {
+                        window.location.href = 'Controlador?accion=ninguno';
+                    });
+                } else {
+                    swal("Error", response.error || "Ocurrió un error al procesar su compra", "error");
             }
         },
         error: function (xhr) {

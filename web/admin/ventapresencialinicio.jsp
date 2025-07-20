@@ -48,17 +48,26 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="dashboard-main">
                     <div class="section-header">
                         <h4>Panel de Venta Presencial</h4>
                         <div class="header-actions">
-                            <button class="btn btn-primary btn-nueva-venta" id="btnNuevoProducto">
-                                <i class="fas fa-plus"></i> Nueva Venta
-                            </button>
+                            <div class="caja-info">
+                                <span id="montoCaja">S/. 0.00</span>
+                                <button class="btn btn-success btn-caja" id="btnAbrirCaja">
+                                    <i class="fas fa-cash-register"></i> Aperturar Caja
+                                </button>
+                                <button class="btn btn-danger btn-caja" id="btnCerrarCaja" disabled>
+                                    <i class="fas fa-lock"></i> Finalizar Caja
+                                </button>
+                                <button class="btn btn-primary btn-nueva-venta" id="btnNuevaVenta" disabled>
+                                    <i class="fas fa-plus"></i> Nueva Venta
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div class="main-content">
                         <!-- Columna izquierda - Tabla de ventas -->
                         <div class="left-column">
@@ -66,7 +75,7 @@
                                 <div class="section-title">
                                     <h5><i class="fas fa-history"></i> Últimas Ventas Presenciales</h5>
                                 </div>
-                                
+
                                 <div class="table-container">
                                     <c:choose>
                                         <c:when test="${not empty ventas}">
@@ -81,7 +90,7 @@
                                                         <th>Estado</th>
                                                         <th>Método Pago</th>
                                                         <th>Total</th>
-                                                        
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -99,7 +108,7 @@
                                                             </td>
                                                             <td>${venta.metodoPagoNombre}</td>
                                                             <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
-                                                          
+
                                                         </tr>
                                                     </c:forEach>
                                                 </tbody>
@@ -116,19 +125,19 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Columna derecha - Guía de uso -->
                         <div class="right-column">
                             <div class="guide-section">
                                 <div class="section-title">
                                     <h5><i class="fas fa-info-circle"></i> Guía de Uso</h5>
                                 </div>
-                                
+
                                 <div class="guide-content">
                                     <div class="guide-intro">
                                         <p>Sigue estos pasos para realizar una venta presencial exitosa:</p>
                                     </div>
-                                    
+
                                     <div class="guide-steps">
                                         <div class="step-item">
                                             <div class="step-number">1</div>
@@ -146,7 +155,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="step-item">
                                             <div class="step-number">2</div>
                                             <div class="step-content">
@@ -163,7 +172,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="step-item">
                                             <div class="step-number">3</div>
                                             <div class="step-content">
@@ -177,7 +186,7 @@
                                                 </ul>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="step-item">
                                             <div class="step-number">4</div>
                                             <div class="step-content">
@@ -199,7 +208,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="step-item">
                                             <div class="step-number">5</div>
                                             <div class="step-content">
@@ -218,7 +227,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="guide-footer">
                                         <div class="success-message">
                                             <i class="fas fa-trophy"></i>
@@ -227,7 +236,7 @@
                                                 <p>Después de finalizar, podrás imprimir la boleta y regresarás a este panel automáticamente.</p>
                                             </div>
                                         </div>
-                                        
+
                                         <button class="btn btn-primary btn-start-sale" id="btnIniciarVenta">
                                             <i class="fas fa-play"></i> Iniciar Nueva Venta
                                         </button>
@@ -239,36 +248,141 @@
                 </div>
             </div>
         </div>
-                                    
+
+        <!-- Modal Aperturar Caja -->
+        <div class="modal fade" id="abrirCajaModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-cash-register"></i> Aperturar Caja
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Monto Inicial</label>
+                            <input type="number" class="form-control" id="montoInicial" 
+                                   min="0" step="0.01" placeholder="Ingrese el monto inicial">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnConfirmarAbrirCaja">
+                            <i class="fas fa-check"></i> Aperturar Caja
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Cerrar Caja -->
+        <div class="modal fade" id="cerrarCajaModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-lock"></i> Finalizar Caja
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Resumen de Ventas</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Hora</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="resumenVentas">
+                                            <!-- Ventas se cargarán aquí -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-primary">
+                                                <th colspan="2">Total Ventas:</th>
+                                                <th id="totalVentas">S/. 0.00</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Monto Inicial</label>
+                                    <input type="text" class="form-control" id="montoInicialResumen" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Caja (Monto Inicial + Ventas)</label>
+                                    <input type="text" class="form-control" id="totalCaja" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label class="required">Monto Recaudado</label>
+                                    <input type="number" class="form-control" id="montoRecaudado" 
+                                           min="0" step="0.01" placeholder="Ingrese el monto recaudado">
+                                    <small class="form-text text-muted">Ingrese el monto físico que tiene en caja</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Diferencia</label>
+                                    <input type="text" class="form-control" id="diferenciaCaja" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Observaciones</label>
+                                    <textarea class="form-control" id="observacionesCaja" 
+                                              placeholder="Ingrese observaciones si hay diferencia"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnConfirmarCerrarCaja">
+                            <i class="fas fa-check"></i> Finalizar Caja
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
+        <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
+        
+
         <script>
             const AppContext = {
                 path: '${pageContext.request.contextPath}',
                 endpoints: {
-                    producto: {
-                        nuevo: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=nuevaventa'
+                    ventaPresencial: {
+                        buscarCliente: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=buscarCliente',
+                        registrarCliente: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=registrarCliente',
+                        buscarProducto: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=buscarProducto',
+                        finalizarVenta: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=finalizarVenta',
+                        generarBoleta: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=generarBoleta',
+                        ventaInicio: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=inicio',
+                        verificarEstadoCaja: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=verificarEstadoCaja',
+                        abrirCaja: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=abrirCaja',
+                        cerrarCaja: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=cerrarCaja',
+                        obtenerResumenCaja: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=obtenerResumenCaja',
+                        obtenerVentasCaja: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=obtenerVentasCaja'
+                    },
+                    cliente: {
+                        consultarDni: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarDni&dni=',
+                        consultarRuc: '${pageContext.request.contextPath}/ClienteControlador?accion=consultarRuc&ruc='
                     }
                 }
             };
-            
-            // Event listeners para los botones de nueva venta
-            document.getElementById("btnNuevoProducto").addEventListener("click", function () {
-                window.location.href = AppContext.endpoints.producto.nuevo;
-            });
-            
-            document.getElementById("btnIniciarVenta").addEventListener("click", function () {
-                window.location.href = AppContext.endpoints.producto.nuevo;
-            });
-            
-            // Animación de los pasos de la guía
-            document.addEventListener('DOMContentLoaded', function() {
-                const steps = document.querySelectorAll('.step-item');
-                steps.forEach((step, index) => {
-                    setTimeout(() => {
-                        step.style.opacity = '1';
-                        step.style.transform = 'translateY(0)';
-                    }, index * 200);
-                });
-            });
-        </script>                            
+        </script>
+        
+        <script src="${pageContext.request.contextPath}/js/ventapresencialinicio.js"></script>
     </body>
 </html>

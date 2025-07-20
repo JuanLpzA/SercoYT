@@ -289,7 +289,7 @@
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>    
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="js/funciones.js" type="text/javascript"></script>
-        <script src="js/carrito.js?v2"></script>
+        <script src="js/carrito.js?v4"></script>
        
     </body>
 </html>
