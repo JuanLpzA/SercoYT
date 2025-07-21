@@ -226,12 +226,12 @@
         <script src="${pageContext.request.contextPath}/js/jquery-3.7.1.min.js"></script>
         <script src="${pageContext.request.contextPath}/js/bootstrap.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
 
         <script src="${pageContext.request.contextPath}/js/dashboard.js"></script>
         <script>
             const AppContext = {
                 path: '${pageContext.request.contextPath}',
+                idCaja: '${sessionScope.idCaja}', 
                 endpoints: {
                     ventaPresencial: {
                         buscarCliente: '${pageContext.request.contextPath}/VentaPresencialControlador?accion=buscarCliente',

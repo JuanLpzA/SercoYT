@@ -91,7 +91,9 @@
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h4>Últimas ventas</h4>
+                        <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
                         <a href="${pageContext.request.contextPath}/ReporteControlador" class="btn-view-all">Ver todas</a>
+                        </c:if>
                     </div>
                     <div class="section-content">
                         <table class="table table-striped">
@@ -100,8 +102,11 @@
                                     <th>ID</th>
                                     <th>Fecha</th>
                                     <th>Cliente</th>
+                                    <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
                                     <th>Total</th>
+                                    </c:if>
                                     <th>Estado</th>
+                                    
                                 </tr>
                             </thead>
                             <tbody>
@@ -113,7 +118,9 @@
                                         <td><strong>#${venta.idVenta}</strong></td>
                                         <td><fmt:formatDate value="${venta.fecha}" pattern="dd/MM/yyyy HH:mm"/></td>
                                         <td>${venta.clienteNombre}</td>
+                                        <c:if test="${sessionScope.usuario.tipoUsuario == 'administrador'}">
                                         <td class="text-success font-weight-bold">S/<fmt:formatNumber value="${venta.total}" maxFractionDigits="2" minFractionDigits="2"/></td>
+                                        </c:if>
                                         <td>
                                             <span class="status-badge status-${venta.estadoNombre != null ? fn:toLowerCase(fn:replace(venta.estadoNombre, ' ', '-')) : 'sin-estado'}">
                                                 ${venta.estadoNombre != null ? venta.estadoNombre : 'Sin estado'}

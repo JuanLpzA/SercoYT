@@ -60,6 +60,10 @@
         <servlet-name>DespachoControlador</servlet-name>
         <servlet-class>com.sercoyt.controller.DespachoControlador</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CajaControlador</servlet-name>
+        <servlet-class>com.sercoyt.controller.CajaControlador</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ServletContextProvider</servlet-name>
         <url-pattern>/ServletContextProvider</url-pattern>
@@ -119,6 +123,10 @@
     <servlet-mapping>
         <servlet-name>DespachoControlador</servlet-name>
         <url-pattern>/DespachoControlador</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CajaControlador</servlet-name>
+        <url-pattern>/CajaControlador</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

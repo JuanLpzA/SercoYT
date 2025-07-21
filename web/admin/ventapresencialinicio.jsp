@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/dashboard.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ventapresencial.css">
-        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ventapresencial-inicio.css">
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ventapresencial-inicio.css?v2">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     </head>
     <body>
@@ -257,9 +257,6 @@
                         <h5 class="modal-title">
                             <i class="fas fa-cash-register"></i> Aperturar Caja
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
@@ -269,7 +266,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        
                         <button type="button" class="btn btn-primary" id="btnConfirmarAbrirCaja">
                             <i class="fas fa-check"></i> Aperturar Caja
                         </button>
@@ -286,9 +283,7 @@
                         <h5 class="modal-title">
                             <i class="fas fa-lock"></i> Finalizar Caja
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -343,7 +338,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        
                         <button type="button" class="btn btn-primary" id="btnConfirmarCerrarCaja">
                             <i class="fas fa-check"></i> Finalizar Caja
                         </button>
@@ -383,6 +378,6 @@
             };
         </script>
         
-        <script src="${pageContext.request.contextPath}/js/ventapresencialinicio.js"></script>
+        <script src="${pageContext.request.contextPath}/js/ventapresencialinicio.js?v4"></script>
     </body>
 </html>

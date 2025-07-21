@@ -53,6 +53,11 @@
                     <i class="fas fa-history"></i> Reportes
                 </a>
             </li>
+            <li class="${pageContext.request.requestURI.contains('caja') ? 'active' : ''}">
+                <a href="${pageContext.request.contextPath}/CajaControlador">
+                    <i class="fas fa-cash-register"></i> Cajas
+                </a>
+            </li>
 
             <li class="${pageContext.request.requestURI.contains('usuarios') ? 'active' : ''}">
                 <a href="${pageContext.request.contextPath}/UsuarioControlador?accion=listarAdmin">

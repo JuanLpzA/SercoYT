@@ -16,39 +16,87 @@ $(document).ready(function() {
     $('#btnConfirmarAbrirCaja').click(abrirCaja);
     $('#btnConfirmarCerrarCaja').click(cerrarCaja);
     $('#btnNuevaVenta').click(function() {
-        window.location.href = AppContext.endpoints.ventaPresencial.ventaInicio + '&nuevaVenta=true';
+        verificarEstadoCaja(function(caja) {
+            if (caja && caja.cajaAbierta) {
+                window.location.href = AppContext.endpoints.ventaPresencial.ventaInicio + '&nuevaVenta=true&idCaja=' + caja.idCaja;
+            } else {
+                mostrarError('No hay una caja abierta para realizar ventas');
+            }
+        });
+    });
+    
+    // Configurar botón de iniciar venta de la guía
+    $('#btnIniciarVenta').click(function() {
+        $('#btnNuevaVenta').click(); // Reutilizar la lógica del botón nueva venta
     });
     
     // Configurar validación de monto recaudado
     $('#montoRecaudado').on('input', calcularDiferencia);
     
     // Función para verificar estado de caja
-    function verificarEstadoCaja() {
+    function verificarEstadoCaja(callback) {
         $.ajax({
             url: AppContext.endpoints.ventaPresencial.verificarEstadoCaja,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
                 if (response.cajaAbierta) {
-                    // Caja abierta
+                    // Caja abierta - Actualizar monto total de caja
                     $('#btnAbrirCaja').hide();
                     $('#btnCerrarCaja').prop('disabled', false);
                     $('#btnNuevaVenta').prop('disabled', false);
-                    $('#montoCaja').text('S/. ' + response.montoInicial.toFixed(2));
+                    
+                    // Obtener el total real de la caja (monto inicial + ventas)
+                    obtenerMontoTotalCaja(response.idCaja, response.montoInicial);
                     
                     // Actualizar lista de ventas de esta caja
                     actualizarVentasCaja(response.idCaja);
+                    
+                    if (typeof callback === 'function') {
+                        callback({
+                            cajaAbierta: true,
+                            idCaja: response.idCaja,
+                            montoInicial: response.montoInicial
+                        });
+                    }
                 } else {
                     // Caja cerrada
                     $('#btnAbrirCaja').show();
                     $('#btnCerrarCaja').prop('disabled', true);
                     $('#btnNuevaVenta').prop('disabled', true);
                     $('#montoCaja').text('S/. 0.00');
+                    
+                    if (typeof callback === 'function') {
+                        callback({ cajaAbierta: false });
+                    }
                 }
             },
             error: function(xhr) {
                 console.error('Error al verificar estado de caja:', xhr.responseText);
                 mostrarError('Error al verificar estado de caja');
+                
+                if (typeof callback === 'function') {
+                    callback({ cajaAbierta: false });
+                }
+            }
+        });
+    }
+    
+    // Nueva función para obtener el monto total de la caja
+    function obtenerMontoTotalCaja(idCaja, montoInicial) {
+        $.ajax({
+            url: AppContext.endpoints.ventaPresencial.obtenerResumenCaja,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                const totalVentas = response.totalVentas || 0;
+                const montoTotalCaja = montoInicial + totalVentas;
+                $('#montoCaja').text('S/. ' + montoTotalCaja.toFixed(2));
+            },
+            error: function(xhr) {
+                console.error('Error al obtener monto total de caja:', xhr.responseText);
+                // Si hay error, mostrar al menos el monto inicial
+                $('#montoCaja').text('S/. ' + montoInicial.toFixed(2));
             }
         });
     }
@@ -68,14 +116,17 @@ $(document).ready(function() {
             url: AppContext.endpoints.ventaPresencial.abrirCaja,
             type: 'POST',
             data: {
-                montoInicial: montoInicial
+                montoInicial: montoInicial.toFixed(2)
             },
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
                     $('#abrirCajaModal').modal('hide');
-                    mostrarExito('Caja aperturada correctamente');
-                    verificarEstadoCaja();
+                    mostrarExito('Caja aperturada correctamente con S/.' + montoInicial.toFixed(2));
+                    $('#montoCaja').text('S/. ' + montoInicial.toFixed(2));
+                    $('#btnAbrirCaja').hide();
+                    $('#btnCerrarCaja').prop('disabled', false);
+                    $('#btnNuevaVenta').prop('disabled', false);
                 } else {
                     mostrarError(response.error || 'Error al aperturar caja');
                 }
@@ -126,7 +177,7 @@ $(document).ready(function() {
                 
                 // Calcular totales
                 const totalVentas = response.totalVentas || 0;
-                const montoInicial = parseFloat($('#montoCaja').text().replace('S/. ', ''));
+                const montoInicial = parseFloat($('#montoCaja').text().replace('S/. ', '')) - totalVentas; // Obtener solo el monto inicial
                 const totalCaja = montoInicial + totalVentas;
                 
                 $('#totalVentas').text('S/. ' + totalVentas.toFixed(2));
@@ -215,13 +266,23 @@ $(document).ready(function() {
                 if (response.success) {
                     $('#cerrarCajaModal').modal('hide');
                     
-                    if (diferencia < 0) {
-                        mostrarAdvertencia(`Caja cerrada con una diferencia de S/. ${Math.abs(diferencia).toFixed(2)}`);
-                    } else {
-                        mostrarExito('Caja cerrada correctamente');
-                    }
+                    // Mostrar mensaje de éxito o advertencia
+                    const mensaje = diferencia < 0 ? 
+                        `Caja cerrada con una diferencia de S/. ${Math.abs(diferencia).toFixed(2)}` : 
+                        'Caja cerrada correctamente';
                     
-                    verificarEstadoCaja();
+                    const tipoMensaje = diferencia < 0 ? 'warning' : 'success';
+                    
+                    Swal.fire({
+                        icon: tipoMensaje,
+                        title: diferencia < 0 ? 'Advertencia' : 'Éxito',
+                        text: mensaje,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Recargar la página después de mostrar el mensaje
+                        window.location.reload();
+                    });
                 } else {
                     mostrarError(response.error || 'Error al cerrar caja');
                 }
@@ -272,6 +333,19 @@ $(document).ready(function() {
                             </tr>
                         `);
                     });
+                    
+                    // También mostrar el empty state si no hay ventas después de la actualización
+                } else {
+                    const $emptyStateContainer = $('.left-column .table-container');
+                    if ($emptyStateContainer.find('.empty-state').length === 0) {
+                        $emptyStateContainer.html(`
+                            <div class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <h6>No hay ventas registradas</h6>
+                                <p>Comienza realizando tu primera venta presencial</p>
+                            </div>
+                        `);
+                    }
                 }
             },
             error: function(xhr) {

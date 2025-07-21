@@ -1,5 +1,6 @@
 package com.sercoyt.controller;
 
+import com.google.gson.Gson;
 import com.sercoyt.model.TipoUsuario;
 import com.sercoyt.model.Usuario;
 import com.sercoyt.model.dao.UsuarioDao;
@@ -7,6 +8,7 @@ import com.sercoyt.util.EmailUtil;
 import com.sercoyt.util.PasswordUtil;
 import com.sercoyt.util.ReniecAPI;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -100,6 +102,9 @@ public class UsuarioControlador extends HttpServlet {
                     break;
                 case "cambiarContrasenaAdmin":
                     cambiarContrasenaAdmin(request, response);
+                    break;
+                case "listarActivosCajasActivas":
+                    listarUsuariosActivosCajasActivas(request, response);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Acción no válida");
@@ -732,6 +737,32 @@ public class UsuarioControlador extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/UsuarioControlador?accion=listarAdmin&error=Error al activar usuario");
         }
     }
+    
+    private void listarUsuariosActivosCajasActivas(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        List<Usuario> usuarios = usuarioDao.listarUsuariosActivosCajasActivas();
+        
+        // Configurar respuesta como JSON
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
+        // Convertir a JSON usando Gson
+        Gson gson = new Gson();
+        String json = gson.toJson(usuarios);
+        
+        // Enviar respuesta
+        PrintWriter out = response.getWriter();
+        out.print(json);
+        out.flush();
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setContentType("application/json");
+        response.getWriter().print("{\"error\":\"Error al listar usuarios activos\"}");
+    }
+}
 
 // Método para desactivar usuario
     private void desactivarUsuarioAdmin(HttpServletRequest request, HttpServletResponse response)

@@ -90,14 +90,29 @@ public class VentaPresencialControlador extends HttpServlet {
     }
 
     private void mostrarVentaPresencial(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException {
-        List<Producto> productos = productoDao.listarActivos();
-        request.setAttribute("productos", productos);
-        request.getRequestDispatcher("/admin/ventapresencial.jsp").forward(request, response);
+    throws ServletException, IOException, SQLException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
+    
+    // Verificar si hay caja abierta
+    Caja caja = cajaDao.obtenerCajaAbierta(usuario.getIdUsuario());
+    if (caja == null) {
+        response.sendRedirect(request.getContextPath() + "/VentaPresencialControlador?accion=inicio");
+        return;
     }
     
+    // Guardar idCaja en sesión para usarlo al finalizar la venta
+    session.setAttribute("idCaja", caja.getIdCaja());
+    
+    List<Producto> productos = productoDao.listarActivos();
+    request.setAttribute("productos", productos);
+    request.getRequestDispatcher("/admin/ventapresencial.jsp").forward(request, response);
+}
+    
     private void mostrarVentaInicio(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException, SQLException {
+    throws ServletException, IOException, SQLException {
+    HttpSession session = request.getSession();
+    Usuario usuario = (Usuario) session.getAttribute("usuario");
     
     // Verificar si viene el parámetro nuevaVenta
     String nuevaVenta = request.getParameter("nuevaVenta");
@@ -107,11 +122,16 @@ public class VentaPresencialControlador extends HttpServlet {
         return;
     }
     
-    // Código original para mostrar la página de inicio
-    List<Producto> productos = productoDao.listarActivos();
-    List<VentaExtra> ventasPresenciales = reporteDao.listarVentasPresencialesEntregadas(8);
-
-    request.setAttribute("productos", productos);
+    // Obtener caja abierta si existe
+    Caja caja = cajaDao.obtenerCajaAbierta(usuario.getIdUsuario());
+    List<VentaExtra> ventasPresenciales = new ArrayList<>();
+    
+    if (caja != null) {
+        // Mostrar solo ventas de esta caja
+        ventasPresenciales = cajaDao.obtenerVentasDeCaja(caja.getIdCaja());
+        session.setAttribute("idCaja", caja.getIdCaja());
+    }
+    
     request.setAttribute("ventas", ventasPresenciales);
     request.getRequestDispatcher("/admin/ventapresencialinicio.jsp").forward(request, response);
 }
@@ -211,7 +231,7 @@ public class VentaPresencialControlador extends HttpServlet {
         return;
     }
     
-    if (idCaja == null) {
+    if (idCaja == null || idCaja <= 0) {
         enviarErrorJson(response, "No hay una caja abierta para registrar la venta");
         return;
     }
@@ -267,7 +287,7 @@ public class VentaPresencialControlador extends HttpServlet {
     int idVenta = ventaDao.registrarVenta(venta, detalles);
     
     if (idVenta > 0) {
-        CajaDao cajaDao = new CajaDao();
+        
         cajaDao.registrarVentaEnCaja(idCaja, idVenta);
     }
     // Generar respuesta
@@ -426,11 +446,15 @@ private void verificarEstadoCaja(HttpServletRequest request, HttpServletResponse
     HttpSession session = request.getSession();
     Usuario usuario = (Usuario) session.getAttribute("usuario");
     
+    if (usuario == null) {
+        enviarErrorJson(response, "Usuario no autenticado");
+        return;
+    }
+
     try {
-        CajaDao cajaDao = new CajaDao();
         Caja caja = cajaDao.obtenerCajaAbierta(usuario.getIdUsuario());
-        
         JSONObject respuesta = new JSONObject();
+        
         if (caja != null) {
             respuesta.put("cajaAbierta", true);
             respuesta.put("idCaja", caja.getIdCaja());
@@ -438,6 +462,7 @@ private void verificarEstadoCaja(HttpServletRequest request, HttpServletResponse
             session.setAttribute("idCaja", caja.getIdCaja());
         } else {
             respuesta.put("cajaAbierta", false);
+            session.removeAttribute("idCaja");
         }
         
         response.setContentType("application/json");

@@ -542,6 +542,40 @@ public class UsuarioDao {
             closeResources(con, ps, null);
         }
     }
+    
+    // Agregar este método en la clase UsuarioDao
+public List<Usuario> listarUsuariosActivosCajasActivas() {
+    List<Usuario> usuarios = new ArrayList<>();
+    String SQL_SELECT_ACTIVOS = "SELECT DISTINCT u.*, t.nombre as tipoNombre FROM usuarios u " +
+                                "JOIN tipousuario t ON u.idTipoUsuario = t.idTipoUsuario " +
+                                "JOIN caja c ON u.idUsuario = c.idUsuario " +
+                                "WHERE u.estadoUsuario = 'activo' " +
+                                "AND u.idTipoUsuario != 3 " +
+                                "ORDER BY u.nombre, u.apellido";
+    
+    try (Connection conn = ConnectDB.getConnection(); 
+         PreparedStatement stmt = conn.prepareStatement(SQL_SELECT_ACTIVOS); 
+         ResultSet rs = stmt.executeQuery()) {
+        
+        while (rs.next()) {
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(rs.getInt("idUsuario"));
+            usuario.setNombre(rs.getString("nombre"));
+            usuario.setApellido(rs.getString("apellido"));
+            usuario.setCorreo(rs.getString("correo"));
+            usuario.setDni(rs.getString("dni"));
+            usuario.setTelefono(rs.getString("telefono"));
+            usuario.setDireccion(rs.getString("direccion"));
+            usuario.setTipoUsuario(rs.getString("tipoNombre"));
+            usuario.setEstado(rs.getString("estadoUsuario"));
+            usuarios.add(usuario);
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        throw new RuntimeException("Error al listar usuarios activos: " + ex.getMessage());
+    }
+    return usuarios;
+}
 
     private void closeResources(Connection con, PreparedStatement ps, ResultSet rs) {
         try {
